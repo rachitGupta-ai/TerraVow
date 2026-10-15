@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: terravow
+
+# TerraVow config namespace. Behaviour is config-gated and defaults to safe,
+# behaviour-preserving values. Populated incrementally by later tasks.
+terravow:
+  llm:
+    pro-model: gemini-3.1-pro   # Pro tier: deep reasoning/planning (Req 11.1, 12.1)
+    flash-model: gemini-flash   # Flash tier: high-volume classification (Req 11.1, 12.1)
+  reasoning:
+    retry-limit: 3          # clamped 1..5 (Req 11.4)
+  certification:
+    min-observation-period-days: 90
+  audit:
+    retention-years: 7       # Req 10.4
