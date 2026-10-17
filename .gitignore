@@ -38,3 +38,5 @@ __pycache__/
 .hypothesis/
 ### Agent working artifacts ###
 .agents/
+### Meeting transcripts (not for the public repo) ###
+meeting-transcripts/
