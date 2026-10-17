@@ -1,0 +1,1286 @@
+{
+ "base_template_id": "base-metals-1",
+ "industry": "metals",
+ "template": {
+  "machine_profile": {
+   "summary": "Generic template for steel and foundry heat-treatment and melting equipment: walking-beam reheating furnaces, induction and electric-arc melting, cupolas, sinter strands and quench systems.",
+   "typical_duty": "Continuous 24-hour operation at 900 to 1,650 C with campaign shutdowns; melt shops cycle by heat or tap.",
+   "key_components": [
+    "Burners and recuperator",
+    "Furnace doors and seals",
+    "Hearth and wall refractory",
+    "Walking beams and skid pipes",
+    "Electrodes and regulator",
+    "Induction coil and cooling water",
+    "Baghouse and fume extraction",
+    "Combustion-air fan",
+    "Quench and scale-pit water system",
+    "Slag handling"
+   ],
+   "specs": []
+  },
+  "operating_parameters": [
+   {
+    "id": "zone-temp",
+    "label": "Furnace zone temperature",
+    "unit": "C",
+    "typical_range": "1,100 to 1,280 (reheat)",
+    "why_it_matters": "Overheating wastes fuel and grows scale; underheating causes mill cobbles."
+   },
+   {
+    "id": "furnace-pressure",
+    "label": "Furnace pressure",
+    "unit": "Pa",
+    "typical_range": "+5 to +15",
+    "why_it_matters": "Negative pressure pulls cold air in through doors and leaks."
+   },
+   {
+    "id": "excess-air",
+    "label": "Excess combustion air",
+    "unit": "%",
+    "typical_range": "5 to 15",
+    "why_it_matters": "Each 10% extra excess air costs about 2 to 4% fuel."
+   },
+   {
+    "id": "recuperator-outlet",
+    "label": "Combustion air temperature after the recuperator",
+    "unit": "C",
+    "typical_range": "350 to 550",
+    "why_it_matters": "A drop means recuperator fouling or leaks and lost heat recovery."
+   },
+   {
+    "id": "discharge-temp",
+    "label": "Steel discharge temperature",
+    "unit": "C",
+    "typical_range": "1,150 to 1,250",
+    "why_it_matters": "Temperature spread across the billet affects rolling quality."
+   },
+   {
+    "id": "cooling-water-flow",
+    "label": "Skid or coil cooling-water flow",
+    "unit": "m3/h",
+    "typical_range": "Per design",
+    "why_it_matters": "Low flow risks skid-pipe or coil failure."
+   },
+   {
+    "id": "coil-water-temp",
+    "label": "Induction coil water outlet temperature",
+    "unit": "C",
+    "typical_range": "Below 55",
+    "why_it_matters": "High outlet temperature signals scaling or low flow."
+   },
+   {
+    "id": "baghouse-dp",
+    "label": "Baghouse differential pressure",
+    "unit": "mbar",
+    "typical_range": "10 to 18",
+    "why_it_matters": "High dP means blinded bags; a sudden drop means a burst bag."
+   },
+   {
+    "id": "fuel-per-tonne",
+    "label": "Specific fuel consumption",
+    "unit": "GJ per tonne",
+    "typical_range": "1.2 to 1.8 (reheat)",
+    "why_it_matters": "The main energy and CO2 indicator."
+   }
+  ],
+  "job_types": [
+   {
+    "id": "door-seal-rebuild",
+    "name": "Furnace door seal and jamb rebuild",
+    "trigger": "Visible flame or air ingress at the doors, or each campaign stop",
+    "schedule": "At every campaign stop",
+    "checklist": [
+     "Inspect the door jambs and the sealing faces",
+     "Replace the ceramic-fibre rope and the seal blocks",
+     "Adjust the door lowering stops",
+     "Check the furnace pressure control after restart"
+    ],
+    "parts_and_tools": [
+     "Ceramic-fibre rope",
+     "Seal blocks",
+     "Door hoist chain"
+    ],
+    "safety_and_permit_notes": [
+     "Hot-work permit if cutting, welding or grinding",
+     "Heat-resistant gloves and face shield; allow cooling to below 50 C",
+     "Ceramic-fibre dust: use a respirator"
+    ],
+    "est_downtime_hours": 10.0,
+    "est_cost_band": {
+     "low_inr": 60000,
+     "high_inr": 250000
+    }
+   },
+   {
+    "id": "recuperator-repair",
+    "name": "Recuperator inspection and tube repair",
+    "trigger": "Combustion-air temperature down 50 C, or annually",
+    "schedule": "Annual",
+    "checklist": [
+     "Cool and isolate the recuperator",
+     "Inspect the tubes by borescope",
+     "Plug or replace leaking tubes",
+     "Clean deposits",
+     "Leak-test with air"
+    ],
+    "parts_and_tools": [
+     "Borescope",
+     "Tube plugs",
+     "Expansion joints"
+    ],
+    "safety_and_permit_notes": [
+     "Confined-space entry permit, gas test and standby attendant",
+     "Hot-work permit if cutting, welding or grinding"
+    ],
+    "est_downtime_hours": 48.0,
+    "est_cost_band": {
+     "low_inr": 300000,
+     "high_inr": 1500000
+    }
+   },
+   {
+    "id": "refractory-gunning",
+    "name": "Hearth and wall refractory gunning",
+    "trigger": "Shell hot spots or hearth erosion at inspection",
+    "schedule": "Each campaign",
+    "checklist": [
+     "Map hot spots with a thermal camera",
+     "Remove slag build-up",
+     "Gun or cast the refractory in the eroded zones",
+     "Follow a controlled dry-out curve"
+    ],
+    "parts_and_tools": [
+     "Gunning machine",
+     "Monolithic refractory",
+     "Thermal camera"
+    ],
+    "safety_and_permit_notes": [
+     "Confined-space entry permit, gas test and standby attendant",
+     "Dust and silica exposure control"
+    ],
+    "est_downtime_hours": 72.0,
+    "est_cost_band": {
+     "low_inr": 400000,
+     "high_inr": 2500000
+    }
+   },
+   {
+    "id": "beam-alignment",
+    "name": "Walking-beam and skid alignment check",
+    "trigger": "Billet tracking problems or quarterly",
+    "schedule": "Quarterly",
+    "checklist": [
+     "Survey the beam levels",
+     "Check the hydraulic lift and travel cylinders",
+     "Inspect the skid riders and the insulation",
+     "Re-shim as required"
+    ],
+    "parts_and_tools": [
+     "Laser level",
+     "Shims",
+     "Skid riders"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Hydraulic stored-energy release"
+    ],
+    "est_downtime_hours": 24.0,
+    "est_cost_band": {
+     "low_inr": 150000,
+     "high_inr": 800000
+    }
+   },
+   {
+    "id": "electrode-system-service",
+    "name": "Electrode regulator and arm service",
+    "trigger": "Arc instability or regulator alarms",
+    "schedule": "Monthly",
+    "checklist": [
+     "Check the regulator hydraulics",
+     "Inspect the electrode clamps and contact pads",
+     "Verify the current transformer signals",
+     "Test the regulator response"
+    ],
+    "parts_and_tools": [
+     "Contact pads",
+     "Hydraulic seals",
+     "Test meter"
+    ],
+    "safety_and_permit_notes": [
+     "High-voltage isolation and earthing",
+     "Permit to work on the furnace transformer"
+    ],
+    "est_downtime_hours": 8.0,
+    "est_cost_band": {
+     "low_inr": 80000,
+     "high_inr": 400000
+    }
+   },
+   {
+    "id": "coil-cooling-service",
+    "name": "Induction coil cooling-water service",
+    "trigger": "Coil outlet temperature high, or quarterly",
+    "schedule": "Quarterly",
+    "checklist": [
+     "Check the water conductivity and the flow",
+     "Flush or descale the coil circuits",
+     "Inspect the hoses and the coil insulation",
+     "Pressure-test the circuit"
+    ],
+    "parts_and_tools": [
+     "Conductivity meter",
+     "Descaling solution",
+     "Hoses"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Never test with molten metal in the furnace"
+    ],
+    "est_downtime_hours": 8.0,
+    "est_cost_band": {
+     "low_inr": 50000,
+     "high_inr": 300000
+    }
+   },
+   {
+    "id": "baghouse-maintenance",
+    "name": "Baghouse and fume-extraction maintenance",
+    "trigger": "dP out of range, visible emission, or monthly",
+    "schedule": "Monthly",
+    "checklist": [
+     "Check the pulse-jet valves",
+     "Locate burst bags with a dye or particle test",
+     "Replace damaged bags and cages",
+     "Verify the fan damper and duct leaks"
+    ],
+    "parts_and_tools": [
+     "Filter bags",
+     "Cages",
+     "Pulse valve diaphragms"
+    ],
+    "safety_and_permit_notes": [
+     "Confined-space entry permit, gas test and standby attendant",
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Dust exposure: respirator"
+    ],
+    "est_downtime_hours": 12.0,
+    "est_cost_band": {
+     "low_inr": 100000,
+     "high_inr": 600000
+    }
+   },
+   {
+    "id": "burner-ratio-tune",
+    "name": "Burner air-fuel ratio tuning",
+    "trigger": "Excess air outside the band, or quarterly",
+    "schedule": "Quarterly",
+    "checklist": [
+     "Calibrate the flow meters",
+     "Tune the ratio per zone with a flue-gas analyser",
+     "Check the burner tiles",
+     "Record specific fuel consumption before and after"
+    ],
+    "parts_and_tools": [
+     "Flue-gas analyser",
+     "Flow calibrator"
+    ],
+    "safety_and_permit_notes": [
+     "Gas-train isolation and leak test",
+     "Heat-resistant gloves and face shield; allow cooling to below 50 C"
+    ],
+    "est_downtime_hours": 8.0,
+    "est_cost_band": {
+     "low_inr": 40000,
+     "high_inr": 200000
+    }
+   },
+   {
+    "id": "fan-service",
+    "name": "Combustion-air and extraction fan service",
+    "trigger": "Vibration above 7 mm/s, or half-yearly",
+    "schedule": "Half-yearly",
+    "checklist": [
+     "Measure the vibration",
+     "Clean and balance the impeller",
+     "Check the bearings and the coupling",
+     "Inspect the inlet vanes"
+    ],
+    "parts_and_tools": [
+     "Vibration meter",
+     "Bearings",
+     "Balancing weights"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 30000,
+     "high_inr": 150000
+    }
+   },
+   {
+    "id": "quench-water-treatment",
+    "name": "Quench and scale-pit water treatment",
+    "trigger": "Oil sheen or suspended solids above limits, or weekly",
+    "schedule": "Weekly",
+    "checklist": [
+     "Skim oil from the scale pit",
+     "Remove settled scale",
+     "Check the oil separator",
+     "Test the recirculated water for oil and suspended solids"
+    ],
+    "parts_and_tools": [
+     "Oil skimmer",
+     "Sample bottles",
+     "Grab bucket"
+    ],
+    "safety_and_permit_notes": [
+     "Slippery edges: fall protection near the pit",
+     "Oily waste goes to an authorised handler"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 20000,
+     "high_inr": 120000
+    }
+   },
+   {
+    "id": "slag-area-cleanup",
+    "name": "Slag handling and spill clean-up",
+    "trigger": "Spill outside the slag bay, or each shift",
+    "schedule": "Each shift",
+    "checklist": [
+     "Barricade the area",
+     "Allow the slag to solidify",
+     "Collect it into the designated slag bay",
+     "Record the quantity and the disposal route"
+    ],
+    "parts_and_tools": [
+     "Loader",
+     "Water spray",
+     "Barricade tape"
+    ],
+    "safety_and_permit_notes": [
+     "Molten slag explosion risk with water: never quench uncontrolled",
+     "Heat-resistant gloves and face shield; allow cooling to below 50 C"
+    ],
+    "est_downtime_hours": 4.0,
+    "est_cost_band": {
+     "low_inr": 15000,
+     "high_inr": 100000
+    }
+   }
+  ],
+  "snag_types": [
+   {
+    "id": "door-seal",
+    "name": "Door seal air ingress",
+    "category": "structural",
+    "symptoms": [
+     "Cold air drawn in at the door jambs",
+     "Flame or glow visible around a closed door",
+     "Furnace pressure going negative and zone temperature falling"
+    ],
+    "root_causes": [
+     "Worn ceramic-fibre rope",
+     "Door warping",
+     "Jamb refractory damage"
+    ],
+    "detection_method": "Visual check at each door and the furnace-pressure trend; thermal image of the door frame",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of door seal air ingress: cold air drawn in at the door jambs noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: cold air drawn in at the door jambs confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: flame or glow visible around a closed door; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: furnace pressure going negative and zone temperature falling; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the zone temperature cannot be held or the door structure is cracked"
+     }
+    ],
+    "immediate_action": "Lower the door fully, raise the furnace pressure set-point slightly, and book a seal rebuild",
+    "recommended_job_id": "door-seal-rebuild",
+    "time_to_fix_hours": 10.0,
+    "parts": [
+     "Ceramic-fibre rope",
+     "Seal blocks"
+    ],
+    "safety_hazards": [
+     "Radiant heat",
+     "Flame roll-out"
+    ],
+    "escalation_criteria": "Escalate if the zone temperature cannot be held or the door structure is cracked",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Air ingress raises fuel use and CO2 per tonne and increases scale."
+     },
+     {
+      "domain": "soil",
+      "effect": "More scale means more mill scale and refractory waste to dispose of."
+     }
+    ]
+   },
+   {
+    "id": "recuperator-leak",
+    "name": "Recuperator leak",
+    "category": "thermal",
+    "symptoms": [
+     "Combustion-air temperature lower than normal",
+     "Rising fuel per tonne",
+     "Visible leak, noise or flue gas in the air duct"
+    ],
+    "root_causes": [
+     "Tube corrosion",
+     "Thermal fatigue",
+     "Expansion-joint failure"
+    ],
+    "detection_method": "Combustion-air temperature trend and a pressure test at the stop",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of recuperator leak: combustion-air temperature lower than normal noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: combustion-air temperature lower than normal confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: rising fuel per tonne; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: visible leak, noise or flue gas in the air duct; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the air temperature falls more than 100 C or flue gas reaches the air side"
+     }
+    ],
+    "immediate_action": "Reduce the firing rate to protect the tubes and plan an inspection",
+    "recommended_job_id": "recuperator-repair",
+    "time_to_fix_hours": 48.0,
+    "parts": [
+     "Tubes",
+     "Expansion joints"
+    ],
+    "safety_hazards": [
+     "Hot flue gas",
+     "Confined space"
+    ],
+    "escalation_criteria": "Escalate if the air temperature falls more than 100 C or flue gas reaches the air side",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Lost heat recovery raises fuel use, CO2 and NOx."
+     }
+    ]
+   },
+   {
+    "id": "hearth-refractory-erosion",
+    "name": "Hearth refractory erosion",
+    "category": "structural",
+    "symptoms": [
+     "Shell hot spots",
+     "Slag pooling on the hearth",
+     "Exposed anchors or a shell temperature above 250 C"
+    ],
+    "root_causes": [
+     "Slag attack",
+     "Mechanical damage from billets",
+     "Thermal cycling"
+    ],
+    "detection_method": "Monthly thermal-camera shell scan and inspection at the campaign stop",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of hearth refractory erosion: shell hot spots noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: shell hot spots confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: slag pooling on the hearth; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: exposed anchors or a shell temperature above 250 c; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the shell exceeds 300 C anywhere"
+     }
+    ],
+    "immediate_action": "Lower the zone temperature near the hot spot and schedule gunning",
+    "recommended_job_id": "refractory-gunning",
+    "time_to_fix_hours": 72.0,
+    "parts": [
+     "Monolithic refractory"
+    ],
+    "safety_hazards": [
+     "Shell burn-through",
+     "Silica dust"
+    ],
+    "escalation_criteria": "Escalate if the shell exceeds 300 C anywhere",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Heat loss raises fuel use."
+     },
+     {
+      "domain": "soil",
+      "effect": "Spent refractory is a solid waste stream."
+     }
+    ]
+   },
+   {
+    "id": "walking-beam-misalignment",
+    "name": "Walking-beam misalignment",
+    "category": "mechanical",
+    "symptoms": [
+     "Billets skewing on the beams",
+     "Uneven discharge temperature",
+     "Billet jam or beam stalls"
+    ],
+    "root_causes": [
+     "Hydraulic cylinder wear",
+     "Skid rider wear",
+     "Foundation settlement"
+    ],
+    "detection_method": "Billet tracking camera and the beam-level survey",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of walking-beam misalignment: billets skewing on the beams noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: billets skewing on the beams confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: uneven discharge temperature; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: billet jam or beam stalls; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if a billet jams inside the furnace"
+     }
+    ],
+    "immediate_action": "Slow the beam cycle and watch the billet position",
+    "recommended_job_id": "beam-alignment",
+    "time_to_fix_hours": 24.0,
+    "parts": [
+     "Skid riders",
+     "Hydraulic seals"
+    ],
+    "safety_hazards": [
+     "Hydraulic stored energy",
+     "Hot billets"
+    ],
+    "escalation_criteria": "Escalate if a billet jams inside the furnace",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Longer residence time wastes fuel."
+     },
+     {
+      "domain": "soil",
+      "effect": "Rejected billets become scrap and scale."
+     }
+    ]
+   },
+   {
+    "id": "skid-insulation-loss",
+    "name": "Skid-pipe insulation loss",
+    "category": "thermal",
+    "symptoms": [
+     "Dark skid marks on the billets",
+     "Cooling-water heat pick-up rising",
+     "Bare skid pipes visible through the peep door"
+    ],
+    "root_causes": [
+     "Insulation spalling",
+     "Mechanical impact",
+     "Poor anchoring"
+    ],
+    "detection_method": "Cooling-water temperature rise across the skids and peep-door inspection",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of skid-pipe insulation loss: dark skid marks on the billets noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: dark skid marks on the billets confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: cooling-water heat pick-up rising; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: bare skid pipes visible through the peep door; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the water outlet temperature approaches the boiling margin"
+     }
+    ],
+    "immediate_action": "Log the extra water heat load and plan re-insulation at the stop",
+    "recommended_job_id": "beam-alignment",
+    "time_to_fix_hours": 24.0,
+    "parts": [
+     "Skid insulation tiles"
+    ],
+    "safety_hazards": [
+     "Hot surfaces"
+    ],
+    "escalation_criteria": "Escalate if the water outlet temperature approaches the boiling margin",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Heat lost to cooling water raises fuel use and CO2."
+     }
+    ]
+   },
+   {
+    "id": "electrode-regulator-fault",
+    "name": "Electrode regulator fault",
+    "category": "electrical",
+    "symptoms": [
+     "Arc current swinging",
+     "Higher electrode consumption per heat",
+     "Electrode breakage or regulator trips"
+    ],
+    "root_causes": [
+     "Hydraulic valve wear",
+     "Signal noise",
+     "Clamp contact problems"
+    ],
+    "detection_method": "Arc current and power trends; electrode consumption per tonne",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of electrode regulator fault: arc current swinging noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: arc current swinging confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: higher electrode consumption per heat; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: electrode breakage or regulator trips; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if an electrode breaks or the arc is lost repeatedly"
+     }
+    ],
+    "immediate_action": "Switch to the backup regulation mode if available and call the electrical team",
+    "recommended_job_id": "electrode-system-service",
+    "time_to_fix_hours": 8.0,
+    "parts": [
+     "Contact pads",
+     "Servo valve"
+    ],
+    "safety_hazards": [
+     "High voltage",
+     "Arc flash"
+    ],
+    "escalation_criteria": "Escalate if an electrode breaks or the arc is lost repeatedly",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Unstable arcs raise power use and fume generation."
+     }
+    ]
+   },
+   {
+    "id": "induction-coil-water-leak",
+    "name": "Induction coil cooling-water leak",
+    "category": "hydraulic_pneumatic",
+    "symptoms": [
+     "Water drops at the coil hoses",
+     "Coil outlet temperature above 55 C",
+     "Water near molten metal or a ground-fault alarm"
+    ],
+    "root_causes": [
+     "Hose ageing",
+     "Coil insulation damage",
+     "Scaling and hot spots"
+    ],
+    "detection_method": "Coil outlet temperature, flow switch alarms and a visual check of the hoses",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of induction coil cooling-water leak: water drops at the coil hoses noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: water drops at the coil hoses confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: coil outlet temperature above 55 c; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: water near molten metal or a ground-fault alarm; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate immediately if water is near the melt"
+     }
+    ],
+    "immediate_action": "If water may reach molten metal, stop power and evacuate the platform; otherwise reduce power and call maintenance",
+    "recommended_job_id": "coil-cooling-service",
+    "time_to_fix_hours": 8.0,
+    "parts": [
+     "Hoses",
+     "Clamps"
+    ],
+    "safety_hazards": [
+     "Steam explosion with molten metal",
+     "Electrical shock"
+    ],
+    "escalation_criteria": "Escalate immediately if water is near the melt",
+    "pollution_effects": [
+     {
+      "domain": "water",
+      "effect": "Contaminated cooling water may be discharged."
+     },
+     {
+      "domain": "air",
+      "effect": "Extra power use from scaled coils."
+     }
+    ]
+   },
+   {
+    "id": "baghouse-bag-burst",
+    "name": "Baghouse bag burst",
+    "category": "emissions_control",
+    "symptoms": [
+     "Sudden drop in baghouse dP",
+     "Visible dust at the stack",
+     "Dust deposits around the stack and the yard"
+    ],
+    "root_causes": [
+     "Bag ageing",
+     "Spark carry-over",
+     "Pulse valve fault"
+    ],
+    "detection_method": "Stack opacity check and the baghouse dP trend; a particle counter if fitted",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of baghouse bag burst: sudden drop in baghouse dp noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: sudden drop in baghouse dp confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: visible dust at the stack; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: dust deposits around the stack and the yard; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate at once if the stack opacity is visible or a permit limit is at risk"
+     }
+    ],
+    "immediate_action": "Isolate the affected compartment if possible and inform EHS",
+    "recommended_job_id": "baghouse-maintenance",
+    "time_to_fix_hours": 12.0,
+    "parts": [
+     "Filter bags",
+     "Cages"
+    ],
+    "safety_hazards": [
+     "Dust exposure",
+     "Confined space"
+    ],
+    "escalation_criteria": "Escalate at once if the stack opacity is visible or a permit limit is at risk",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Particulate emissions above permit limits."
+     },
+     {
+      "domain": "soil",
+      "effect": "Dust deposits on surrounding land."
+     }
+    ]
+   },
+   {
+    "id": "burner-ratio-drift",
+    "name": "Burner air-fuel ratio drift",
+    "category": "instrumentation_control",
+    "symptoms": [
+     "Excess air outside 5 to 15%",
+     "Flame colour change",
+     "CO alarms or soot"
+    ],
+    "root_causes": [
+     "Flow meter drift",
+     "Damper linkage wear",
+     "Fuel pressure changes"
+    ],
+    "detection_method": "Flue-gas O2 and CO per zone against the tuning record",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of burner air-fuel ratio drift: excess air outside 5 to 15% noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: excess air outside 5 to 15% confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: flame colour change; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: co alarms or soot; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if CO stays above 400 ppm"
+     }
+    ],
+    "immediate_action": "Put the zone in manual and set the ratio from a portable analyser",
+    "recommended_job_id": "burner-ratio-tune",
+    "time_to_fix_hours": 8.0,
+    "parts": [
+     "Damper linkage",
+     "Flow transmitter"
+    ],
+    "safety_hazards": [
+     "Gas leaks"
+    ],
+    "escalation_criteria": "Escalate if CO stays above 400 ppm",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "More fuel per tonne raises CO2 and NOx."
+     }
+    ]
+   },
+   {
+    "id": "combustion-fan-vibration",
+    "name": "Combustion-air fan vibration",
+    "category": "mechanical",
+    "symptoms": [
+     "Rising vibration",
+     "Bearing noise",
+     "Air-flow fluctuation and burner trips"
+    ],
+    "root_causes": [
+     "Impeller dust build-up",
+     "Bearing wear",
+     "Misalignment"
+    ],
+    "detection_method": "Vibration measurement on both bearings",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of combustion-air fan vibration: rising vibration noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: rising vibration confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: bearing noise; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: air-flow fluctuation and burner trips; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate above 11 mm/s or a hot bearing"
+     }
+    ],
+    "immediate_action": "Reduce the fan speed if allowed and plan a service",
+    "recommended_job_id": "fan-service",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Bearings",
+     "Coupling"
+    ],
+    "safety_hazards": [
+     "Rotating parts"
+    ],
+    "escalation_criteria": "Escalate above 11 mm/s or a hot bearing",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Unstable air supply causes incomplete combustion."
+     }
+    ]
+   },
+   {
+    "id": "quench-water-contamination",
+    "name": "Quench water contamination",
+    "category": "process_chemical",
+    "symptoms": [
+     "Oil sheen on the scale pit",
+     "Turbid recirculated water",
+     "Oily water overflowing to the drain"
+    ],
+    "root_causes": [
+     "Hydraulic oil leaks",
+     "Separator failure",
+     "Scale build-up"
+    ],
+    "detection_method": "Daily visual check of the pit and a weekly oil-in-water test",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of quench water contamination: oil sheen on the scale pit noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: oil sheen on the scale pit confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: turbid recirculated water; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: oily water overflowing to the drain; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if oily water leaves the site boundary"
+     }
+    ],
+    "immediate_action": "Deploy absorbent booms and stop any overflow to the drain",
+    "recommended_job_id": "quench-water-treatment",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Absorbent booms",
+     "Skimmer belt"
+    ],
+    "safety_hazards": [
+     "Slips",
+     "Fall into the pit"
+    ],
+    "escalation_criteria": "Escalate if oily water leaves the site boundary",
+    "pollution_effects": [
+     {
+      "domain": "water",
+      "effect": "Oil and suspended solids in the discharge."
+     },
+     {
+      "domain": "soil",
+      "effect": "Oily scale is a contaminated solid waste."
+     }
+    ]
+   },
+   {
+    "id": "slag-handling-spill",
+    "name": "Slag handling spill",
+    "category": "other",
+    "symptoms": [
+     "Slag outside the designated bay",
+     "Slag spread onto bare ground",
+     "Molten slag near water or a cable trench"
+    ],
+    "root_causes": [
+     "Overfilled slag pot",
+     "Pot handling error",
+     "Bay wall damage"
+    ],
+    "detection_method": "Shift inspection of the slag route and the bay",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of slag handling spill: slag outside the designated bay noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: slag outside the designated bay confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: slag spread onto bare ground; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: molten slag near water or a cable trench; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if slag reaches bare soil outside the paved area"
+     }
+    ],
+    "immediate_action": "Barricade, let it solidify, and collect into the bay",
+    "recommended_job_id": "slag-area-cleanup",
+    "time_to_fix_hours": 4.0,
+    "parts": [
+     "Bay wall blocks"
+    ],
+    "safety_hazards": [
+     "Molten slag",
+     "Explosion with water"
+    ],
+    "escalation_criteria": "Escalate if slag reaches bare soil outside the paved area",
+    "pollution_effects": [
+     {
+      "domain": "soil",
+      "effect": "Slag on unpaved ground leaches metals into soil."
+     },
+     {
+      "domain": "water",
+      "effect": "Run-off from the slag area carries fines."
+     }
+    ]
+   },
+   {
+    "id": "tuyere-blockage",
+    "name": "Cupola tuyere blockage",
+    "category": "thermal",
+    "symptoms": [
+     "Uneven blast distribution",
+     "Lower tapping temperature",
+     "Tuyere fully blocked or burning back"
+    ],
+    "root_causes": [
+     "Slag freezing at the tuyere",
+     "Coke size variation",
+     "Low blast pressure"
+    ],
+    "detection_method": "Tuyere sight-glass inspection each hour and the blast pressure trend",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of cupola tuyere blockage: uneven blast distribution noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: uneven blast distribution confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: lower tapping temperature; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: tuyere fully blocked or burning back; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if two or more tuyeres are blocked"
+     }
+    ],
+    "immediate_action": "Rod the tuyere if safe and check the blast pressure",
+    "recommended_job_id": "burner-ratio-tune",
+    "time_to_fix_hours": 3.0,
+    "parts": [
+     "Tuyere sight glass"
+    ],
+    "safety_hazards": [
+     "Molten metal",
+     "CO exposure"
+    ],
+    "escalation_criteria": "Escalate if two or more tuyeres are blocked",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Poor combustion raises CO and coke per tonne."
+     }
+    ]
+   }
+  ],
+  "pollutant_capture": [
+   {
+    "id": "stack-opacity",
+    "label": "Stack appearance",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Clear",
+     "Light haze",
+     "Visible dust plume",
+     "Dense plume"
+    ],
+    "help_text": "Look at the stack exit against the sky.",
+    "domain": "air"
+   },
+   {
+    "id": "dust-capture-status",
+    "label": "Fume or dust capture",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Working normally",
+     "Reduced suction",
+     "Visible fugitive fume",
+     "Not working"
+    ],
+    "help_text": "Is the extraction hood capturing the fume?",
+    "domain": "air"
+   },
+   {
+    "id": "slag-disposal-route",
+    "label": "Slag or scale disposal route",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Designated slag bay",
+     "Sold for re-use",
+     "Temporary heap on paved ground",
+     "Unpaved ground"
+    ],
+    "help_text": "Where the slag or scale went.",
+    "domain": "soil"
+   },
+   {
+    "id": "slag-spill-area",
+    "label": "Slag or scale spill area",
+    "type": "text",
+    "required": false,
+    "max_length": 60,
+    "options": null,
+    "help_text": "Approximate area in square metres.",
+    "domain": "soil"
+   },
+   {
+    "id": "quench-oil-sheen",
+    "label": "Quench or scale-pit water",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Clear",
+     "Light sheen",
+     "Visible oil layer",
+     "Overflowing"
+    ],
+    "help_text": "Look at the pit surface.",
+    "domain": "water"
+   },
+   {
+    "id": "scale-pit-discharge",
+    "label": "Water discharged off-site",
+    "type": "text",
+    "required": false,
+    "max_length": 60,
+    "options": null,
+    "help_text": "Estimated volume in cubic metres, if any.",
+    "domain": "water"
+   }
+  ],
+  "form_fields": [
+   {
+    "id": "machine-state",
+    "label": "Machine state when noticed",
+    "type": "dropdown",
+    "required": true,
+    "max_length": null,
+    "options": [
+     "Running normally",
+     "Running at reduced load",
+     "Stopped",
+     "Tripped"
+    ],
+    "help_text": "What the machine was doing when the snag was seen.",
+    "domain": null
+   },
+   {
+    "id": "shift",
+    "label": "Shift",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Morning",
+     "Evening",
+     "Night",
+     "General"
+    ],
+    "help_text": "Shift during which the snag was noticed.",
+    "domain": null
+   },
+   {
+    "id": "observed-by",
+    "label": "Observed by",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Operator",
+     "Fitter / mechanic",
+     "Electrician",
+     "Instrument technician",
+     "Supervisor",
+     "EHS officer"
+    ],
+    "help_text": "Trade of the person reporting (no names).",
+    "domain": null
+   },
+   {
+    "id": "hours-since-service",
+    "label": "Operating hours since last service",
+    "type": "text",
+    "required": false,
+    "max_length": 12,
+    "options": null,
+    "help_text": "Approximate number from the log book; leave blank if unknown.",
+    "domain": null
+   },
+   {
+    "id": "furnace-zone",
+    "label": "Area of the furnace",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Charging end",
+     "Preheat zone",
+     "Heating zone",
+     "Soaking zone",
+     "Discharge end",
+     "Auxiliaries"
+    ],
+    "help_text": "Where on the furnace or melt shop.",
+    "domain": null
+   }
+  ]
+ }
+}

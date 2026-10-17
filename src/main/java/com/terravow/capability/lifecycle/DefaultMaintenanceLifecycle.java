@@ -15,6 +15,7 @@ import com.terravow.gate.DecisionGate;
 import com.terravow.gate.GateVerdict;
 import com.terravow.gate.HarmDelta;
 import com.terravow.gate.Recommendation;
+import com.terravow.gate.TrustContext;
 import com.terravow.reasoning.tool.ToolResult;
 
 import java.util.ArrayList;
@@ -211,8 +212,9 @@ public final class DefaultMaintenanceLifecycle implements MaintenanceLifecycle {
 
         // Ranking maintenance by harm neither increases emission mass nor relocates load, so no hard
         // veto applies; the gate classifies by confidence (Req 15.9).
+        TrustContext noTrustCap = new TrustContext(1.0, 0.0);  // TODO: wire real trust score when Req 16 is implemented
         GateVerdict verdict =
-                decisionGate.classify(rec, config.gateThresholds(), HarmDelta.NONE);
+                decisionGate.classify(rec, config.gateThresholds(), HarmDelta.NONE, noTrustCap);
 
         return new MaintenanceRecommendation(id, ranking, deferralCost, verdict);
     }

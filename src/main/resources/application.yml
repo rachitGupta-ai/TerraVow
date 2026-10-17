@@ -14,3 +14,8 @@ terravow:
     min-observation-period-days: 90
   audit:
     retention-years: 7       # Req 10.4
+
+# Internal HTTP port for the Java engine. In the single Cloud Run container the
+# Python front door listens on $PORT (public) and proxies to this port on localhost.
+server:
+  port: ${JAVA_PORT:8081}

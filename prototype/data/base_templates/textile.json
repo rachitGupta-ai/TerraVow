@@ -1,0 +1,1259 @@
+{
+ "base_template_id": "base-textile-1",
+ "industry": "textile",
+ "template": {
+  "machine_profile": {
+   "summary": "Generic template for textile dyeing and finishing machinery: jet and soft-flow dyeing machines, stenters, thermal-oil heaters and steam boilers that supply process heat.",
+   "typical_duty": "Batch dyeing cycles of 4 to 10 hours at 60 to 135 C, continuous stenter drying and heat-setting at 150 to 210 C, boilers and heaters running 20 to 24 hours a day.",
+   "key_components": [
+    "Burner and combustion-air fan",
+    "Boiler / heater refractory and coils",
+    "Dye-liquor circulation pump and seals",
+    "Heat exchanger",
+    "Stenter chain, clips and rails",
+    "Padder rolls",
+    "Exhaust fans and lint screens",
+    "Chemical dosing pumps",
+    "Steam traps and condensate return",
+    "Effluent drain and colour-carryover line"
+   ],
+   "specs": []
+  },
+  "operating_parameters": [
+   {
+    "id": "stack-o2",
+    "label": "Stack oxygen",
+    "unit": "% O2 (dry)",
+    "typical_range": "3 to 5",
+    "why_it_matters": "Higher O2 means excess air and wasted fuel; lower means incomplete combustion and soot."
+   },
+   {
+    "id": "stack-temp",
+    "label": "Stack gas temperature",
+    "unit": "C",
+    "typical_range": "180 to 240 (boiler), 250 to 320 (heater)",
+    "why_it_matters": "A rise of 20 C at the same load signals fouled heat-transfer surfaces."
+   },
+   {
+    "id": "steam-pressure",
+    "label": "Steam header pressure",
+    "unit": "bar(g)",
+    "typical_range": "7 to 10",
+    "why_it_matters": "Unstable pressure lengthens dye cycles and wastes fuel."
+   },
+   {
+    "id": "liquor-ratio",
+    "label": "Liquor ratio",
+    "unit": "L per kg fabric",
+    "typical_range": "1:4 to 1:8",
+    "why_it_matters": "Higher ratios raise water, chemical and energy use per kg."
+   },
+   {
+    "id": "dye-bath-temp",
+    "label": "Dye-bath temperature",
+    "unit": "C",
+    "typical_range": "60 to 135 per recipe",
+    "why_it_matters": "Overshoot damages fabric and wastes energy; undershoot causes shade variation and re-dyeing."
+   },
+   {
+    "id": "thermal-oil-outlet",
+    "label": "Thermal-oil outlet temperature",
+    "unit": "C",
+    "typical_range": "230 to 280",
+    "why_it_matters": "Overheating cracks the oil and fouls coils."
+   },
+   {
+    "id": "fabric-speed",
+    "label": "Stenter fabric speed",
+    "unit": "m/min",
+    "typical_range": "20 to 80",
+    "why_it_matters": "Speed loss at the same temperature means drying capacity is lost."
+   },
+   {
+    "id": "effluent-ph",
+    "label": "Effluent pH at machine drain",
+    "unit": "pH",
+    "typical_range": "6.5 to 9.0",
+    "why_it_matters": "Out-of-range pH stresses the effluent treatment plant and may breach discharge limits."
+   },
+   {
+    "id": "fuel-rate",
+    "label": "Fuel firing rate",
+    "unit": "L/h or SCM/h",
+    "typical_range": "Per load chart",
+    "why_it_matters": "Fuel per tonne of steam or per metre of fabric is the core efficiency metric."
+   }
+  ],
+  "job_types": [
+   {
+    "id": "burner-service",
+    "name": "Burner and combustion tune-up",
+    "trigger": "Every 2,000 operating hours, or when stack O2 drifts more than 1.5 points",
+    "schedule": "Quarterly service; monthly flue-gas analysis",
+    "checklist": [
+     "Isolate fuel and power",
+     "Remove and clean the nozzle, swirler and diffuser",
+     "Check the ignition electrode gap",
+     "Inspect the flame scanner lens",
+     "Re-set the air-fuel ratio with a flue-gas analyser at low, mid and high fire",
+     "Record O2, CO and stack temperature after tuning"
+    ],
+    "parts_and_tools": [
+     "Flue-gas analyser",
+     "Nozzle kit",
+     "Ignition electrode",
+     "Gasket set",
+     "Torque wrench"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Fuel-line isolation and leak test on reassembly",
+     "Heat-resistant gloves and face shield; allow cooling to below 50 C"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 40000,
+     "high_inr": 150000
+    }
+   },
+   {
+    "id": "heat-exchanger-descale",
+    "name": "Heat-exchanger and coil descaling",
+    "trigger": "Approach temperature up 5 C, or annually",
+    "schedule": "Annual, or by condition",
+    "checklist": [
+     "Isolate and drain the exchanger",
+     "Open the end covers and inspect the tubes",
+     "Circulate an inhibited descaling solution or clean mechanically",
+     "Neutralise and flush",
+     "Pressure-test before return to service"
+    ],
+    "parts_and_tools": [
+     "Descaling pump skid",
+     "Inhibited acid or chelant",
+     "Tube brushes",
+     "Gaskets"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Chemical handling PPE and an eyewash station",
+     "Neutralised spent solution goes to the ETP, never the storm drain"
+    ],
+    "est_downtime_hours": 12.0,
+    "est_cost_band": {
+     "low_inr": 60000,
+     "high_inr": 250000
+    }
+   },
+   {
+    "id": "pump-seal-replace",
+    "name": "Circulation pump mechanical-seal replacement",
+    "trigger": "Visible leak, or seal age over 8,000 hours",
+    "schedule": "By condition; inspect monthly",
+    "checklist": [
+     "Isolate and drain the pump casing",
+     "Remove the coupling and the bearing housing",
+     "Replace the mechanical seal and O-rings",
+     "Check shaft run-out (below 0.05 mm)",
+     "Re-align the coupling with a laser tool"
+    ],
+    "parts_and_tools": [
+     "Mechanical seal kit",
+     "Laser alignment tool",
+     "Dial gauge",
+     "O-ring kit"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Hot dye liquor: drain and cool first",
+     "Spill tray under the pump"
+    ],
+    "est_downtime_hours": 5.0,
+    "est_cost_band": {
+     "low_inr": 25000,
+     "high_inr": 90000
+    }
+   },
+   {
+    "id": "stenter-chain-overhaul",
+    "name": "Stenter chain, clip, padder and rail overhaul",
+    "trigger": "Chain elongation above 2%, padder nip variation above 10%, or every 6 months",
+    "schedule": "Half-yearly",
+    "checklist": [
+     "Measure chain elongation over ten links",
+     "Replace worn clips and pins",
+     "Clean and lubricate rails with high-temperature grease",
+     "Check padder roll parallelism and nip pressure",
+     "Run a fabric-width test"
+    ],
+    "parts_and_tools": [
+     "Chain links and clips",
+     "High-temperature grease",
+     "Feeler gauges",
+     "Nip-impression paper"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Guarding back in place before the trial run",
+     "Burn risk from hot chamber panels"
+    ],
+    "est_downtime_hours": 16.0,
+    "est_cost_band": {
+     "low_inr": 80000,
+     "high_inr": 400000
+    }
+   },
+   {
+    "id": "refractory-repair",
+    "name": "Boiler / heater refractory patch repair",
+    "trigger": "Casing hot spot above 80 C, or visible cracks at inspection",
+    "schedule": "Annual inspection",
+    "checklist": [
+     "Cool the furnace below 50 C",
+     "Remove loose refractory",
+     "Apply anchors where needed",
+     "Cast or gun castable refractory",
+     "Dry out on a controlled heat-up curve"
+    ],
+    "parts_and_tools": [
+     "Castable refractory",
+     "Anchors",
+     "Thermal camera",
+     "Mixer"
+    ],
+    "safety_and_permit_notes": [
+     "Confined-space entry permit, gas test and standby attendant",
+     "Hot-work permit if cutting, welding or grinding",
+     "Dust mask for refractory dust"
+    ],
+    "est_downtime_hours": 36.0,
+    "est_cost_band": {
+     "low_inr": 150000,
+     "high_inr": 600000
+    }
+   },
+   {
+    "id": "filter-and-strainer-clean",
+    "name": "Air filter, strainer and lint-screen cleaning",
+    "trigger": "Filter differential pressure above the set limit, or weekly",
+    "schedule": "Weekly",
+    "checklist": [
+     "Isolate the fan",
+     "Remove and clean or replace the intake filter",
+     "Clean the lint screens and the fuel strainer",
+     "Check the filter housing seals",
+     "Record the differential pressure after cleaning"
+    ],
+    "parts_and_tools": [
+     "Replacement filter elements",
+     "Vacuum cleaner",
+     "Differential pressure gauge"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Lint is combustible: keep away from hot surfaces"
+    ],
+    "est_downtime_hours": 2.0,
+    "est_cost_band": {
+     "low_inr": 5000,
+     "high_inr": 30000
+    }
+   },
+   {
+    "id": "effluent-line-inspect",
+    "name": "Effluent drain, dosing and colour-carryover check",
+    "trigger": "Effluent colour or pH out of range, or monthly",
+    "schedule": "Monthly",
+    "checklist": [
+     "Inspect the drain valve and seals for leaks",
+     "Check the dye-bath drop sequence and the rinse count",
+     "Verify the dosing-pump stroke",
+     "Take a grab sample for colour and pH",
+     "Record the volume per batch"
+    ],
+    "parts_and_tools": [
+     "Sample bottles",
+     "pH meter",
+     "Colour comparator",
+     "Spare drain valve seals"
+    ],
+    "safety_and_permit_notes": [
+     "Chemical-resistant gloves and goggles",
+     "Slippery floor: use a wet-area mat"
+    ],
+    "est_downtime_hours": 3.0,
+    "est_cost_band": {
+     "low_inr": 8000,
+     "high_inr": 40000
+    }
+   },
+   {
+    "id": "control-calibration",
+    "name": "Instrument and dosing-pump calibration",
+    "trigger": "Reading drift beyond tolerance, or every 6 months",
+    "schedule": "Half-yearly",
+    "checklist": [
+     "Calibrate temperature and pressure transmitters against a reference",
+     "Calibrate the dosing pumps by a timed volume test",
+     "Check the controller loop tuning",
+     "Update the calibration labels and records"
+    ],
+    "parts_and_tools": [
+     "Calibrator",
+     "Graduated cylinder",
+     "Reference thermometer"
+    ],
+    "safety_and_permit_notes": [
+     "Inform operators before forcing signals",
+     "Permit to work on live control panels"
+    ],
+    "est_downtime_hours": 4.0,
+    "est_cost_band": {
+     "low_inr": 10000,
+     "high_inr": 50000
+    }
+   },
+   {
+    "id": "steam-trap-survey",
+    "name": "Steam-trap and condensate-return survey",
+    "trigger": "Condensate return below 60%, or quarterly",
+    "schedule": "Quarterly",
+    "checklist": [
+     "Test every trap with an ultrasonic or temperature method",
+     "Tag failed-open and failed-closed traps",
+     "Replace failed traps",
+     "Check the condensate pump and tank vent"
+    ],
+    "parts_and_tools": [
+     "Ultrasonic tester",
+     "Spare steam traps",
+     "Gaskets"
+    ],
+    "safety_and_permit_notes": [
+     "Live steam: isolate and depressurise",
+     "Heat-resistant gloves and face shield; allow cooling to below 50 C"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 20000,
+     "high_inr": 120000
+    }
+   },
+   {
+    "id": "thermal-oil-analysis",
+    "name": "Thermal-oil sampling, analysis and top-up or change",
+    "trigger": "Annually, or when the oil darkens or smells cracked",
+    "schedule": "Annual lab analysis",
+    "checklist": [
+     "Take a hot sample from the circulating line",
+     "Send it for viscosity, acid number and flash point tests",
+     "Vent low-boilers through the expansion tank",
+     "Top up or change the oil per the lab result"
+    ],
+    "parts_and_tools": [
+     "Sample bomb",
+     "Lab test kit",
+     "Replacement thermal oil",
+     "Drum pump"
+    ],
+    "safety_and_permit_notes": [
+     "Hot oil burns: sample with a cooler",
+     "Fire watch while handling oil near the heater"
+    ],
+    "est_downtime_hours": 8.0,
+    "est_cost_band": {
+     "low_inr": 30000,
+     "high_inr": 500000
+    }
+   },
+   {
+    "id": "exhaust-fan-service",
+    "name": "Exhaust and combustion-air fan service",
+    "trigger": "Vibration above 7 mm/s, or half-yearly",
+    "schedule": "Half-yearly",
+    "checklist": [
+     "Measure vibration on both bearings",
+     "Clean the impeller of lint and deposits",
+     "Check the belt tension or the coupling",
+     "Balance the impeller if vibration persists",
+     "Re-grease the bearings"
+    ],
+    "parts_and_tools": [
+     "Vibration meter",
+     "Balancing weights",
+     "Bearing grease",
+     "Belts"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Wait for the impeller to stop completely"
+    ],
+    "est_downtime_hours": 4.0,
+    "est_cost_band": {
+     "low_inr": 15000,
+     "high_inr": 80000
+    }
+   }
+  ],
+  "snag_types": [
+   {
+    "id": "burner-fouling",
+    "name": "Burner fouling",
+    "category": "thermal",
+    "symptoms": [
+     "Yellow or smoky flame",
+     "Soot on the nozzle and the furnace tubes",
+     "Stack O2 or CO outside the tuned band with higher fuel use"
+    ],
+    "root_causes": [
+     "Poor fuel atomisation from a worn nozzle",
+     "Wrong air-fuel ratio",
+     "Contaminated or cold furnace oil"
+    ],
+    "detection_method": "Visual flame check plus flue-gas analysis of O2 and CO against the last tuning record",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of burner fouling: yellow or smoky flame noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: yellow or smoky flame confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: soot on the nozzle and the furnace tubes; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: stack o2 or co outside the tuned band with higher fuel use; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate to the combustion engineer if CO stays above 200 ppm after cleaning or the flame is unstable"
+     }
+    ],
+    "immediate_action": "Reduce the firing rate, check the fuel temperature and filter, and book the burner service",
+    "recommended_job_id": "burner-service",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Nozzle",
+     "Swirler",
+     "Gasket set"
+    ],
+    "safety_hazards": [
+     "Flash-back during relight",
+     "Hot surfaces"
+    ],
+    "escalation_criteria": "Escalate to the combustion engineer if CO stays above 200 ppm after cleaning or the flame is unstable",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Incomplete combustion raises CO2 per unit of steam, NOx variability and particulate emissions."
+     }
+    ]
+   },
+   {
+    "id": "refractory-wear",
+    "name": "Refractory wear",
+    "category": "structural",
+    "symptoms": [
+     "Hot spots on the casing",
+     "Cracked or spalled refractory visible through the sight glass",
+     "Casing temperature above 80 C over a large area"
+    ],
+    "root_causes": [
+     "Thermal cycling from frequent starts",
+     "Flame impingement",
+     "Age and anchor failure"
+    ],
+    "detection_method": "Thermal-camera scan of the casing every month; internal inspection at the annual shutdown",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of refractory wear: hot spots on the casing noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: hot spots on the casing confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: cracked or spalled refractory visible through the sight glass; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: casing temperature above 80 c over a large area; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if a casing spot exceeds 150 C or the casing paint discolours"
+     }
+    ],
+    "immediate_action": "Avoid rapid load changes and schedule a refractory inspection",
+    "recommended_job_id": "refractory-repair",
+    "time_to_fix_hours": 36.0,
+    "parts": [
+     "Castable refractory",
+     "Anchors"
+    ],
+    "safety_hazards": [
+     "Casing burn-through",
+     "Refractory dust"
+    ],
+    "escalation_criteria": "Escalate if a casing spot exceeds 150 C or the casing paint discolours",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Heat loss through the casing raises fuel burned and CO2 per unit of heat."
+     }
+    ]
+   },
+   {
+    "id": "pump-seal",
+    "name": "Dye-liquor pump seal leak",
+    "category": "mechanical",
+    "symptoms": [
+     "Drips of dye liquor at the pump seal",
+     "Steady leak with a puddle under the pump",
+     "Spray of hot liquor or loss of circulation pressure"
+    ],
+    "root_causes": [
+     "Seal face wear",
+     "Dry running at the start of a cycle",
+     "Shaft misalignment or bearing wear"
+    ],
+    "detection_method": "Walk-round visual check and a drip count per minute; circulation pressure trend",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of dye-liquor pump seal leak: drips of dye liquor at the pump seal noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: drips of dye liquor at the pump seal confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: steady leak with a puddle under the pump; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: spray of hot liquor or loss of circulation pressure; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the leak reaches a floor drain or circulation pressure falls below the recipe minimum"
+     }
+    ],
+    "immediate_action": "Contain the leak with a tray, cool and drain before touching, and book the seal replacement",
+    "recommended_job_id": "pump-seal-replace",
+    "time_to_fix_hours": 5.0,
+    "parts": [
+     "Mechanical seal",
+     "O-rings",
+     "Bearings"
+    ],
+    "safety_hazards": [
+     "Hot dye liquor",
+     "Slippery floor"
+    ],
+    "escalation_criteria": "Escalate if the leak reaches a floor drain or circulation pressure falls below the recipe minimum",
+    "pollution_effects": [
+     {
+      "domain": "water",
+      "effect": "Leaked dye liquor reaches the effluent stream untreated or as a shock load."
+     },
+     {
+      "domain": "chemical",
+      "effect": "Dyes and auxiliaries are released outside the closed loop."
+     }
+    ]
+   },
+   {
+    "id": "filter-clog",
+    "name": "Air filter or strainer clog",
+    "category": "mechanical",
+    "symptoms": [
+     "Filter differential pressure above normal",
+     "Fan running at higher current with weaker draft",
+     "Burner starving of air with a rich flame"
+    ],
+    "root_causes": [
+     "Lint and dust load from the finishing area",
+     "Missed weekly cleaning",
+     "Damaged filter allowing bypass"
+    ],
+    "detection_method": "Differential-pressure gauge reading against the clean value; fan current trend",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of air filter or strainer clog: filter differential pressure above normal noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: filter differential pressure above normal confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: fan running at higher current with weaker draft; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: burner starving of air with a rich flame; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the burner trips on low air or the filter housing is damaged"
+     }
+    ],
+    "immediate_action": "Clean or swap the filter element at the next safe stop",
+    "recommended_job_id": "filter-and-strainer-clean",
+    "time_to_fix_hours": 2.0,
+    "parts": [
+     "Filter element",
+     "Housing seal"
+    ],
+    "safety_hazards": [
+     "Rotating fan",
+     "Combustible lint"
+    ],
+    "escalation_criteria": "Escalate if the burner trips on low air or the filter housing is damaged",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Air starvation causes incomplete combustion and soot emissions."
+     }
+    ]
+   },
+   {
+    "id": "stenter-chain-wear",
+    "name": "Stenter chain wear",
+    "category": "mechanical",
+    "symptoms": [
+     "Uneven fabric width",
+     "Clicking or jerking chain with visible elongation",
+     "Clips dropping the fabric edge or the chain jumping the sprocket"
+    ],
+    "root_causes": [
+     "Lubrication loss at high temperature",
+     "Lint and finish residue on the rails",
+     "Overload from tight fabric tension"
+    ],
+    "detection_method": "Chain elongation measurement over ten links and fabric width checks at the exit",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of stenter chain wear: uneven fabric width noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: uneven fabric width confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: clicking or jerking chain with visible elongation; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: clips dropping the fabric edge or the chain jumping the sprocket; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the chain jumps the sprocket or the clips drop fabric repeatedly"
+     }
+    ],
+    "immediate_action": "Reduce speed, clean and lubricate the rails, and plan the chain overhaul",
+    "recommended_job_id": "stenter-chain-overhaul",
+    "time_to_fix_hours": 16.0,
+    "parts": [
+     "Chain links",
+     "Clips",
+     "High-temperature grease"
+    ],
+    "safety_hazards": [
+     "Nip points",
+     "Hot chamber panels"
+    ],
+    "escalation_criteria": "Escalate if the chain jumps the sprocket or the clips drop fabric repeatedly",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Re-processing rejected fabric adds drying energy and CO2."
+     }
+    ]
+   },
+   {
+    "id": "heat-exchanger-scaling",
+    "name": "Heat-exchanger scaling",
+    "category": "thermal",
+    "symptoms": [
+     "Longer heating time to reach the dye-bath temperature",
+     "Approach temperature up by more than 5 C",
+     "Steam consumption per batch up 10% or more"
+    ],
+    "root_causes": [
+     "Hard water or poor softener regeneration",
+     "Dye and auxiliary deposits",
+     "No periodic descaling"
+    ],
+    "detection_method": "Heating-rate and approach-temperature trend per batch; steam per batch from the meter",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of heat-exchanger scaling: longer heating time to reach the dye-bath temperature noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: longer heating time to reach the dye-bath temperature confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: approach temperature up by more than 5 c; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: steam consumption per batch up 10% or more; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the batch cycle overruns by more than 20% or a tube leak is suspected"
+     }
+    ],
+    "immediate_action": "Check the softener and the water hardness, and plan descaling",
+    "recommended_job_id": "heat-exchanger-descale",
+    "time_to_fix_hours": 12.0,
+    "parts": [
+     "Gaskets",
+     "Descaling chemicals"
+    ],
+    "safety_hazards": [
+     "Chemical handling",
+     "Pressurised steam"
+    ],
+    "escalation_criteria": "Escalate if the batch cycle overruns by more than 20% or a tube leak is suspected",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Extra steam per batch raises boiler fuel use and CO2."
+     },
+     {
+      "domain": "water",
+      "effect": "Descaling waste must be neutralised before it reaches the ETP."
+     }
+    ]
+   },
+   {
+    "id": "padder-roll-misalignment",
+    "name": "Padder roll misalignment",
+    "category": "mechanical",
+    "symptoms": [
+     "Uneven pick-up across the width",
+     "Listing or shade variation edge to centre",
+     "Roll bearing noise and visible roll skew"
+    ],
+    "root_causes": [
+     "Bearing wear",
+     "Uneven nip pressure",
+     "Roll cover damage"
+    ],
+    "detection_method": "Nip-impression test and pick-up weight checks at both edges and the centre",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of padder roll misalignment: uneven pick-up across the width noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: uneven pick-up across the width confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: listing or shade variation edge to centre; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: roll bearing noise and visible roll skew; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the shade variation causes batch rejection"
+     }
+    ],
+    "immediate_action": "Adjust the nip pressure, check the roll cover, and plan re-alignment",
+    "recommended_job_id": "stenter-chain-overhaul",
+    "time_to_fix_hours": 8.0,
+    "parts": [
+     "Roll bearings",
+     "Roll cover"
+    ],
+    "safety_hazards": [
+     "Nip points"
+    ],
+    "escalation_criteria": "Escalate if the shade variation causes batch rejection",
+    "pollution_effects": [
+     {
+      "domain": "chemical",
+      "effect": "Over-padding wastes finish chemicals that end up in the effluent."
+     },
+     {
+      "domain": "water",
+      "effect": "Re-washing rejected fabric adds effluent volume."
+     }
+    ]
+   },
+   {
+    "id": "condensate-return-loss",
+    "name": "Condensate return loss",
+    "category": "hydraulic_pneumatic",
+    "symptoms": [
+     "Plume of steam from the condensate vents",
+     "Condensate return below 60% of steam raised",
+     "Boiler feed-water temperature falling with higher make-up water use"
+    ],
+    "root_causes": [
+     "Failed-open steam traps",
+     "Leaking condensate lines",
+     "Condensate pump failure"
+    ],
+    "detection_method": "Feed-water temperature and make-up water meter trend; ultrasonic trap survey",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of condensate return loss: plume of steam from the condensate vents noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: plume of steam from the condensate vents confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: condensate return below 60% of steam raised; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: boiler feed-water temperature falling with higher make-up water use; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the make-up water exceeds 40% or the condensate pump has failed"
+     }
+    ],
+    "immediate_action": "Isolate visibly leaking traps and book a trap survey",
+    "recommended_job_id": "steam-trap-survey",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Steam traps",
+     "Gaskets"
+    ],
+    "safety_hazards": [
+     "Live steam",
+     "Hot surfaces"
+    ],
+    "escalation_criteria": "Escalate if the make-up water exceeds 40% or the condensate pump has failed",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Lost condensate heat increases boiler fuel use and CO2."
+     },
+     {
+      "domain": "water",
+      "effect": "More make-up water and blow-down add treated-water demand and effluent."
+     }
+    ]
+   },
+   {
+    "id": "thermal-oil-degradation",
+    "name": "Thermal-oil degradation",
+    "category": "process_chemical",
+    "symptoms": [
+     "Darker oil and a burnt smell at the expansion tank",
+     "Rising pressure drop across the heater coil",
+     "Coil hot spots or low flash point in the lab result"
+    ],
+    "root_causes": [
+     "Overheating above the oil rating",
+     "Oxidation from air contact in the expansion tank",
+     "Low circulation flow"
+    ],
+    "detection_method": "Annual lab analysis (viscosity, acid number, flash point) and the coil pressure-drop trend",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of thermal-oil degradation: darker oil and a burnt smell at the expansion tank noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: darker oil and a burnt smell at the expansion tank confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: rising pressure drop across the heater coil; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: coil hot spots or low flash point in the lab result; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate immediately if the flash point is below the operating temperature"
+     }
+    ],
+    "immediate_action": "Lower the outlet set-point and take a sample for the lab",
+    "recommended_job_id": "thermal-oil-analysis",
+    "time_to_fix_hours": 8.0,
+    "parts": [
+     "Thermal oil",
+     "Filters"
+    ],
+    "safety_hazards": [
+     "Hot oil burns",
+     "Fire risk"
+    ],
+    "escalation_criteria": "Escalate immediately if the flash point is below the operating temperature",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Coked coils reduce heat transfer and raise fuel use."
+     },
+     {
+      "domain": "chemical",
+      "effect": "Spent thermal oil is hazardous waste and must be disposed through an authorised handler."
+     }
+    ]
+   },
+   {
+    "id": "dosing-pump-drift",
+    "name": "Chemical dosing pump drift",
+    "category": "instrumentation_control",
+    "symptoms": [
+     "Recipe chemicals running out early or late",
+     "Shade or pH variation between batches",
+     "Dosing volume more than 10% off the set value"
+    ],
+    "root_causes": [
+     "Worn diaphragm or check valves",
+     "Air lock",
+     "Calibration drift"
+    ],
+    "detection_method": "Timed volume test against the set point and a batch-to-batch shade check",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of chemical dosing pump drift: recipe chemicals running out early or late noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: recipe chemicals running out early or late confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: shade or ph variation between batches; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: dosing volume more than 10% off the set value; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if over-dosing has released excess chemical to the drain"
+     }
+    ],
+    "immediate_action": "Switch to manual dosing with a measured volume and book a calibration",
+    "recommended_job_id": "control-calibration",
+    "time_to_fix_hours": 4.0,
+    "parts": [
+     "Diaphragm",
+     "Check valves"
+    ],
+    "safety_hazards": [
+     "Chemical splash"
+    ],
+    "escalation_criteria": "Escalate if over-dosing has released excess chemical to the drain",
+    "pollution_effects": [
+     {
+      "domain": "chemical",
+      "effect": "Over-dosing raises auxiliary chemicals in the effluent."
+     },
+     {
+      "domain": "water",
+      "effect": "Batch re-runs add effluent volume."
+     }
+    ]
+   },
+   {
+    "id": "dye-liquor-overflow",
+    "name": "Dye-liquor overflow or drain valve passing",
+    "category": "process_chemical",
+    "symptoms": [
+     "Liquor level falling during hold",
+     "Coloured water at the floor drain during the cycle",
+     "Visible overflow from the machine or the expansion tank"
+    ],
+    "root_causes": [
+     "Drain valve seat wear",
+     "Level sensor fault",
+     "Foaming from the wrong auxiliary dose"
+    ],
+    "detection_method": "Level trend during hold and a floor-drain colour check each batch",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of dye-liquor overflow or drain valve passing: liquor level falling during hold noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: liquor level falling during hold confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: coloured water at the floor drain during the cycle; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: visible overflow from the machine or the expansion tank; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if coloured liquor reaches a storm drain or outside the ETP collection"
+     }
+    ],
+    "immediate_action": "Close the manual isolation valve, contain the flow, and check the level sensor",
+    "recommended_job_id": "effluent-line-inspect",
+    "time_to_fix_hours": 3.0,
+    "parts": [
+     "Drain valve seat",
+     "Level sensor"
+    ],
+    "safety_hazards": [
+     "Hot liquor",
+     "Slippery floor"
+    ],
+    "escalation_criteria": "Escalate if coloured liquor reaches a storm drain or outside the ETP collection",
+    "pollution_effects": [
+     {
+      "domain": "water",
+      "effect": "Untreated coloured liquor raises COD and colour in the discharge."
+     },
+     {
+      "domain": "chemical",
+      "effect": "Dyes and salts are released outside the treatment path."
+     }
+    ]
+   },
+   {
+    "id": "exhaust-fan-imbalance",
+    "name": "Exhaust fan imbalance",
+    "category": "mechanical",
+    "symptoms": [
+     "Rising vibration at the fan bearings",
+     "Noise and belt slip",
+     "Weak exhaust with fumes or humidity in the chamber"
+    ],
+    "root_causes": [
+     "Lint and finish deposits on the impeller",
+     "Bearing wear",
+     "Loose belts or coupling"
+    ],
+    "detection_method": "Vibration reading in mm/s on both bearings and the exhaust damper position",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of exhaust fan imbalance: rising vibration at the fan bearings noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: rising vibration at the fan bearings confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: noise and belt slip; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: weak exhaust with fumes or humidity in the chamber; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if vibration exceeds 11 mm/s or a bearing runs hot"
+     }
+    ],
+    "immediate_action": "Reduce the speed if possible and book the fan service",
+    "recommended_job_id": "exhaust-fan-service",
+    "time_to_fix_hours": 4.0,
+    "parts": [
+     "Bearings",
+     "Belts",
+     "Balancing weights"
+    ],
+    "safety_hazards": [
+     "Rotating parts",
+     "Fume exposure"
+    ],
+    "escalation_criteria": "Escalate if vibration exceeds 11 mm/s or a bearing runs hot",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Weak exhaust leaves fumes and VOC from finishes in the work area and raises drying energy."
+     }
+    ]
+   }
+  ],
+  "pollutant_capture": [
+   {
+    "id": "stack-opacity",
+    "label": "Stack appearance",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Clear",
+     "Light haze",
+     "Grey smoke",
+     "Black smoke"
+    ],
+    "help_text": "Look at the stack exit against the sky.",
+    "domain": "air"
+   },
+   {
+    "id": "effluent-colour",
+    "label": "Effluent colour at the machine drain",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Clear",
+     "Light tint",
+     "Strong colour",
+     "Very dark"
+    ],
+    "help_text": "Compare a grab sample against white paper.",
+    "domain": "water"
+   },
+   {
+    "id": "effluent-flow-estimate",
+    "label": "Estimated effluent flow or leak volume",
+    "type": "text",
+    "required": false,
+    "max_length": 60,
+    "options": null,
+    "help_text": "Litres per batch or litres per hour, with units.",
+    "domain": "water"
+   },
+   {
+    "id": "effluent-ph-reading",
+    "label": "Effluent pH reading",
+    "type": "text",
+    "required": false,
+    "max_length": 10,
+    "options": null,
+    "help_text": "pH meter or strip reading, if taken.",
+    "domain": "water"
+   },
+   {
+    "id": "aux-chemical-type",
+    "label": "Auxiliary chemical involved",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "None",
+     "Reactive dye",
+     "Disperse dye",
+     "Salt / soda",
+     "Softener / finish",
+     "Peroxide / bleach",
+     "Other"
+    ],
+    "help_text": "The main chemical in the leaked or carried-over liquor.",
+    "domain": "chemical"
+   },
+   {
+    "id": "chemical-quantity-estimate",
+    "label": "Estimated chemical quantity released",
+    "type": "text",
+    "required": false,
+    "max_length": 60,
+    "options": null,
+    "help_text": "Kilograms or litres, with units, if known.",
+    "domain": "chemical"
+   }
+  ],
+  "form_fields": [
+   {
+    "id": "machine-state",
+    "label": "Machine state when noticed",
+    "type": "dropdown",
+    "required": true,
+    "max_length": null,
+    "options": [
+     "Running normally",
+     "Running at reduced load",
+     "Stopped",
+     "Tripped"
+    ],
+    "help_text": "What the machine was doing when the snag was seen.",
+    "domain": null
+   },
+   {
+    "id": "shift",
+    "label": "Shift",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Morning",
+     "Evening",
+     "Night",
+     "General"
+    ],
+    "help_text": "Shift during which the snag was noticed.",
+    "domain": null
+   },
+   {
+    "id": "observed-by",
+    "label": "Observed by",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Operator",
+     "Fitter / mechanic",
+     "Electrician",
+     "Instrument technician",
+     "Supervisor",
+     "EHS officer"
+    ],
+    "help_text": "Trade of the person reporting (no names).",
+    "domain": null
+   },
+   {
+    "id": "hours-since-service",
+    "label": "Operating hours since last service",
+    "type": "text",
+    "required": false,
+    "max_length": 12,
+    "options": null,
+    "help_text": "Approximate number from the log book; leave blank if unknown.",
+    "domain": null
+   },
+   {
+    "id": "process-stage",
+    "label": "Process stage",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Pre-treatment",
+     "Dyeing",
+     "Rinsing",
+     "Finishing",
+     "Drying / heat-setting",
+     "Utilities"
+    ],
+    "help_text": "Stage of the textile process.",
+    "domain": null
+   }
+  ]
+ }
+}

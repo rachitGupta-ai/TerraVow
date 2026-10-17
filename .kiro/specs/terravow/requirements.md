@@ -312,3 +312,276 @@ This document specifies requirements for the full platform vision. Outputs that 
 14. IF the live TamperEvidentLogEntry chain does not reproduce a previously published Anchored_Hash_Root when recomputed to that checkpoint, THEN THE TerraVow_System SHALL raise a tamper-detected condition, record the diverging Machine_Asset Operating_Log and the affected Anchored_Hash_Root in the Evidence_Chain, and route the finding to human review.
 15. IF the externally-verifiable anchoring location is unavailable or does not respond within its configured timeout at a scheduled anchoring interval, THEN THE TerraVow_System SHALL treat the anchoring path as unavailable, retain the unpublished hash root for the next scheduled attempt, and record the missed anchoring attempt.
 16. THE TerraVow_System SHALL ensure that none of the Baseline_Plausibility_Check, the Independent_Verification_Source reconciliation, the Trust_Weighted_Profile construction, or the Anchored_Hash_Root verification raises a Decision_Gate classification or a confidence value beyond what Requirement 8 and Requirements 16.15 and 16.16 otherwise allow, such that each hardening check in this requirement may only add an additional downgrade or human-review path and preserves the existing fail-closed posture.
+
+---
+
+## Prototype Extension: Industry Templates, Snag History, and Sustainability Recommendations (Requirements 18–30)
+
+### Scope, Product Intent, and Assumptions
+
+Requirements 18–30 extend the **Python FastAPI prototype** (`prototype/`) so that it delivers the product described in the meetings (`meeting-transcripts/`) and in the follow-up product brief: industry-specific, AI-generated, cached machine-model templates; a per-machine snag history that drives health, remaining lifespan, and pollution intensity; and a recommendation of a better sustainable machine or process together with the government incentives that apply. They do not change Requirements 1–17. The Java library under `src/main/java/com/terravow` is not required to change; where an existing Java capability already covers a concern (for example `capability/substitution`, `DefaultEconomicsEngine.assessIncentives`), the prototype is not required to call it.
+
+Each requirement below is tagged with the product intent it serves:
+
+| Tag | Product intent (from the product brief) |
+|---|---|
+| **PI-1** | Product design and template differ by industry category; four heavy-machinery industries covering air, water, chemical, and soil pollution. |
+| **PI-2** | Template is AI-decided once a machine model is selected; very deep on job and snag issues and recommendations. |
+| **PI-3** | Template is saved in the database after model selection; AI generates it only if no template for that model exists. |
+| **PI-4** | A snag-history document in the database drives machine health and lifespan, linked to pollution intensity (carbon, water, and so on). |
+| **PI-5** | Recommend a better sustainable machine alternative or a more sustainable assembly/process change. |
+| **PI-6** | Show government tax rebates and policies that incentivise sustainable upgrades, for small (MSME) and large industry. |
+| **PI-M** | Meeting-derived workflow: industry dropdown, machine autocomplete, manual entry, reporter and resolver roles (`Meeting-16Oct`, TerraVow Part 2 summary). |
+
+**Assumptions (explicit, to be confirmed in design review):**
+
+- A1. The four default industries are (a) Textile dyeing and finishing [air, water, chemical] (air added in the design revision because textile mills run gas- and oil-fired boilers, thermal-oil heaters and stenters, and the air engine is reused for them), (b) Metals: steel and foundry [air, soil, water], (c) Chemicals and fertiliser [air, water, chemical, soil], (d) Mining and mineral processing [soil, water, air]. The meetings named no industries ("two industries" in `Meeting-16Oct`); the product brief overrides this with four.
+- A2. The default country is India (currency INR). The incentive data model is keyed by country so that other countries can be added without schema change; only India is populated in this release.
+- A3. The prototype has no authentication. Reporter and Resolver are a demo-grade role switch only.
+- A4. Catalogue manufacturer and model names are plausible **sample data**, not an authoritative manufacturer database, and are labelled as such wherever shown.
+- A5. Numeric limits stated in acceptance criteria (for example field lengths and result counts) are defaults; they SHALL be held as named configuration constants, not scattered literals.
+- A6. The pollution-intensity and lifespan factors are illustrative engineering assumptions. They are never presented as measurements.
+- A7. The 14 minutes missing from `Meeting-16Oct` may contain further resolver-workflow decisions; Requirement 25 defines a minimal resolver workflow and does not claim to reproduce them.
+
+### Extension Glossary
+
+- **Industry_Category**: One of the four configured heavy-machinery industries, carrying a stable identifier, a display name, and a set of Pollution_Domains.
+- **Pollution_Domain**: One of `air`, `water`, `chemical`, or `soil`.
+- **Machine_Catalogue**: The sample set of manufacturer and model entries per Industry_Category, each marked as sample data.
+- **Machine_Model_Key**: The normalised slug of industry, manufacturer, and model, used with the schema version to key a Machine_Template.
+- **Machine_Template**: The structured per-industry, per-model document describing the machine profile, operating parameters, job types, snag taxonomy, pollutant-capture fields, and form-field definitions.
+- **Base_Template**: The deterministic, curated, per-Industry_Category template used as grounding input to Gemini and as the labelled fallback when generation is unavailable.
+- **Template_Source**: One of `ai` (generated by Gemini and schema-validated) or `fallback-base` (the Base_Template adapted deterministically to the selected model).
+- **Snag**: A reported machine issue recorded against a Machine_Instance, answering the form defined by the Machine_Template.
+- **Machine_Instance**: A specific physical machine (for example `B-2`) of a Machine_Model, carrying an install year.
+- **Snag_History_Document**: The per-Machine_Instance persisted record of all Snags and their lifecycle.
+- **Health_Score**: A deterministic engine-computed value in the range 0 to 100 inclusive (100 is best) derived from the Snag_History_Document and Machine_Instance age.
+- **Remaining_Lifespan_Estimate**: A deterministic engine-computed estimate of remaining useful operating time in days, with a stated basis and an uncertainty band, derived from the Health_Score and wear factors.
+- **Pollution_Intensity**: The per-day and over-remaining-lifespan emission quantities per Pollution_Domain attributed to a Machine_Instance, computed from the Health_Score using labelled illustrative factors.
+- **Sustainability_Recommendation**: The pair of (a) a sustainable machine alternative and (b) a sustainable process or assembly change for a Machine_Instance, each with a deterministic quantitative comparison.
+- **Incentive_Scheme**: A government tax rebate, subsidy, or policy record for sustainable upgrades, keyed by country.
+- **Enterprise_Size**: One of `MSME` or `LARGE`.
+- **Role**: One of `REPORTER` or `RESOLVER`, a demo-grade label with no authentication.
+- **Grounded_Source**: A URL (and title where available) returned by Gemini Google Search grounding metadata and retained verbatim with the content it supports.
+
+---
+
+### Requirement 18: Industry Categories and Fleet Tagging
+
+**Product intent:** PI-1, PI-M. **User Story:** As a plant owner, I want the product to be organised around four heavy-machinery industries and their pollution domains, so that templates and recommendations fit my industry rather than being generic.
+
+#### Acceptance Criteria
+
+1. THE TerraVow_System SHALL define exactly four Industry_Categories by default: Textile dyeing and finishing, Metals (steel and foundry), Chemicals and fertiliser, and Mining and mineral processing.
+2. THE TerraVow_System SHALL tag each Industry_Category with its Pollution_Domains, with the default tagging being Textile [air, water, chemical]; Metals [air, soil, water]; Chemicals and fertiliser [air, water, chemical, soil]; Mining and mineral processing [soil, water, air]; and every Pollution_Domain SHALL be covered by at least one Industry_Category.
+3. WHEN a client requests the list of industries, THE TerraVow_System SHALL return every Industry_Category with its identifier, display name, and Pollution_Domains, ordered deterministically.
+4. THE TerraVow_System SHALL tag each of the six existing fleet machines (B-2, F-1, K-4, C-7, D-3, G-5) with exactly one Industry_Category, and the fleet response SHALL include the industry identifier, manufacturer, and model for each machine.
+5. WHEN a Machine_Catalogue is served, THE TerraVow_System SHALL provide at least 4 and at most 6 entries per Industry_Category, each carrying a manufacturer, a model name, a machine type, and a `sample_data: true` marker.
+6. THE TerraVow_System SHALL display a "sample data, not an authoritative manufacturer database" label wherever Machine_Catalogue entries are shown.
+7. THE TerraVow_System SHALL keep the existing six-machine fleet behaviour (ranking, `/api/analyze`, `/api/explain`, `/api/decide`, `/api/impact`) unchanged apart from the added industry, manufacturer, and model fields.
+8. IF a request references an industry identifier that is not configured, THEN THE TerraVow_System SHALL reject the request with a client-error response naming the invalid field and SHALL NOT create or modify any record.
+
+### Requirement 19: Catalogue Search and Manual Machine Entry
+
+**Product intent:** PI-M, PI-1. **User Story:** As a reporter, I want to pick an industry and find my machine by typing a few letters, or enter a machine that is not listed, so that I can select the exact machine model without browsing a long list.
+
+#### Acceptance Criteria
+
+1. WHEN the user selects an Industry_Category, THE TerraVow_System SHALL restrict machine search to the Machine_Catalogue of that Industry_Category.
+2. WHEN a client submits a search query to the catalogue search endpoint, THE TerraVow_System SHALL return catalogue entries whose manufacturer, model, or machine type contains the query as a case-insensitive prefix of any word or as a case-insensitive substring, ranking prefix matches above substring matches and breaking ties deterministically.
+3. THE catalogue search endpoint SHALL accept a query of 1 to 80 characters, SHALL return at most 10 results, and SHALL treat an empty query as a request for the first 10 entries of the selected Industry_Category.
+4. IF the search query exceeds 80 characters or the industry is missing or not configured, THEN THE TerraVow_System SHALL reject the request with a client-error response and SHALL NOT perform a search.
+5. WHEN a search yields no result, THE TerraVow_System SHALL return an empty list and the user interface SHALL offer the manual machine entry option.
+6. WHEN a user submits a manual machine entry consisting of an industry, a manufacturer, and a model name, THE TerraVow_System SHALL validate each field as required, non-blank, and at most 80 characters, and SHALL retrieve the machine specifications through Gemini with Google Search grounding.
+7. WHEN grounded specifications are returned, THE TerraVow_System SHALL retain each Grounded_Source URL with the specifications, SHALL show those URLs in the user interface, and SHALL mark the specification record as AI-retrieved and unverified.
+8. IF Google Search grounding or Gemini is unavailable, returns an error, or returns no Grounded_Source, THEN THE TerraVow_System SHALL return the manual entry with an explicit message stating that specifications could not be retrieved and with no specifications invented, SHALL record the specification record as `ungrounded`, and SHALL still allow the user to select the model.
+9. WHEN the user selects a catalogue entry or confirms a manual entry, THE TerraVow_System SHALL treat the combination of industry, manufacturer, and model as the selected machine model and SHALL make it available to the template generation flow in Requirement 20.
+10. THE TerraVow_System SHALL NOT send any contact detail or personal identifier to Gemini as part of a specification lookup; only industry, manufacturer, and model text SHALL be sent.
+
+### Requirement 20: AI-Generated Deep Per-Model Template
+
+**Product intent:** PI-1, PI-2, PI-M. **User Story:** As a reporter, I want a deep, model-specific snag and job template created for the machine I selected, so that I record the right information and the resolver gets a precise, actionable recommendation.
+
+#### Acceptance Criteria
+
+1. WHEN a machine model is selected and no Machine_Template exists for its Machine_Model_Key, THE TerraVow_System SHALL generate a Machine_Template through Gemini, grounded on the Base_Template of the selected Industry_Category and on any retained Grounded_Source specifications.
+2. THE Machine_Template SHALL contain a machine profile and specifications section, a list of operating parameters to log, a list of job and run types, a snag taxonomy, pollutant-capture fields, and form-field definitions.
+3. THE Machine_Template SHALL define, for each job or run type, a name, an interval or trigger, a maintenance or inspection schedule, a checklist, parts and tools, safety and permit notes, an estimated downtime, and an estimated cost band.
+4. THE Machine_Template SHALL define, for each snag type, a stable identifier, a category, symptoms, likely root causes, a detection method, a definition for each of the severity levels 1 to 5, an immediate action, a recommended repair job referencing a job or run type, a time-to-fix, parts, safety hazards, escalation criteria, and the Pollution_Domains it affects with a one-sentence description of how each is affected.
+5. THE Machine_Template SHALL define pollutant-capture fields specific to the Pollution_Domains of the Industry_Category (for example effluent colour and flow for Textile, stack opacity and slag disposal for Metals), and every Pollution_Domain of the Industry_Category SHALL be covered by at least one pollutant-capture field.
+6. THE Machine_Template SHALL define form-field definitions, each with an identifier, a label, a type of `text` or `dropdown`, a required flag, a maximum length for `text` fields, and a non-empty option list for `dropdown` fields, so that the user interface can render the snag form dynamically from the template without per-industry code.
+7. WHEN Gemini returns a template, THE TerraVow_System SHALL validate it against the defined template schema, including referential integrity (each snag's recommended repair job exists) and minimum depth (by default at least 6 job or run types, at least 12 snag types, and at least 8 operating parameters), and SHALL apply the bounded retry policy of Requirement 11.4 for a failed validation.
+8. THE Base_Template of each Industry_Category SHALL be deterministic, curated, and schema-valid, and the Base_Templates of any two Industry_Categories SHALL differ materially, meaning that the overlap between their snag-type identifiers and between their pollutant-capture field identifiers is at most a configured fraction (default 0.5).
+9. IF Gemini is unavailable, errors, times out, or fails schema validation on every permitted attempt, THEN THE TerraVow_System SHALL return the Base_Template adapted deterministically to the selected manufacturer and model with `source = "fallback-base"` and an explicit user-visible label stating that it is a generic industry template and not AI-generated for this model.
+10. THE TerraVow_System SHALL treat all Machine_Template text as untrusted content, SHALL bound its total size (default at most 200 kilobytes) and field lengths, and SHALL reject or truncate content beyond the bounds before storing or returning it.
+11. THE Gemini prompt for template generation SHALL NOT include any reporter handle, contact detail, or free-text Snag content.
+12. THE Machine_Template SHALL carry a disclaimer that its maintenance intervals, costs, and root-cause lists are AI-generated or generic guidance for qualified-engineer review and are not manufacturer instructions.
+
+### Requirement 21: Template Persistence with Cache-Once Semantics
+
+**Product intent:** PI-3. **User Story:** As a platform operator, I want each model's template generated once and then reused, so that Gemini cost and latency are not repeated and every user of the same model sees the same template.
+
+#### Acceptance Criteria
+
+1. THE TerraVow_System SHALL key each stored Machine_Template by the Machine_Model_Key (the normalised slug of industry, manufacturer, and model: lower-cased, with runs of non-alphanumeric characters collapsed to a single hyphen, and trimmed) combined with the template schema version.
+2. THE TerraVow_System SHALL store, with each Machine_Template, `generated_at`, `model_used`, `schema_version`, `source`, and the Grounded_Source list.
+3. WHEN a template is requested for a Machine_Model_Key for which a stored Machine_Template with `source = "ai"` exists, THE TerraVow_System SHALL return the stored template with `cache_status = "cache-hit"` and SHALL NOT call Gemini.
+4. WHEN a template is requested for a Machine_Model_Key with no stored Machine_Template and Gemini generation succeeds, THE TerraVow_System SHALL persist the template and return it with `cache_status = "generated"`.
+5. THE TerraVow_System SHALL persist a Machine_Template only through an atomic create-if-absent operation (Firestore `create()` or an equivalent transaction, and a per-key lock for the in-memory fallback), such that concurrent requests across replicas for the same key result in exactly one stored document.
+6. IF a create-if-absent operation reports that a document already exists, THEN THE TerraVow_System SHALL discard its own generated result and return the stored document with `cache_status = "cache-hit"`.
+7. WHILE a generation for a Machine_Model_Key is in progress on the same instance, THE TerraVow_System SHALL make concurrent requests for that key wait for and share the single result rather than starting additional Gemini calls.
+8. THE TerraVow_System SHALL NOT persist a template with `source = "fallback-base"` as a cache entry for the Machine_Model_Key, SHALL return it with `cache_status = "fallback"`, and SHALL attempt Gemini generation again on the next request for that key.
+9. WHEN the template schema version changes, THE TerraVow_System SHALL treat templates stored under a different schema version as absent for the new key and SHALL leave the older documents unmodified.
+10. THE TerraVow_System SHALL provide an endpoint that ensures a template for a selected model (returning the template and `cache_status`) and an endpoint that fetches a stored template by key without ever invoking Gemini (returning not-found when absent).
+11. IF persistence of a newly generated template fails, THEN THE TerraVow_System SHALL return the generated template to the caller with `cache_status = "generated-unsaved"`, SHALL log the failure at error level without secrets, and SHALL NOT report the template as cached.
+12. THE TerraVow_System SHALL show the user whether a template came from the cache, was newly generated, or is a fallback, together with `source` and `generated_at`.
+
+### Requirement 22: Snag History Document
+
+**Product intent:** PI-4, PI-M. **User Story:** As a maintenance manager, I want every snag on a machine recorded in one history document, so that the machine's health and remaining life can be assessed from facts rather than memory.
+
+#### Acceptance Criteria
+
+1. THE TerraVow_System SHALL persist one Snag_History_Document per Machine_Instance, realised as a header document plus the Snag records that reference it by machine identifier and read together as one document, in Firestore when configured and in an in-memory store otherwise, using the same backend-selection and visible backend indicator as the existing store.
+2. WHEN a Snag is submitted, THE TerraVow_System SHALL append a Snag record carrying a Snag identifier, the Machine_Instance identifier, the Machine_Model_Key and template schema version used, the answers to the template form fields, a snag type identifier when selected, a severity from 1 to 5, a category, the report timestamp, the pseudonymous reporter handle and Role, a status, and optional photo-analysis reference.
+3. THE Snag status SHALL be one of `OPEN`, `ASSIGNED`, `RESOLVED`, or `CLOSED`, and THE TerraVow_System SHALL permit only the transitions OPEN to ASSIGNED, ASSIGNED to RESOLVED, RESOLVED to CLOSED, and OPEN to RESOLVED.
+4. WHEN a Snag is resolved, THE TerraVow_System SHALL record the resolver handle, the resolution timestamp, the resolution notes and actions taken, the downtime hours, and the cost in INR.
+5. WHEN a Snag is submitted or updated, THE TerraVow_System SHALL validate every answer against the field definition of the stored template: required fields present, `dropdown` values drawn from the option list, `text` values within the maximum length, severity an integer from 1 to 5, and SHALL reject an invalid submission with a client-error response listing each invalid field and SHALL NOT store it.
+6. THE TerraVow_System SHALL append Snag records without modifying or deleting prior Snag records; status changes SHALL be recorded as appended events with timestamps.
+7. WHEN the demo reset endpoint is called, THE TerraVow_System SHALL restore the seeded Snag_History_Documents and clear Snags created during the demo, and SHALL leave the existing reset behaviour for the fleet and audit trail intact.
+8. THE TerraVow_System SHALL provide a seeded demo Snag_History_Document for each of the six existing machines, labelled as synthetic, with Snag counts, severities, and open/closed mixes that produce distinct Health_Scores across the fleet.
+9. THE TerraVow_System SHALL expose an endpoint to read the Snag_History_Document of a Machine_Instance and an endpoint to list Snags filtered by status.
+10. THE TerraVow_System SHALL NOT send a Snag's free-text answers, photo, or reporter handle to any LLM except through the existing `/api/analyze` photo flow, and, because the prototype has no PII masking module today, SHALL redact email-address and phone-number patterns in free text with a simple deterministic filter before the text is persisted, as the prototype-level realisation of Requirement 13.3.
+
+### Requirement 23: Health Score and Remaining Lifespan from Snag History
+
+**Product intent:** PI-4. **User Story:** As a maintenance manager, I want machine health and remaining lifespan computed from the past snags in a way I can reproduce, so that I can plan repair or replacement with a defensible basis.
+
+#### Acceptance Criteria
+
+1. WHEN a Snag_History_Document and an as-of date are supplied, THE TerraVow_System SHALL compute a Health_Score from 0 to 100 inclusive in engine code, with no LLM involvement.
+2. THE Health_Score computation SHALL take as inputs the Snag frequency over a configured window, the recurrence of the same category or snag type, the severity trend (realised as a capped, recency-weighted load of high-severity Snags), the number and severity of unresolved Snags, the Machine_Instance age (as-of date minus 1 January of the install year, in days), and the time since the last major repair (a RESOLVED or CLOSED Snag of severity 4 or 5).
+3. THE TerraVow_System SHALL compute a Remaining_Lifespan_Estimate in days from the Health_Score and the age factor, SHALL attach a basis string and an uncertainty band, and SHALL label it as an estimate and not a prediction of failure.
+4. THE Health_Score and Remaining_Lifespan_Estimate SHALL be deterministic: identical Snag_History_Document, install year, configuration, and as-of date SHALL always produce identical outputs, and the engine SHALL NOT read the wall clock except to supply a default as-of date at the API boundary.
+5. WHEN an additional unresolved Snag of severity 1 to 5 is added to a Snag_History_Document, THE TerraVow_System SHALL compute a Health_Score no greater than, and a Remaining_Lifespan_Estimate no greater than, the values before the addition.
+6. WHEN an unresolved Snag is resolved with all else unchanged, THE TerraVow_System SHALL compute a Health_Score no less than the value before resolution.
+7. WHEN the Snag_History_Document is empty, THE TerraVow_System SHALL compute the Health_Score from age alone and SHALL mark the result `low-history` with reduced confidence.
+8. THE TerraVow_System SHALL return, with each Health_Score, the contributing factors and their individual penalties so that the user interface can explain the score ("How this is calculated").
+9. THE Remaining_Lifespan_Estimate SHALL be bounded below by 0 days and above by a configured maximum design life, and a Health_Score of 0 SHALL yield 0 days.
+10. IF the install year is absent or later than the as-of year, THEN THE TerraVow_System SHALL compute the Health_Score without the age factor, mark the result `age-unknown`, and record the reason.
+
+### Requirement 24: Pollution Intensity Linked to Health
+
+**Product intent:** PI-4, PI-1. **User Story:** As an environmental officer, I want a machine's pollution intensity to rise as its health falls, across air, water, chemical, and soil, so that deferred maintenance is visible as an environmental cost.
+
+#### Acceptance Criteria
+
+1. WHEN a Health_Score is available for a Machine_Instance, THE TerraVow_System SHALL compute the Pollution_Intensity per day for each Pollution_Domain applicable to the machine's Industry_Category.
+2. THE Pollution_Intensity SHALL be reported with these indicators: for air, CO2e and NOx; for water, COD, BOD, and effluent volume; for chemical, a hazardous-chemical release proxy; for soil, a solid-waste or sludge and soil-contamination proxy; each with its unit.
+3. THE TerraVow_System SHALL compute Pollution_Intensity as a deterministic function of a per-machine healthy baseline, a labelled illustrative degradation factor per Pollution_Domain, and the Health_Score, using engine code only.
+4. WHEN the Health_Score of a Machine_Instance decreases with all other inputs unchanged, THE TerraVow_System SHALL report a per-day intensity for each applicable indicator that is no lower than before, and strictly higher for every indicator whose healthy baseline is greater than zero.
+5. THE TerraVow_System SHALL report the cumulative Pollution_Intensity over the Remaining_Lifespan_Estimate for each indicator, computed deterministically as the per-day intensity multiplied by the remaining days.
+6. WHEN the existing deferral-cost engine already computes excess fuel, CO2, and NOx for a machine, THE TerraVow_System SHALL reuse its air-domain loss curve and computation so that air figures for the same machine are produced by the same function, with the defect-severity input and the snag-history input both shown and labelled.
+7. THE TerraVow_System SHALL label every Pollution_Intensity value as an illustrative estimate, show the factor source or "illustrative assumption" tag beside the value, and SHALL NOT present it as a measurement or as a regulatory exceedance.
+8. IF a Pollution_Domain is not applicable to the machine's Industry_Category, THEN THE TerraVow_System SHALL omit that domain rather than report zero.
+9. THE TerraVow_System SHALL show on the machine view the Health_Score, Remaining_Lifespan_Estimate, and per-domain Pollution_Intensity together, so the linkage is visible without navigating elsewhere.
+
+### Requirement 25: Reporter and Resolver Roles and Workflow
+
+**Product intent:** PI-M, PI-4. **User Story:** As a plant team, I want a reporter to submit snags using the generated template and a resolver to pick up, fix, and close them, so that issue history is captured end to end.
+
+#### Acceptance Criteria
+
+1. THE TerraVow_System SHALL provide a demo-grade Role switch between Reporter and Resolver in the user interface and SHALL record the selected Role on every Snag creation and status change.
+2. THE TerraVow_System SHALL state prominently, in a code comment at the role-handling module, in the user interface footer, and in the README, that no authentication or authorisation exists and that the Role switch is not a security control.
+3. THE TerraVow_System SHALL require the reporter handle to be a pseudonym of 3 to 32 characters from `A-Z a-z 0-9 _ -`, SHALL reject any handle that does not match, and SHALL NOT collect names, emails, or phone numbers.
+4. WHEN the Role is Reporter, THE TerraVow_System SHALL let the user select an industry and machine model, obtain the template, fill the dynamically rendered form, optionally attach a photo analysed through the existing `/api/analyze` flow, and submit a Snag.
+5. WHEN a Snag is submitted, THE TerraVow_System SHALL show the reporter the AI-recommended repair job from the selected snag type of the template, labelled as template guidance.
+6. WHEN the Role is Resolver, THE TerraVow_System SHALL show an open-Snag queue ordered deterministically by severity descending, then report time ascending, with each entry showing the recommended repair job, time-to-fix, safety hazards, and escalation criteria drawn from the template.
+7. WHEN a Resolver accepts a Snag, THE TerraVow_System SHALL set the status to ASSIGNED and record the resolver handle; WHEN the Resolver records a resolution, THE TerraVow_System SHALL set RESOLVED with the data in Requirement 22.4; WHEN the Resolver closes the Snag, THE TerraVow_System SHALL set CLOSED.
+8. WHEN a Snag is CLOSED, THE TerraVow_System SHALL recompute the Health_Score, Remaining_Lifespan_Estimate, and Pollution_Intensity of the Machine_Instance.
+9. WHERE a closed Snag has a before-photo analysis and the Resolver supplies an after-photo, THE TerraVow_System SHALL pass the after-photo through the existing verify-improvement flow, and a verified improvement SHALL still require the existing evidence conditions (notes alone never verify).
+10. IF an action is requested that is not permitted for the current status or Role (for example a Reporter closing a Snag), THEN THE TerraVow_System SHALL reject it with a client-error response stating the reason and SHALL leave the Snag unchanged.
+11. THE role-based restrictions in criterion 10 SHALL be described as workflow guidance only and SHALL NOT be described anywhere as access control.
+
+### Requirement 26: Sustainable Machine Alternative and Process Change
+
+**Product intent:** PI-5. **User Story:** As an operations director, I want a better sustainable machine alternative and a more sustainable process change for the machine I selected, with numbers I can check, so that I can decide on an upgrade.
+
+#### Acceptance Criteria
+
+1. WHEN a Sustainability_Recommendation is requested for a Machine_Instance, THE TerraVow_System SHALL return (a) between 1 and 3 sustainable machine alternatives and (b) between 1 and 3 sustainable process or assembly changes, each with a name, a rationale, and a source label.
+2. THE TerraVow_System SHALL compute, in engine code, for every alternative and process change: capex in INR, efficiency gain in percent, production-value effect in INR per year, per-domain emissions reduction relative to the current Pollution_Intensity, and simple payback in years (capex divided by net annual benefit, reported as "no payback" when the net annual benefit is not positive).
+3. WHEN Gemini is used, THE TerraVow_System SHALL ask it only to propose candidate names, rationale, and the input parameters needed by the engine (for example a claimed efficiency range), SHALL use Google Search grounding where available, SHALL retain Grounded_Source URLs, SHALL validate the response against a schema, and SHALL NOT accept any payback, savings, or emission total computed by Gemini.
+4. THE TerraVow_System SHALL label Gemini-proposed candidates "AI-suggested, requires vendor validation and process-safety review", consistent with Requirement 5.4.
+5. THE TerraVow_System SHALL provide, for every Industry_Category, a curated fallback set of alternatives and process changes with explicit illustrative parameters, so that the recommendation works with no Gemini and is labelled `curated-fallback`.
+6. IF Gemini or grounding is unavailable or returns invalid output, THEN THE TerraVow_System SHALL return the curated fallback with a visible message and SHALL NOT fail the request.
+7. THE TerraVow_System SHALL NOT recommend an alternative or process change that increases total emission mass or shifts load across Pollution_Domains, applying the same hard veto as Requirement 8.3, and SHALL pass each recommendation through the existing Decision_Gate before it is shown as actionable.
+8. WHEN a recommendation is shown, THE TerraVow_System SHALL show the current Health_Score and Pollution_Intensity beside the alternative so the comparison against the current usage is visible.
+9. THE TerraVow_System SHALL show a sustainable-assembly process change as a distinct item from a machine replacement, and a machine alternative SHALL NOT be presented as the only option.
+10. THE TerraVow_System SHALL label every Sustainability_Recommendation as an estimate and not a quotation, an engineering design, or a compliance determination.
+11. IF a required engine input (for example the current Pollution_Intensity) is unavailable, THEN THE TerraVow_System SHALL report the affected comparison as undetermined with the reason and SHALL NOT substitute an invented value.
+
+### Requirement 27: Government Incentives by Country and Enterprise Size
+
+**Product intent:** PI-6. **User Story:** As a small or large manufacturer, I want to see the tax rebates and policies available for the sustainable upgrade I am considering and how they change payback, so that I can judge affordability.
+
+#### Acceptance Criteria
+
+1. THE TerraVow_System SHALL store Incentive_Schemes in a structure keyed by country, with India populated by default and INR as its currency.
+2. THE TerraVow_System SHALL record for each Incentive_Scheme a name, issuing authority, applicable Industry_Categories, applicable Enterprise_Sizes, benefit type, benefit description, eligibility notes, source URL, `retrieved_on` date, and a `verified` flag; a record that is an explicitly labelled illustrative demo record (no real issuing body) MAY have a null source URL and a null `retrieved_on` and SHALL carry an `authored_on` date instead, and a curated record nobody retrieved SHALL have a null `retrieved_on`.
+3. THE TerraVow_System SHALL NOT fabricate a scheme, a rate, a cap, or a source URL; every Incentive_Scheme lacking a checked primary source SHALL carry `status = "UNVERIFIED/illustrative"` and SHALL be labelled as such in the user interface.
+4. WHEN a user selects an Enterprise_Size, THE TerraVow_System SHALL return the Incentive_Schemes applicable to the machine's Industry_Category and to that Enterprise_Size, and THE TerraVow_System SHALL include schemes applicable to both sizes in either selection.
+5. THE TerraVow_System SHALL include, in the default India set, at least one scheme applicable to MSME and at least one applicable to LARGE for each Industry_Category, or SHALL show an explicit "no matching scheme recorded" message when none is recorded.
+6. WHEN a scheme has a quantifiable benefit parameter (for example a percentage capital subsidy with a cap), THE TerraVow_System SHALL compute the incentive-adjusted capex and incentive-adjusted payback in engine code and SHALL show them beside the unadjusted capex and payback.
+7. WHEN a scheme has no quantifiable parameter, THE TerraVow_System SHALL list it as qualitative and exclude it from the adjusted calculation.
+8. THE TerraVow_System SHALL guarantee that the incentive-adjusted capex is no greater than the unadjusted capex and that the incentive-adjusted payback is no greater than the unadjusted payback when payback is defined.
+9. WHEN Gemini with grounding is used to discover or refresh schemes, THE TerraVow_System SHALL store its output as `UNVERIFIED` with the Grounded_Source URLs and `retrieved_on`, and SHALL NOT mark a scheme `verified` without a recorded human-checked primary source.
+10. THE TerraVow_System SHALL label every incentive output "informational, not tax or legal advice; confirm eligibility with the issuing authority", consistent with Requirement 6.8.
+11. IF a country other than the populated set is requested, THEN THE TerraVow_System SHALL return an empty scheme list with an explicit "no data for this country" message.
+
+### Requirement 28: Honesty, Determinism, and Security Constraints for the Extension
+
+**Product intent:** PI-1 to PI-6. **User Story:** As a judge or auditor, I want the new features to be honest about what is estimated, generated, or unverified and safe against untrusted content, so that no new claim exceeds its evidence.
+
+#### Acceptance Criteria
+
+1. THE TerraVow_System SHALL compute every number shown in Requirements 18–27 (Health_Score, Remaining_Lifespan_Estimate, Pollution_Intensity, capex, payback, adjusted payback, emissions reduction) in engine code and SHALL NOT take any number from Gemini output as a computed result; a number supplied by Gemini SHALL be treated only as a labelled input parameter.
+2. THE Decision_Gate and the verify-improvement flow SHALL behave exactly as before, and THE audit hash chain SHALL keep its record format, hash computation, verification, and ordering semantics unchanged (the only permitted change being that, in Firestore mode, the append is made transactional so the chain stays unforked when several service replicas write at once), and THE TerraVow_System SHALL pass existing tests for all three unchanged.
+3. WHEN a decision-oriented output from Requirements 23–27 is produced (a sustainability recommendation, or a workflow decision such as resolving or closing a Snag), THE TerraVow_System SHALL append an audit entry using the existing hash-chained store before returning the output.
+4. THE TerraVow_System SHALL label estimates as estimates, AI-generated content as AI-generated, sample data as sample data, and unverified items as unverified, and SHALL state "not an official certification" wherever health or lifespan is shown.
+5. THE TerraVow_System SHALL NOT present any source, URL, regulation, or scheme that was not returned by grounding metadata or entered in a curated data file with its origin recorded.
+6. THE TerraVow_System SHALL render all template, AI, catalogue, and user-supplied text in the user interface through text-safe means (text nodes or escaped output), SHALL NOT insert it as markup, and SHALL render only `http` or `https` Grounded_Source URLs as links with `rel="noopener noreferrer"`.
+7. THE TerraVow_System SHALL read Gemini and Firestore credentials only from environment or platform identity and SHALL NOT embed or log any secret.
+8. THE TerraVow_System SHALL validate every new endpoint input for type, required presence, and length (default free-text answer maximum 2000 characters, identifiers maximum 80 characters), and SHALL return a client-error response, not a server error, on invalid input.
+9. THE TerraVow_System SHALL NOT send raw personal data to Gemini or persist it, consistent with Requirement 13.3, and SHALL store only pseudonymous reporter handles.
+10. IF a Gemini call fails or returns invalid output in any new flow, THEN THE TerraVow_System SHALL degrade to the labelled deterministic fallback or an explicit unavailable message, never to a silently invented value.
+11. THE TerraVow_System SHALL provide automated tests for the deterministic engines (Requirements 23, 24, 26, 27), the cache-once logic (Requirement 21) with a fake Gemini that counts calls, input validation, and the template schema validator.
+
+### Requirement 29: Lower-Priority Items (Possible Concern Flag, Wear Tracking, Theme, Registry Exclusion)
+
+**Product intent:** PI-M, PI-4. **User Story:** As a product owner, I want the lower-priority meeting items captured explicitly, so that they are either delivered carefully or recorded as follow-ups instead of dropped silently.
+
+#### Acceptance Criteria
+
+1. WHERE a Machine_Catalogue entry or Machine_Instance is flagged as an outdated or possibly restricted machine type, THE TerraVow_System SHALL show a "possible concern" flag that cites a dated authoritative source and the text "verify with the regulator", and SHALL NOT assert that the machine is illegal or banned.
+2. IF no dated authoritative source is recorded for a flag, THEN THE TerraVow_System SHALL NOT display the flag. This item is a follow-up and MAY ship with zero flagged entries.
+3. THE TerraVow_System SHALL show machine age (as-of date minus 1 January of the install year, displayed in years) and the age factor used in the Health_Score on the machine view (the wear tracking required by the meetings).
+4. THE user interface SHALL use a light theme with white as the base, green as the primary accent, and blue as the secondary accent, and SHALL neutralise the `prefers-color-scheme: dark` block in `prototype/static/index.html` so the dark theme does not apply.
+5. THE visual theme change SHALL keep the existing ALLOW, ASK, and BLOCK states distinguishable by label and icon or text as well as colour.
+6. THE TerraVow_System SHALL NOT build or publish a public registry or certification for the prototype extension; the public registry and certification remain specification-only, and the deck and README SHALL say so.
+
+### Requirement 30: Documentation Accuracy
+
+**Product intent:** All. **User Story:** As a judge reading the repository, I want the README claims to match what runs, so that no claim exceeds the implementation.
+
+#### Acceptance Criteria
+
+1. THE root `README.md` SHALL be corrected so that the opening paragraph and the "Google Cloud — how the stack is used" table distinguish services used by the running prototype (Gemini via Vertex AI or AI Studio, Firestore, Cloud Run, and Google Search grounding once implemented) from services that are specified, designed, or stubbed only (Vertex AI Agent Engine, Vertex AI Search, BigQuery, Pub/Sub, Cloud Storage).
+2. THE root `README.md` section "Honesty about scope" SHALL be corrected to state that a working prototype exists, SHALL state which of Requirements 16 and 17 (Integrity_Gate and detection hardening) are specified but not implemented, and SHALL correct the "64 correctness properties each validated" claim to the number actually implemented.
+3. THE root `README.md` SHALL state that the public global registry and certification are specification-only and are not part of the running prototype.
+4. THE root `README.md` SHALL replace its reference to Gemini model versions that the running prototype does not use with the model identifiers actually configured in the prototype, or state which are target-only.
+5. THE `prototype/README.md` SHALL be updated to list the new endpoints, the Template cache-once behaviour, the Role switch, the data sources and their sample/illustrative status, the "no authentication" note, and a "What is NOT built" list that includes the items still outstanding.
+6. THE `prototype/README.md` SHALL state that Google Search grounding is used only if and when the manual entry, template, recommendation, or incentive flows actually call it, and SHALL NOT list it before it is implemented.
+7. THE documentation SHALL state that catalogue entries, Base_Templates, seeded snag histories, illustrative factors, and any `UNVERIFIED` incentive records are sample or illustrative data.
+8. THE root `README.md` link to `competitive-landscape.md` SHALL point to the file's actual location under `docs/`.

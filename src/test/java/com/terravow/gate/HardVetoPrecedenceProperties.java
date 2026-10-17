@@ -55,8 +55,9 @@ class HardVetoPrecedenceProperties {
             @ForAll("thresholds") GateThresholds thresholds) {
 
         Recommendation rec = new Recommendation("rec-1", confidence, readingChain());
+        TrustContext noTrustCap = new TrustContext(1.0, 0.0);
 
-        GateVerdict verdict = gate.classify(rec, thresholds, harm);
+        GateVerdict verdict = gate.classify(rec, thresholds, harm, noTrustCap);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.BLOCK);
         assertThat(verdict.vetoApplied()).isTrue();

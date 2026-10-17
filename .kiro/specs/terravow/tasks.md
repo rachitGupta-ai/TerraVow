@@ -535,3 +535,178 @@ implemented as jqwik property tests placed next to the code they validate.
   ]
 }
 ```
+
+## Prototype Extension Tasks (Requirements 18–30)
+
+These tasks implement the Python prototype extension in `prototype/` (design sections E1–E15,
+Properties 65–95). They are ordered **vertical-slice-first**: tasks 30–39 deliver the complete demo
+flow (industry → catalogue → AI template cached once → snag → resolver → health / lifespan /
+pollution → sustainable alternatives + India incentives); tasks 40–45 are honesty, carried-over,
+hardening and polish. Property tests use `hypothesis` (`@settings(max_examples=100)`, tagged
+`# Feature: terravow, Property N: <title>`). `prototype/tests/test_core.py` must pass unchanged
+throughout. The detailed plan with files and checks is `.agents/tasks/plan.md`.
+
+- [x] 30. Prototype foundation: settings, industries, seeds, Store document API
+  - [x] 30.1 Create the venv, pin `google-genai==1.20.0` / `google-cloud-firestore==2.19.0`, add `hypothesis` to dev requirements, git-ignore `prototype/.venv/`
+    - _Requirements: 28.7, A5_
+  - [x] 30.2 Add `app/settings.py` (named constants; lease/deadline constants derived, never literals) and `app/industries.py` (`INDUSTRIES`, domain→indicator map, `slug`, `model_key`, `fold`)
+    - _Requirements: 18.1, 18.2, 18.3, 21.1, A5_
+  - [x] 30.3 Add `data/industries.json` and `data/catalogue.json` (20 sample entries; pinned economics for the six fleet rows); tag the six fleet machines with industry, manufacturer, model, install year, catalogue id
+    - _Requirements: 18.4, 18.5, 18.7_
+  - [x] 30.4 Add the Store document API (`get_doc`, `create_if_absent`, `put_doc`, `update_doc`, `query_eq`, `query_in`, `delete_doc`, `replace_if`) for memory and Firestore; refuse non-`ai` template/alternatives documents
+    - _Requirements: 21.5, 21.8, 22.1_
+  - [x]* 30.5 Write property tests for tagging and model key
+    - **Property 65: Industry and fleet tagging invariants**
+    - **Property 66: The Machine_Model_Key is a deterministic, field-boundary-safe normalisation**
+    - **Validates: Requirements 18.1–18.5, 21.1**
+
+- [x] 31. Catalogue search, industry endpoints and the UI shell
+  - [x] 31.1 Implement `catalogue.search`, `GET /api/industries`, `GET /api/catalogue/search` in a new `routes_ext.py` router; add the new fields to `machine_view`
+    - _Requirements: 18.3, 18.7, 18.8, 19.1–19.5_
+  - [x] 31.2 Add the tab bar, Role switch, handle field, no-authentication footer, light theme, industry dropdown and ARIA autocomplete with the sample-data notice
+    - _Requirements: 18.6, 19.5, 25.1, 25.2, 29.4, 29.5_
+  - [x]* 31.3 Write property test for catalogue search
+    - **Property 72: Catalogue search is industry-scoped, bounded, and deterministically ordered**
+    - **Validates: Requirements 19.1–19.4**
+
+- [x] 32. Base Templates, template schema and validator
+  - [x] 32.1 Author the four curated Base_Templates (deep, schema-valid, materially different, covering every seeded snag type)
+    - _Requirements: 20.2–20.6, 20.8_
+  - [x] 32.2 Implement `GeneratedTemplate`, `validate_template`, `build_form_schema`, `adapt_base` and the server-constant disclaimer
+    - _Requirements: 20.6, 20.7, 20.9, 20.10, 20.12_
+  - [x]* 32.3 Write property tests for the validator and base templates
+    - **Property 70: The template validator accepts exactly the schema-valid, deep, referentially intact, bounded templates**
+    - **Property 71: Base templates are valid, domain-covering, and materially different across industries**
+    - **Validates: Requirements 20.7, 20.8, 20.10**
+
+- [x] 33. Template ensure with cache-once, Gemini generation and manual entry
+  - [x] 33.1 Implement `cache_once.ensure_once` (double-checked read, per-key flight, create-if-absent; fallback never stored; `generated-unsaved` on persistence failure)
+    - _Requirements: 21.3–21.8, 21.11_
+  - [x] 33.2 Add `gemini_client.generate_template` and grounded `lookup_specs` with the grounding-source extractor and call budget
+    - _Requirements: 19.6–19.8, 19.10, 20.1, 20.11, 28.9_
+  - [x] 33.3 Add `POST /api/catalogue/manual`, `POST /api/template/ensure`, `GET /api/template/{key}`; UI manual entry, ensure spinner, cache status line and collapsible template sections
+    - _Requirements: 19.6–19.9, 21.10, 21.12_
+  - [x]* 33.4 Write property tests for cache-once
+    - **Property 67: A model's template is generated once and then served from the cache**
+    - **Property 68: Concurrent ensure calls generate once and store one document** (two stores sharing one dictionary)
+    - **Property 69: A fallback-base template is never cached as AI-generated**
+    - **Validates: Requirements 21.3–21.9**
+
+- [x] 34. Machine instances and snag submission
+  - [x] 34.1 Implement `snags.py`: role comment, handle rule, `validate_answers`, `redact`, append-only snag documents, `resolve_guidance`
+    - _Requirements: 22.2, 22.3, 22.5, 22.6, 22.10, 25.2, 25.3, 25.11_
+  - [x] 34.2 Add `POST /api/instances`, `GET /api/instances`, `POST /api/snags`; UI instance picker, dynamic form rendered from `form_schema`, guidance card
+    - _Requirements: 22.1, 22.2, 25.4, 25.5_
+  - [x]* 34.3 Write property tests for snag validation and redaction
+    - **Property 73: Snag submissions are validated against the stored template and history is append-only**
+    - **Property 87: Free-text redaction is deterministic, idempotent, and removes contact patterns**
+    - **Validates: Requirements 22.5, 22.6, 22.10**
+
+- [x] 35. Seeded histories, startup seeding, demo reset and resolver workflow
+  - [x] 35.1 Add `data/seed_snags.json` and `app/seed.py` (deterministic ids, shared anchor, startup handler, lazy re-seed, reset)
+    - _Requirements: 22.7, 22.8_
+  - [x] 35.2 Add `GET /api/snags`, `GET /api/resolver/queue`, accept / resolve / close, `GET /api/machines/{id}/history`; audit `snag_resolved` / `snag_closed`; UI resolver queue
+    - _Requirements: 22.4, 22.9, 25.6, 25.7, 25.10, 28.3_
+  - [x]* 35.3 Write property tests for seeding, guidance, roles and reset
+    - **Property 84: The role guard and handle rules hold for every action**
+    - **Property 86: Demo reset restores seeded histories and preserves the audit trail and caches**
+    - **Property 88: Seeding is idempotent and independent of the replica that performs it**
+    - **Property 89: Snag guidance resolves in a fixed order and is labelled with the source actually used**
+    - **Validates: Requirements 22.7, 22.8, 25.3, 25.6, 25.10**
+
+- [x] 36. Health score, remaining lifespan and pollution intensity
+  - [x] 36.1 Add the pure engine functions `health_score`, `remaining_lifespan`, `degradation_loss`, `excess_from_loss`, `pollution_intensity`, `health_timeline`, and `snags.snag_facts`
+    - _Requirements: 23.1–23.10, 24.1–24.8_
+  - [x] 36.2 Add `GET /api/machines/{id}/health`; recompute on close; UI Machine health tab (gauge, lifespan, age and wear, factor table, snag timeline, pollution trend, labels)
+    - _Requirements: 24.7, 24.9, 25.8, 28.4, 29.3_
+  - [x]* 36.3 Write property tests for the health and pollution engine
+    - **Property 74: Health score is bounded, deterministic, and monotone in snag history**
+    - **Property 75: The health factors explain the score exactly**
+    - **Property 76: Remaining lifespan is bounded and non-decreasing in health**
+    - **Property 77: Degraded health raises pollution intensity monotonically**
+    - **Property 78: Air intensity reuses the existing deferral engine**
+    - **Validates: Requirements 23.1–23.10, 24.3–24.6**
+
+- [x] 37. Curated alternatives, economics, incentives and the recommendations endpoint
+  - [ ] 37.1 Add `data/curated_alternatives.json` and `data/incentives.json` (India; real-named schemes qualitative and unverified; demo-synthetic records labelled illustrative)
+    - _Requirements: 26.5, 27.1–27.3, 27.5_
+  - [ ] 37.2 Add `candidate_economics` (payback statuses) and `apply_incentive` to the engine; `sustain.py` with the gate, zero-reduction rule and backfill
+    - _Requirements: 26.2, 26.7, 26.11, 27.6–27.8, 28.1_
+  - [ ] 37.3 Add `POST /api/machines/{id}/recommendations` (audited, optional `country`) and `GET /api/incentives`
+    - _Requirements: 26.1, 26.8–26.10, 27.4, 27.10, 27.11, 28.3_
+  - [ ]* 37.4 Write property tests for economics, incentives and seed economics
+    - **Property 79: Economics and payback are deterministic and never take totals from Gemini**
+    - **Property 80: Incentive filtering is correct and adjustment never worsens the outcome**
+    - **Property 91: Unverified incentive data is never presented as verified or as a real scheme's figure**
+    - **Property 95: The pinned seed economics keep the seeded health table and the payback outcomes reproducible**
+    - **Validates: Requirements 26.2, 27.3–27.8, 28.1**
+
+- [x] 38. AI-suggested alternatives and the Sustainability tab
+  - [ ] 38.1 Add grounded `suggest_alternatives` cached in `alternatives` via `ensure_once`; curated fallback with a visible message
+    - _Requirements: 26.3, 26.4, 26.6, 28.10_
+  - [ ] 38.2 Build the Sustainability tab (current usage, grouped items, gate and source badges, paybacks with statuses, MSME/Large toggle, schemes with labels and disclaimer)
+    - _Requirements: 26.8–26.10, 27.4, 27.6, 27.10_
+  - [ ]* 38.3 Write property test for recommendation gating and fallback
+    - **Property 81: Every recommendation passes the existing Decision_Gate and degrades to the curated set**
+    - **Validates: Requirements 26.5–26.7**
+
+- [x] 39. Checkpoint - End-to-end demo flow passes
+  - Add `tests/test_e2e_flow.py` walking the whole flow with a fake Gemini and with Gemini not configured; run the manual browser walk; ensure all tests pass, ask the user if questions arise.
+
+- [ ] 40. UI safety and accessibility
+  - [ ] 40.1 Review new UI code for text-only sinks, `safeLink`, SVG via `createElementNS`, ARIA roles and focus handling; manual hostile-string check
+    - _Requirements: 28.6, 29.5_
+  - [ ]* 40.2 Write the static scan test
+    - **Property 82: Untrusted content is rendered as text only**
+    - **Validates: Requirements 28.6, 29.4**
+
+- [ ] 41. Documentation accuracy
+  - [ ] 41.1 Correct the root `README.md` (services used vs specified, honesty about scope, property count, model id, registry specification-only, `docs/competitive-landscape.md` link)
+    - _Requirements: 29.6, 30.1–30.4, 30.8_
+  - [ ] 41.2 Update `prototype/README.md` and add `prototype/docs/data-model.md`
+    - _Requirements: 30.5–30.7_
+
+- [ ] 42. Carried over from task 4.5–4.7: Java Decision_Gate trust cap
+  - [ ] 42.1 Move the trust cap into the `DecisionGate` contract with `TrustContext`; `DecisionGateController` delegates with an unchanged response (completes legacy 4.5)
+    - _Requirements: 16.15, 16.16_
+  - [ ]* 42.2 Write property tests for the trust cap (completes legacy 4.6 and 4.7)
+    - **Property 58: Sub-threshold trust caps the Decision_Gate at ASK**
+    - **Property 59: Trust never raises a classification and never lifts the hard veto**
+    - **Validates: Requirements 16.15, 16.16**
+
+- [ ] 43. Multi-replica and time-budget hardening
+  - [ ] 43.1 Add the owner-checked lease, `Deadline`, waiter cap with HTTP 202 `pending`, test hooks and profile start-up assertions to `cache_once`
+    - _Requirements: 21.5–21.7, 28.2_
+  - [ ] 43.2 Make the Firestore audit append transactional over `audit_head` (record format and hash unchanged)
+    - _Requirements: 28.2_
+  - [ ] 43.3 Route manual spec lookup through `ensure_once` with the retry window; add optional `POST /api/incentives/refresh` behind `INCENTIVE_REFRESH_ENABLED=false`; one `CLOUD_RUN_TIMEOUT_S` variable and `--max-instances 5` in both deploy scripts
+    - _Requirements: 19.6–19.8, 27.9, 28.8_
+  - [ ]* 43.4 Write property tests for hardening
+    - **Property 68: Concurrent ensure calls generate once and store one document** (interleavings A and B)
+    - **Property 83: Every new Gemini-backed flow degrades to a labelled fallback**
+    - **Property 85: The safety core is unchanged by the extension**
+    - **Property 90: Spec-lookup results are cached only when deterministic**
+    - **Property 92: An ensure request never exceeds its deadline and never pins more than the waiter cap**
+    - **Property 93: A lease is released only by its owner, and a failed takeover leaves no lease behind**
+    - **Property 94: Country, instance, and snag inputs are validated and bounded before any write or Gemini call**
+    - **Validates: Requirements 19.8, 21.5–21.7, 28.2, 28.8, 28.10**
+
+- [ ] 44. T-MEASURE: template and grounded-call latency (only with Gemini credentials)
+  - Measure p50/p95 and tokens, tune the attempt timeouts under the derived-constant rule, record results in `prototype/docs/data-model.md`; without credentials keep the README "unmeasured" note
+  - _Requirements: 11.4, 20.7, A5_
+
+- [ ] 45. Final checkpoint - Ensure all tests pass (carries legacy task 29)
+  - Run the prototype suite and `./mvnw test`; confirm Properties 65–95 each have one tagged test; ensure all tests pass, ask the user if questions arise.
+
+Legacy open tasks 1.4, 1.5, 2.10, 2.11, 20.7, 22.3, 24.4, 24.5, 25.3, 27, 28 and Properties 45 and
+50–64 stay open and out of scope for the 18 Oct demo; the reasons are in `.agents/tasks/plan.md`
+("Carried-over tasks"), and task 41 makes the README state that Requirements 16 and 17 are specified
+but not implemented.
+
+## Documentation (as-built)
+
+- [x] 46. Write three as-built documentation files
+  - [x] 46.1 `docs/product-features.md` — detailed product feature catalogue: 4 industries and pollution domains, catalogue search + manual entry, AI deep per-model template (fields/sections, cache-once behavior), snag reporting with dynamic forms, reporter/resolver roles and workflow, snag history, health score + remaining lifespan, pollution intensity (air/water/chemical/soil) linked to health, sustainable machine alternative + process change, India incentives by industry and enterprise size (MSME/large) incl. verified vs UNVERIFIED/illustrative, honesty/determinism principles. Group by feature with short user-value notes.
+  - [x] 46.2 `docs/system-architecture.md` — system AND design architecture: component map (FastAPI app, routers, engine, cache_once, store with Firestore + in-memory fallback, gemini_client, gate, UI single page), data model/collections (catalogue, templates, snag_history/snags, instances, incentives, alternatives, audit), key API endpoints grouped by flow, cache-once create-if-absent sequence and multi-replica safety, deterministic-numbers-vs-LLM boundary, graceful degradation/fallbacks, where the Java engine fits. Include at least one Mermaid diagram (component or sequence) and a Mermaid ER-style or table data-model view. Keep diagrams valid Mermaid.
+  - [x] 46.3 `docs/user-flow.md` — user flow / experience chart: end-to-end journeys for Reporter and Resolver roles plus sustainability/analytics view, as Mermaid flowcharts (and a sequence diagram for the template-ensure cache path), with step-by-step narrative of what the user sees at each screen/tab and the fallback experience when Gemini is not configured. Keep Mermaid valid.
+  - _Requirements: 30_

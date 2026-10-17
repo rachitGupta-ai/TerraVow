@@ -1,0 +1,1327 @@
+{
+ "base_template_id": "base-chemicals-1",
+ "industry": "chemicals",
+ "template": {
+  "machine_profile": {
+   "summary": "Generic template for chemical and fertiliser process equipment: spray dryers, granulators, distillation columns, decanter centrifuges and filter presses.",
+   "typical_duty": "Continuous or campaign operation with hazardous or flammable materials, under process-safety management.",
+   "key_components": [
+    "Air heater and burner",
+    "Atomiser wheel or nozzles",
+    "Drying chamber insulation",
+    "Bag filter and cyclones",
+    "Heat exchangers and reboiler",
+    "Pumps with mechanical seals",
+    "Relief valves",
+    "Agitators and gearboxes",
+    "Decanter bowl and scroll",
+    "Filter cloths",
+    "Secondary containment bunds"
+   ],
+   "specs": []
+  },
+  "operating_parameters": [
+   {
+    "id": "dryer-inlet-temp",
+    "label": "Dryer inlet air temperature",
+    "unit": "C",
+    "typical_range": "150 to 250",
+    "why_it_matters": "Set by the product; overshoot risks dust explosion and product damage."
+   },
+   {
+    "id": "dryer-outlet-temp",
+    "label": "Dryer outlet temperature",
+    "unit": "C",
+    "typical_range": "70 to 110",
+    "why_it_matters": "Controls the product moisture and drying efficiency."
+   },
+   {
+    "id": "feed-solids",
+    "label": "Feed solids content",
+    "unit": "% w/w",
+    "typical_range": "35 to 60",
+    "why_it_matters": "Low solids mean more water to evaporate and more energy."
+   },
+   {
+    "id": "column-dp",
+    "label": "Column differential pressure",
+    "unit": "kPa",
+    "typical_range": "Per design",
+    "why_it_matters": "A rise signals flooding or fouling."
+   },
+   {
+    "id": "reflux-ratio",
+    "label": "Reflux ratio",
+    "unit": "-",
+    "typical_range": "Per design",
+    "why_it_matters": "A higher ratio than needed wastes reboiler steam."
+   },
+   {
+    "id": "agitator-current",
+    "label": "Agitator motor current",
+    "unit": "A",
+    "typical_range": "Per motor rating",
+    "why_it_matters": "A rise signals bearing wear or viscosity changes."
+   },
+   {
+    "id": "effluent-cod",
+    "label": "Effluent COD",
+    "unit": "mg/L",
+    "typical_range": "Per consent",
+    "why_it_matters": "The key water-pollution indicator."
+   },
+   {
+    "id": "vent-voc",
+    "label": "Vent VOC concentration",
+    "unit": "ppm",
+    "typical_range": "Below the permit limit",
+    "why_it_matters": "Solvent loss is both a pollution and a cost."
+   },
+   {
+    "id": "filtrate-turbidity",
+    "label": "Filtrate turbidity",
+    "unit": "NTU",
+    "typical_range": "Below 20",
+    "why_it_matters": "High turbidity means cloth failure and solids carry-over."
+   }
+  ],
+  "job_types": [
+   {
+    "id": "insulation-repair",
+    "name": "Thermal insulation and cladding repair",
+    "trigger": "Hot or cold spots at a thermal survey, or annually",
+    "schedule": "Annual thermal survey",
+    "checklist": [
+     "Thermal-camera survey",
+     "Remove damaged cladding",
+     "Replace wet or compressed insulation",
+     "Seal the cladding joints against water ingress"
+    ],
+    "parts_and_tools": [
+     "Mineral wool",
+     "Aluminium cladding",
+     "Sealant",
+     "Thermal camera"
+    ],
+    "safety_and_permit_notes": [
+     "Working at height permit",
+     "Asbestos check on old lagging before removal"
+    ],
+    "est_downtime_hours": 8.0,
+    "est_cost_band": {
+     "low_inr": 20000,
+     "high_inr": 150000
+    }
+   },
+   {
+    "id": "exchanger-cleaning",
+    "name": "Heat-exchanger cleaning",
+    "trigger": "Fouling factor above design, or per campaign",
+    "schedule": "Per campaign",
+    "checklist": [
+     "Isolate, drain and purge",
+     "Open the heads",
+     "Hydro-jet or chemically clean the tubes",
+     "Inspect for pitting",
+     "Pressure-test"
+    ],
+    "parts_and_tools": [
+     "Hydro-jetting unit",
+     "Gaskets",
+     "Cleaning chemicals"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Line-breaking permit",
+     "Residual chemical exposure"
+    ],
+    "est_downtime_hours": 16.0,
+    "est_cost_band": {
+     "low_inr": 80000,
+     "high_inr": 400000
+    }
+   },
+   {
+    "id": "mech-seal-replace",
+    "name": "Process pump mechanical-seal replacement",
+    "trigger": "Seal leak or seal-pot alarm",
+    "schedule": "By condition",
+    "checklist": [
+     "Isolate, drain, purge and verify gas-free",
+     "Replace the cartridge seal",
+     "Check the seal flush plan",
+     "Align the coupling"
+    ],
+    "parts_and_tools": [
+     "Cartridge seal",
+     "Laser alignment tool",
+     "Seal flush parts"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Line-breaking permit",
+     "Toxic or flammable fluid PPE"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 40000,
+     "high_inr": 250000
+    }
+   },
+   {
+    "id": "relief-valve-recertify",
+    "name": "Relief valve test and recertification",
+    "trigger": "Valve weeping or the test interval reached",
+    "schedule": "Per statutory interval",
+    "checklist": [
+     "Isolate with a car-sealed block valve per procedure",
+     "Remove and bench-test the set pressure",
+     "Lap the seat or replace the internals",
+     "Reinstall and update the register"
+    ],
+    "parts_and_tools": [
+     "Test bench",
+     "Seat lapping kit",
+     "Spare internals"
+    ],
+    "safety_and_permit_notes": [
+     "Never isolate a relief valve without a management-of-change approval",
+     "Lock-out / tag-out and zero-energy verification before opening"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 25000,
+     "high_inr": 120000
+    }
+   },
+   {
+    "id": "bearing-replace",
+    "name": "Agitator or gearbox bearing replacement",
+    "trigger": "Vibration or temperature alarm",
+    "schedule": "By condition",
+    "checklist": [
+     "Isolate and lock the drive",
+     "Remove the gearbox or bearing housing",
+     "Replace the bearings and seals",
+     "Refill the lubricant",
+     "Run a vibration check"
+    ],
+    "parts_and_tools": [
+     "Bearings",
+     "Seals",
+     "Gear oil",
+     "Puller"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Lifting plan for heavy components"
+    ],
+    "est_downtime_hours": 12.0,
+    "est_cost_band": {
+     "low_inr": 50000,
+     "high_inr": 300000
+    }
+   },
+   {
+    "id": "filter-cloth-change",
+    "name": "Filter cloth change",
+    "trigger": "Turbidity above the limit or a cycle-time increase",
+    "schedule": "By condition",
+    "checklist": [
+     "Open and wash the press",
+     "Inspect the cloths and plates",
+     "Replace blinded or torn cloths",
+     "Run a test cycle and check turbidity"
+    ],
+    "parts_and_tools": [
+     "Filter cloths",
+     "Plate gaskets"
+    ],
+    "safety_and_permit_notes": [
+     "Residual cake chemical exposure",
+     "Hydraulic closing pressure"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 30000,
+     "high_inr": 200000
+    }
+   },
+   {
+    "id": "ldar-survey",
+    "name": "Leak detection and repair (LDAR) survey",
+    "trigger": "Odour complaints, or quarterly",
+    "schedule": "Quarterly",
+    "checklist": [
+     "Survey flanges, valves, pumps and seals with a VOC analyser",
+     "Tag leaks above the threshold",
+     "Tighten or repair",
+     "Re-survey and log"
+    ],
+    "parts_and_tools": [
+     "VOC analyser",
+     "Leak tags",
+     "Gasket kit"
+    ],
+    "safety_and_permit_notes": [
+     "Flammable atmosphere: intrinsically safe tools",
+     "Gas detector worn"
+    ],
+    "est_downtime_hours": 8.0,
+    "est_cost_band": {
+     "low_inr": 30000,
+     "high_inr": 150000
+    }
+   },
+   {
+    "id": "atomiser-balance",
+    "name": "Atomiser wheel inspection and balancing",
+    "trigger": "Vibration rising, or by running hours",
+    "schedule": "By running hours",
+    "checklist": [
+     "Remove the atomiser",
+     "Inspect the wheel inserts for wear",
+     "Balance the wheel",
+     "Check the bearing condition"
+    ],
+    "parts_and_tools": [
+     "Balancing machine",
+     "Wheel inserts",
+     "Bearings"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Heavy lift"
+    ],
+    "est_downtime_hours": 8.0,
+    "est_cost_band": {
+     "low_inr": 60000,
+     "high_inr": 350000
+    }
+   },
+   {
+    "id": "bag-filter-service",
+    "name": "Dryer bag filter service",
+    "trigger": "Product loss at the stack, or dP out of range",
+    "schedule": "Monthly",
+    "checklist": [
+     "Check pulse cleaning",
+     "Find leaking bags",
+     "Replace bags",
+     "Inspect the explosion vents"
+    ],
+    "parts_and_tools": [
+     "Filter bags",
+     "Cages",
+     "Pulse valves"
+    ],
+    "safety_and_permit_notes": [
+     "Confined-space entry permit, gas test and standby attendant",
+     "Combustible dust: no ignition sources"
+    ],
+    "est_downtime_hours": 10.0,
+    "est_cost_band": {
+     "low_inr": 60000,
+     "high_inr": 300000
+    }
+   },
+   {
+    "id": "decanter-overhaul",
+    "name": "Decanter scroll and bowl overhaul",
+    "trigger": "Cake dryness falling or vibration",
+    "schedule": "Annual",
+    "checklist": [
+     "Remove the bowl assembly",
+     "Inspect the scroll tiles",
+     "Replace worn tiles",
+     "Dynamically balance the rotor"
+    ],
+    "parts_and_tools": [
+     "Wear tiles",
+     "Bearings",
+     "Balancing service"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Heavy-lift plan"
+    ],
+    "est_downtime_hours": 24.0,
+    "est_cost_band": {
+     "low_inr": 200000,
+     "high_inr": 900000
+    }
+   },
+   {
+    "id": "drum-descaling",
+    "name": "Granulator drum build-up removal",
+    "trigger": "Drum current high or product size off spec",
+    "schedule": "Weekly",
+    "checklist": [
+     "Stop and isolate the drum",
+     "Remove the build-up mechanically",
+     "Inspect the flights and the scrapers",
+     "Restart and check the granule size"
+    ],
+    "parts_and_tools": [
+     "Scrapers",
+     "Flights"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Confined-space entry permit, gas test and standby attendant"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 20000,
+     "high_inr": 100000
+    }
+   },
+   {
+    "id": "bund-repair",
+    "name": "Secondary containment bund repair",
+    "trigger": "Cracks or failed bund test",
+    "schedule": "Annual inspection",
+    "checklist": [
+     "Empty and clean the bund",
+     "Inspect the floor and walls",
+     "Repair cracks with chemical-resistant mortar or lining",
+     "Hydro-test the bund"
+    ],
+    "parts_and_tools": [
+     "Chemical-resistant mortar",
+     "Lining",
+     "Test water"
+    ],
+    "safety_and_permit_notes": [
+     "Residual chemical exposure",
+     "Confined space if deep"
+    ],
+    "est_downtime_hours": 24.0,
+    "est_cost_band": {
+     "low_inr": 50000,
+     "high_inr": 300000
+    }
+   }
+  ],
+  "snag_types": [
+   {
+    "id": "insulation-wear",
+    "name": "Insulation wear",
+    "category": "thermal",
+    "symptoms": [
+     "Warm cladding surface",
+     "Damaged or wet lagging",
+     "Surface temperature above 60 C over a large area"
+    ],
+    "root_causes": [
+     "Water ingress through cladding joints",
+     "Mechanical damage",
+     "Age and compaction"
+    ],
+    "detection_method": "Thermal-camera survey and touch-safe surface checks",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of insulation wear: warm cladding surface noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: warm cladding surface confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: damaged or wet lagging; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: surface temperature above 60 c over a large area; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the surface temperature exceeds 80 C where people pass"
+     }
+    ],
+    "immediate_action": "Mark the area, fit temporary guarding if the surface is hot, and book a repair",
+    "recommended_job_id": "insulation-repair",
+    "time_to_fix_hours": 8.0,
+    "parts": [
+     "Mineral wool",
+     "Cladding"
+    ],
+    "safety_hazards": [
+     "Burns",
+     "Working at height"
+    ],
+    "escalation_criteria": "Escalate if the surface temperature exceeds 80 C where people pass",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Heat loss raises fuel use and CO2."
+     },
+     {
+      "domain": "chemical",
+      "effect": "Cold spots can condense corrosive vapours inside the duct."
+     }
+    ]
+   },
+   {
+    "id": "heat-exchanger-fouling",
+    "name": "Heat-exchanger fouling",
+    "category": "thermal",
+    "symptoms": [
+     "Reduced outlet temperature",
+     "Higher steam or fuel demand",
+     "Pressure drop above design"
+    ],
+    "root_causes": [
+     "Process deposits",
+     "Cooling-water scaling",
+     "Polymerisation"
+    ],
+    "detection_method": "Approach temperature and pressure-drop trend",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of heat-exchanger fouling: reduced outlet temperature noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: reduced outlet temperature confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: higher steam or fuel demand; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: pressure drop above design; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the process temperature cannot be met"
+     }
+    ],
+    "immediate_action": "Lower the throughput if the product spec is at risk and plan cleaning",
+    "recommended_job_id": "exchanger-cleaning",
+    "time_to_fix_hours": 16.0,
+    "parts": [
+     "Gaskets"
+    ],
+    "safety_hazards": [
+     "Residual chemical",
+     "Pressure"
+    ],
+    "escalation_criteria": "Escalate if the process temperature cannot be met",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Extra steam raises CO2."
+     },
+     {
+      "domain": "water",
+      "effect": "Cleaning waste must go to treatment."
+     }
+    ]
+   },
+   {
+    "id": "pump-mechanical-seal-failure",
+    "name": "Process pump mechanical-seal failure",
+    "category": "mechanical",
+    "symptoms": [
+     "Seal-pot level change",
+     "Drips at the seal",
+     "Spray of process fluid or vapour"
+    ],
+    "root_causes": [
+     "Dry running",
+     "Seal flush failure",
+     "Misalignment"
+    ],
+    "detection_method": "Seal-pot alarms and walk-round checks with a gas detector",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of process pump mechanical-seal failure: seal-pot level change noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: seal-pot level change confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: drips at the seal; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: spray of process fluid or vapour; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate at once if the gas detector alarms or the fluid is toxic"
+     }
+    ],
+    "immediate_action": "Switch to the standby pump and isolate the leaking one",
+    "recommended_job_id": "mech-seal-replace",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Cartridge seal"
+    ],
+    "safety_hazards": [
+     "Toxic or flammable release",
+     "Slips"
+    ],
+    "escalation_criteria": "Escalate at once if the gas detector alarms or the fluid is toxic",
+    "pollution_effects": [
+     {
+      "domain": "chemical",
+      "effect": "Process chemical release."
+     },
+     {
+      "domain": "air",
+      "effect": "VOC emissions from volatile fluids."
+     },
+     {
+      "domain": "soil",
+      "effect": "Spills outside the bund reach the ground."
+     }
+    ]
+   },
+   {
+    "id": "relief-valve-weeping",
+    "name": "Relief valve weeping",
+    "category": "process_chemical",
+    "symptoms": [
+     "Vapour or liquid at the relief valve discharge",
+     "Flare or vent flow when the system is below the set pressure",
+     "Continuous release or chattering"
+    ],
+    "root_causes": [
+     "Seat damage",
+     "Operating too close to the set pressure",
+     "Corrosion"
+    ],
+    "detection_method": "Tail-pipe temperature or acoustic monitor; flare flow meter",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of relief valve weeping: vapour or liquid at the relief valve discharge noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: vapour or liquid at the relief valve discharge confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: flare or vent flow when the system is below the set pressure; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: continuous release or chattering; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate to process safety immediately; never isolate without approval"
+     }
+    ],
+    "immediate_action": "Lower the operating pressure margin per procedure and inform process safety",
+    "recommended_job_id": "relief-valve-recertify",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Valve internals"
+    ],
+    "safety_hazards": [
+     "Overpressure protection loss",
+     "Toxic release"
+    ],
+    "escalation_criteria": "Escalate to process safety immediately; never isolate without approval",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Vented vapour adds VOC and greenhouse emissions."
+     },
+     {
+      "domain": "chemical",
+      "effect": "Loss of containment of process chemical."
+     }
+    ]
+   },
+   {
+    "id": "agitator-bearing-wear",
+    "name": "Agitator bearing wear",
+    "category": "mechanical",
+    "symptoms": [
+     "Rising motor current",
+     "Noise and vibration",
+     "Hot gearbox or bearing housing"
+    ],
+    "root_causes": [
+     "Lubrication failure",
+     "Shaft misalignment",
+     "Overload"
+    ],
+    "detection_method": "Vibration and temperature checks per round",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of agitator bearing wear: rising motor current noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: rising motor current confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: noise and vibration; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: hot gearbox or bearing housing; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the bearing temperature exceeds 90 C"
+     }
+    ],
+    "immediate_action": "Reduce the batch load if possible and plan a bearing change",
+    "recommended_job_id": "bearing-replace",
+    "time_to_fix_hours": 12.0,
+    "parts": [
+     "Bearings",
+     "Seals"
+    ],
+    "safety_hazards": [
+     "Rotating equipment"
+    ],
+    "escalation_criteria": "Escalate if the bearing temperature exceeds 90 C",
+    "pollution_effects": [
+     {
+      "domain": "chemical",
+      "effect": "Seal damage from shaft run-out can release vessel contents."
+     }
+    ]
+   },
+   {
+    "id": "filter-cloth-blinding",
+    "name": "Filter cloth blinding",
+    "category": "process_chemical",
+    "symptoms": [
+     "Longer filtration cycle",
+     "Wet cake",
+     "Cloudy filtrate or torn cloth"
+    ],
+    "root_causes": [
+     "Fine particles",
+     "Wrong cloth grade",
+     "Poor washing"
+    ],
+    "detection_method": "Cycle time and filtrate turbidity per batch",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of filter cloth blinding: longer filtration cycle noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: longer filtration cycle confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: wet cake; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: cloudy filtrate or torn cloth; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if filtrate solids go to the effluent above the limit"
+     }
+    ],
+    "immediate_action": "Wash the cloths and check the feed conditioning",
+    "recommended_job_id": "filter-cloth-change",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Filter cloths"
+    ],
+    "safety_hazards": [
+     "Chemical contact"
+    ],
+    "escalation_criteria": "Escalate if filtrate solids go to the effluent above the limit",
+    "pollution_effects": [
+     {
+      "domain": "water",
+      "effect": "Solids and COD in the filtrate raise the effluent load."
+     },
+     {
+      "domain": "soil",
+      "effect": "Wetter cake increases the disposal mass."
+     }
+    ]
+   },
+   {
+    "id": "solvent-vapour-leak",
+    "name": "Solvent vapour leak",
+    "category": "emissions_control",
+    "symptoms": [
+     "Solvent odour",
+     "VOC reading above the threshold at flanges",
+     "Gas detector alarm"
+    ],
+    "root_causes": [
+     "Gasket failure",
+     "Valve packing leak",
+     "Condenser overload"
+    ],
+    "detection_method": "LDAR survey with a VOC analyser",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of solvent vapour leak: solvent odour noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: solvent odour confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: voc reading above the threshold at flanges; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: gas detector alarm; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the reading exceeds 25% of the lower explosive limit"
+     }
+    ],
+    "immediate_action": "Ventilate, remove ignition sources, and isolate the source",
+    "recommended_job_id": "ldar-survey",
+    "time_to_fix_hours": 8.0,
+    "parts": [
+     "Gaskets",
+     "Valve packing"
+    ],
+    "safety_hazards": [
+     "Fire and explosion",
+     "Toxic exposure"
+    ],
+    "escalation_criteria": "Escalate if the reading exceeds 25% of the lower explosive limit",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "VOC emissions."
+     },
+     {
+      "domain": "chemical",
+      "effect": "Solvent loss and exposure."
+     }
+    ]
+   },
+   {
+    "id": "atomiser-wheel-imbalance",
+    "name": "Atomiser wheel imbalance",
+    "category": "mechanical",
+    "symptoms": [
+     "Rising atomiser vibration",
+     "Coarser particles",
+     "Wall deposits in the chamber and vibration trips"
+    ],
+    "root_causes": [
+     "Insert wear",
+     "Product build-up on the wheel",
+     "Bearing wear"
+    ],
+    "detection_method": "Vibration trend and product particle size",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of atomiser wheel imbalance: rising atomiser vibration noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: rising atomiser vibration confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: coarser particles; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: wall deposits in the chamber and vibration trips; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate on any vibration trip"
+     }
+    ],
+    "immediate_action": "Reduce the feed rate and plan an atomiser swap",
+    "recommended_job_id": "atomiser-balance",
+    "time_to_fix_hours": 8.0,
+    "parts": [
+     "Wheel inserts",
+     "Bearings"
+    ],
+    "safety_hazards": [
+     "High-speed rotating parts"
+    ],
+    "escalation_criteria": "Escalate on any vibration trip",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Wet deposits cause more drying energy and fines to the bag filter."
+     }
+    ]
+   },
+   {
+    "id": "dryer-bag-filter-leak",
+    "name": "Dryer bag filter leak",
+    "category": "emissions_control",
+    "symptoms": [
+     "Product dust at the stack",
+     "dP drop",
+     "Visible plume or deposits"
+    ],
+    "root_causes": [
+     "Bag damage",
+     "Cage wear",
+     "Condensation"
+    ],
+    "detection_method": "Stack visual and dP trend",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of dryer bag filter leak: product dust at the stack noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: product dust at the stack confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: dp drop; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: visible plume or deposits; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if a permit limit is at risk"
+     }
+    ],
+    "immediate_action": "Isolate the compartment if possible and inform EHS",
+    "recommended_job_id": "bag-filter-service",
+    "time_to_fix_hours": 10.0,
+    "parts": [
+     "Filter bags"
+    ],
+    "safety_hazards": [
+     "Combustible dust",
+     "Confined space"
+    ],
+    "escalation_criteria": "Escalate if a permit limit is at risk",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Particulate emissions."
+     },
+     {
+      "domain": "soil",
+      "effect": "Product dust deposits around the site."
+     }
+    ]
+   },
+   {
+    "id": "decanter-scroll-wear",
+    "name": "Decanter scroll wear",
+    "category": "mechanical",
+    "symptoms": [
+     "Wetter cake",
+     "Higher solids in the centrate",
+     "Vibration or torque alarms"
+    ],
+    "root_causes": [
+     "Abrasive feed",
+     "Tile loss",
+     "Bearing wear"
+    ],
+    "detection_method": "Cake dryness and centrate solids per shift",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of decanter scroll wear: wetter cake noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: wetter cake confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: higher solids in the centrate; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: vibration or torque alarms; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate on a vibration trip"
+     }
+    ],
+    "immediate_action": "Lower the feed rate and plan an overhaul",
+    "recommended_job_id": "decanter-overhaul",
+    "time_to_fix_hours": 24.0,
+    "parts": [
+     "Wear tiles"
+    ],
+    "safety_hazards": [
+     "High-speed rotor"
+    ],
+    "escalation_criteria": "Escalate on a vibration trip",
+    "pollution_effects": [
+     {
+      "domain": "water",
+      "effect": "Solids carry-over raises the effluent load."
+     },
+     {
+      "domain": "soil",
+      "effect": "Wetter cake increases sludge disposal."
+     }
+    ]
+   },
+   {
+    "id": "granulator-drum-buildup",
+    "name": "Granulator drum build-up",
+    "category": "process_chemical",
+    "symptoms": [
+     "Rising drum current",
+     "Off-size granules",
+     "Lumps blocking the discharge"
+    ],
+    "root_causes": [
+     "Excess moisture",
+     "Temperature control",
+     "Worn scrapers"
+    ],
+    "detection_method": "Drum current and the granule size distribution",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of granulator drum build-up: rising drum current noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: rising drum current confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: off-size granules; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: lumps blocking the discharge; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the discharge blocks"
+     }
+    ],
+    "immediate_action": "Adjust the liquid-to-solid ratio and plan cleaning",
+    "recommended_job_id": "drum-descaling",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Scrapers"
+    ],
+    "safety_hazards": [
+     "Rotating drum",
+     "Ammonia exposure"
+    ],
+    "escalation_criteria": "Escalate if the discharge blocks",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Ammonia and dust emissions rise with poor granulation."
+     },
+     {
+      "domain": "soil",
+      "effect": "Off-spec product becomes waste."
+     }
+    ]
+   },
+   {
+    "id": "reboiler-tube-leak",
+    "name": "Reboiler tube leak",
+    "category": "thermal",
+    "symptoms": [
+     "Process contamination of the condensate",
+     "Pressure changes",
+     "Process fluid in the steam system"
+    ],
+    "root_causes": [
+     "Corrosion",
+     "Erosion",
+     "Thermal fatigue"
+    ],
+    "detection_method": "Condensate conductivity or contamination analysis",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of reboiler tube leak: process contamination of the condensate noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: process contamination of the condensate confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: pressure changes; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: process fluid in the steam system; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the process fluid enters the utility steam"
+     }
+    ],
+    "immediate_action": "Divert the condensate to the drain safely and plan isolation",
+    "recommended_job_id": "exchanger-cleaning",
+    "time_to_fix_hours": 24.0,
+    "parts": [
+     "Tube plugs"
+    ],
+    "safety_hazards": [
+     "Hot fluid",
+     "Contamination"
+    ],
+    "escalation_criteria": "Escalate if the process fluid enters the utility steam",
+    "pollution_effects": [
+     {
+      "domain": "water",
+      "effect": "Contaminated condensate to the drain."
+     },
+     {
+      "domain": "chemical",
+      "effect": "Process chemical crosses into the utilities."
+     }
+    ]
+   },
+   {
+    "id": "containment-bund-crack",
+    "name": "Containment bund crack",
+    "category": "structural",
+    "symptoms": [
+     "Hairline cracks",
+     "Liquid in the bund that does not drain",
+     "Ground staining outside the bund"
+    ],
+    "root_causes": [
+     "Chemical attack",
+     "Settlement",
+     "Impact"
+    ],
+    "detection_method": "Monthly visual check and annual hydro-test",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of containment bund crack: hairline cracks noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: hairline cracks confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: liquid in the bund that does not drain; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: ground staining outside the bund; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if staining appears outside the bund"
+     }
+    ],
+    "immediate_action": "Keep the bund empty and plan a repair",
+    "recommended_job_id": "bund-repair",
+    "time_to_fix_hours": 24.0,
+    "parts": [
+     "Chemical-resistant mortar"
+    ],
+    "safety_hazards": [
+     "Chemical exposure"
+    ],
+    "escalation_criteria": "Escalate if staining appears outside the bund",
+    "pollution_effects": [
+     {
+      "domain": "soil",
+      "effect": "Leakage to ground contaminates soil."
+     },
+     {
+      "domain": "water",
+      "effect": "Seepage can reach groundwater."
+     }
+    ]
+   }
+  ],
+  "pollutant_capture": [
+   {
+    "id": "voc-odour-level",
+    "label": "Odour or vapour level",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "None",
+     "Faint odour",
+     "Strong odour",
+     "Gas detector alarm"
+    ],
+    "help_text": "What you smell or the detector shows.",
+    "domain": "air"
+   },
+   {
+    "id": "effluent-cod-sample-ref",
+    "label": "Effluent COD sample reference",
+    "type": "text",
+    "required": false,
+    "max_length": 40,
+    "options": null,
+    "help_text": "Lab sample number if a sample was taken.",
+    "domain": "water"
+   },
+   {
+    "id": "hazardous-release-type",
+    "label": "Hazardous chemical released",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "None",
+     "Acid",
+     "Alkali",
+     "Solvent",
+     "Ammonia",
+     "Product powder",
+     "Other"
+    ],
+    "help_text": "The main substance involved.",
+    "domain": "chemical"
+   },
+   {
+    "id": "release-quantity-estimate",
+    "label": "Estimated release quantity",
+    "type": "text",
+    "required": false,
+    "max_length": 60,
+    "options": null,
+    "help_text": "Kilograms or litres, with units.",
+    "domain": "chemical"
+   },
+   {
+    "id": "spill-containment-status",
+    "label": "Spill containment",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "No spill",
+     "Inside the bund",
+     "On paved ground",
+     "On bare soil"
+    ],
+    "help_text": "Where any spill ended up.",
+    "domain": "soil"
+   },
+   {
+    "id": "soil-contact-area",
+    "label": "Area of soil affected",
+    "type": "text",
+    "required": false,
+    "max_length": 60,
+    "options": null,
+    "help_text": "Approximate area in square metres.",
+    "domain": "soil"
+   }
+  ],
+  "form_fields": [
+   {
+    "id": "machine-state",
+    "label": "Machine state when noticed",
+    "type": "dropdown",
+    "required": true,
+    "max_length": null,
+    "options": [
+     "Running normally",
+     "Running at reduced load",
+     "Stopped",
+     "Tripped"
+    ],
+    "help_text": "What the machine was doing when the snag was seen.",
+    "domain": null
+   },
+   {
+    "id": "shift",
+    "label": "Shift",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Morning",
+     "Evening",
+     "Night",
+     "General"
+    ],
+    "help_text": "Shift during which the snag was noticed.",
+    "domain": null
+   },
+   {
+    "id": "observed-by",
+    "label": "Observed by",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Operator",
+     "Fitter / mechanic",
+     "Electrician",
+     "Instrument technician",
+     "Supervisor",
+     "EHS officer"
+    ],
+    "help_text": "Trade of the person reporting (no names).",
+    "domain": null
+   },
+   {
+    "id": "hours-since-service",
+    "label": "Operating hours since last service",
+    "type": "text",
+    "required": false,
+    "max_length": 12,
+    "options": null,
+    "help_text": "Approximate number from the log book; leave blank if unknown.",
+    "domain": null
+   },
+   {
+    "id": "unit-operation",
+    "label": "Unit operation",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Drying",
+     "Granulation",
+     "Distillation",
+     "Separation",
+     "Filtration",
+     "Utilities"
+    ],
+    "help_text": "Which part of the process.",
+    "domain": null
+   }
+  ]
+ }
+}

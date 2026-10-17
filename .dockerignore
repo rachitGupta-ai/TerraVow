@@ -1,0 +1,10 @@
+.git
+target
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.jqwik-database
+*.log
+meeting-transcripts
+docs
+.kiro

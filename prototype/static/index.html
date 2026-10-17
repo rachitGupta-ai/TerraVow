@@ -1,0 +1,1263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TerraVow: fix it now, or wait?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F7F4; --panel:#FFFFFF; --ink:#12262B; --steel:#4F6369; --rule:#CBD8D2;
+  --cost:#A0650A; --cost-soft:#F4E5C8;
+  --allow:#0F766E; --ask:#3B5B8C; --block:#A4133C;
+  --allow-bg:#D9EFEC; --ask-bg:#DFE7F3; --block-bg:#F6DCE3;
+  --brand-green:#1F7A4D; --brand-blue:#1F5FA8;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+/* Light theme only (Req 29.4): the former prefers-color-scheme dark block was removed on purpose. */
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{color-scheme:light}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 15px/1.5 var(--body)}
+h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:.2px;margin:0}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brand-blue);outline-offset:2px}
+a{color:var(--brand-blue)}
+
+header{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between;
+  padding:14px clamp(16px,3vw,36px);border-bottom:3px solid var(--brand-green);background:var(--panel)}
+.brand h1{color:var(--brand-green)}
+.who{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13.5px}
+.who fieldset{border:0;margin:0;padding:0;display:flex;gap:10px;align-items:center}
+.who legend{float:left;font-weight:600;margin-right:6px}
+.who input[type=text]{width:150px;padding:4px 8px;border:1px solid var(--rule);border-radius:4px}
+.who .err{margin:0;font-size:12.5px}
+nav.navtabs{display:flex;flex-wrap:wrap;gap:4px;padding:8px clamp(16px,3vw,36px) 0;background:var(--panel);border-bottom:1px solid var(--rule)}
+nav.navtabs button{border:1px solid transparent;border-bottom:0;background:transparent;padding:8px 14px;cursor:pointer;
+  font-weight:600;border-radius:6px 6px 0 0;color:var(--steel)}
+nav.navtabs button[aria-selected="true"]{background:var(--paper);color:var(--brand-green);border-color:var(--rule);box-shadow:inset 0 3px 0 var(--brand-green)}
+.panel{padding:20px clamp(16px,3vw,36px) 48px;max-width:1500px;margin:0 auto}
+.panel > section.card{max-width:1100px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+select,.panel input[type=text]{padding:7px 10px;border:1px solid var(--rule);border-radius:4px;background:var(--panel);width:100%}
+.combo{position:relative}
+.combo ul{list-style:none;margin:2px 0 0;padding:0;border:1px solid var(--rule);border-radius:4px;background:var(--panel);
+  max-height:320px;overflow:auto;position:absolute;left:0;right:0;z-index:5;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.combo li{padding:8px 10px;cursor:pointer;border-top:1px solid var(--rule);display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+.combo li:first-child{border-top:0}
+.combo li[aria-selected="true"],.combo li:hover{background:var(--allow-bg)}
+.combo li .mt{color:var(--steel);font-size:13px}
+.pill{font-size:11.5px;padding:1px 7px;border-radius:999px;border:1px solid var(--steel);color:var(--steel);font-weight:600}
+.pill.ai{border-color:var(--brand-blue);color:var(--brand-blue)}
+.pill.warn{border-color:var(--cost);color:var(--cost)}
+.btn.brand{background:var(--brand-green);color:#fff}
+.btn.blue{background:var(--brand-blue);color:#fff}
+.status-line{margin-top:10px;padding:10px 12px;border-radius:4px;background:var(--paper);border-left:4px solid var(--brand-blue)}
+.status-line.fallback{border-left-color:var(--cost)}
+.tpl details{background:var(--paper);border-radius:4px;padding:8px 12px;margin-top:10px;color:var(--ink)}
+.tpl details details{background:var(--panel)}
+.tpl ul{margin:4px 0 4px 18px;padding:0}
+.tpl dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;margin:6px 0}
+.tpl dt{font-weight:600;color:var(--steel)}
+.tpl dd{margin:0}
+footer{padding:14px clamp(16px,3vw,36px);border-top:1px solid var(--rule);color:var(--steel);font-size:13px;background:var(--panel)}
+.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.brand h1{font-size:30px}
+.brand p{margin:0;color:var(--steel);font-size:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:12.5px;padding:3px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);color:var(--steel)}
+.chip b{color:var(--ink);font-weight:600}
+.chip.ok{border-color:var(--allow)}
+.chip.warn{border-color:var(--block);color:var(--block)}
+
+main{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:20px;padding:20px clamp(16px,3vw,36px) 48px;max-width:1500px;margin:0 auto}
+@media (max-width:980px){main{grid-template-columns:1fr}}
+section.card{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:18px 20px}
+section.card + section.card{margin-top:16px}
+.card h2{font-size:22px;margin-bottom:2px}
+.sub{color:var(--steel);font-size:13.5px;margin:0 0 12px}
+
+.fleet{list-style:none;margin:0;padding:0}
+.fleet li{border-top:1px solid var(--rule)}
+.fleet button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:26px 1fr auto;gap:2px 10px;width:100%;
+  padding:10px 6px;cursor:pointer;border-radius:4px}
+.fleet button:hover{background:var(--paper)}
+.fleet button:focus-visible{outline:3px solid var(--ask)}
+.fleet button[aria-current="true"]{background:var(--paper);box-shadow:inset 3px 0 0 var(--cost)}
+.fleet .rk{grid-column:1;grid-row:1/3;font-family:var(--display);font-size:22px;color:var(--steel);align-self:center;text-align:center}
+.fleet .nm{grid-column:2;grid-row:1;font-weight:600}
+.fleet .df{grid-column:2;grid-row:2;color:var(--steel);font-size:13px}
+.fleet .rs{grid-column:3;grid-row:1/3;font-family:var(--display);font-size:20px;text-align:right;align-self:center;white-space:nowrap}
+.fleet .rs small{display:block;font:400 12px var(--body);color:var(--steel)}
+.bar{height:4px;background:var(--rule);border-radius:2px;grid-column:2/4;grid-row:3;margin-top:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--cost)}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:3px;font-weight:600}
+.tag.fix{background:var(--cost-soft);color:var(--cost)}
+.tag.wait{background:var(--ask-bg);color:var(--ask)}
+.note{font-size:12.5px;color:var(--steel);margin:10px 0 0}
+
+.mhead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-start}
+.mhead h2{font-size:34px}
+
+.assess{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.assess{grid-template-columns:1fr}}
+label.f{display:block;font-weight:600;font-size:13.5px;margin-bottom:4px}
+textarea{width:100%;min-height:92px;padding:8px 10px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);resize:vertical}
+input[type=file]{width:100%;padding:8px;border:1px dashed var(--steel);border-radius:4px;background:var(--paper)}
+.thumb{max-width:100%;max-height:120px;margin-top:8px;border-radius:4px;display:none}
+.samples{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:12.5px;color:var(--steel,#5b6b7a)}
+.btn{cursor:pointer;border:0;border-radius:4px;padding:9px 16px;font-weight:600;background:var(--ink);color:var(--paper)}
+.btn:disabled{opacity:.55;cursor:progress}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.btn.small{padding:5px 11px;font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.health{background:var(--paper);border-radius:4px;padding:12px 14px}
+.health h3{font-size:20px}
+.pips{display:inline-flex;gap:3px;vertical-align:middle;margin-left:8px}
+.pips i{width:14px;height:14px;border-radius:2px;background:var(--rule)}
+.pips i.on{background:var(--cost)}
+.health ul{margin:6px 0 0 18px;padding:0}
+.kv{font-size:13.5px;color:var(--steel);margin:6px 0 0}
+.kv b{color:var(--ink)}
+.err{color:var(--block);font-weight:600;margin-top:8px}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:20px}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.meter{border-left:1px solid var(--rule);padding-left:20px;min-width:0}
+@media (max-width:900px){.meter{border-left:0;padding-left:0;border-top:1px solid var(--rule);padding-top:12px}}
+.big{font-family:var(--display);font-weight:600;font-size:clamp(34px,4.2vw,46px);line-height:1;color:var(--cost);font-variant-numeric:tabular-nums}
+.meter .lbl{color:var(--steel);font-size:13.5px;margin:2px 0 14px}
+.meter .m2{font-family:var(--display);font-size:26px;font-variant-numeric:tabular-nums}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--body);font-size:11px;fill:var(--steel)}
+input[type=range]{width:100%;accent-color:var(--cost);margin:6px 0 0}
+.verdict{margin:12px 0 0;padding:10px 12px;border-radius:4px;font-weight:600}
+.verdict.fix{background:var(--cost-soft);color:var(--cost)}
+.verdict.wait{background:var(--ask-bg);color:var(--ask)}
+details{margin-top:12px;font-size:13.5px;color:var(--steel)}
+summary{cursor:pointer;font-weight:600;color:var(--ink)}
+details pre{white-space:pre-wrap;background:var(--paper);padding:10px;border-radius:4px;font:12.5px/1.5 var(--body);margin:8px 0 0}
+
+.tabs{display:flex;gap:6px;margin:8px 0}
+.tabs button{border:1px solid var(--rule);background:transparent;border-radius:4px;padding:5px 12px;cursor:pointer;font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.expl p{margin:6px 0;max-width:75ch}
+.cites{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.cites span{font-size:12.5px;border:1px solid var(--rule);border-radius:3px;padding:1px 7px;background:var(--paper)}
+
+.opts{display:grid;gap:10px}
+.opt{display:grid;grid-template-columns:1fr auto;gap:6px 14px;padding:12px 14px;border:1px solid var(--rule);border-left-width:5px;border-radius:4px;background:var(--paper)}
+.opt.ALLOW{border-left-color:var(--allow)} .opt.ASK{border-left-color:var(--ask)} .opt.BLOCK{border-left-color:var(--block)}
+.opt h3{font-size:19px}
+.opt p{margin:2px 0 0;font-size:13.5px;color:var(--steel)}
+.badge{font-family:var(--display);font-size:20px;font-weight:700;padding:1px 12px;border-radius:3px;align-self:start;justify-self:end}
+.badge.ALLOW{background:var(--allow-bg);color:var(--allow)}
+.badge.ASK{background:var(--ask-bg);color:var(--ask)}
+.badge.BLOCK{background:var(--block-bg);color:var(--block)}
+/* state never depends on colour alone: text plus a glyph */
+.badge.ALLOW::before{content:"\2713\00a0"} .badge.ASK::before{content:"?\00a0"} .badge.BLOCK::before{content:"\2715\00a0"}
+.opt .why{grid-column:1/-1;font-size:13.5px}
+.opt .why b{color:var(--ink)}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-weight:600;color:var(--steel);padding:6px 8px;border-bottom:1px solid var(--rule)}
+td{padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+td.h{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--steel);white-space:nowrap}
+.scroll{overflow-x:auto}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--paper);border-radius:4px;padding:12px 14px}
+.stat .v{font-family:var(--display);font-size:34px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .v.extra{color:var(--cost)}
+.stat .l{font-size:13px;color:var(--steel)}
+.impact .v{font-family:var(--display);font-size:38px;font-weight:600;line-height:1.05;color:var(--allow);font-variant-numeric:tabular-nums}
+.impact .l{font-size:13.5px;color:var(--steel);margin:0 0 10px}
+.ba{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0 4px}
+.ba .arrow{color:var(--steel);font-weight:600}
+.status{font-family:var(--display);font-size:22px;font-weight:700;padding:1px 12px;border-radius:3px}
+.status.VERIFIED{background:var(--allow-bg);color:var(--allow)}
+.status.NEEDS_REVIEW{background:var(--ask-bg);color:var(--ask)}
+.status.NOT_VERIFIED{background:var(--block-bg);color:var(--block)}
+.vres{background:var(--paper);border-radius:4px;padding:12px 14px;margin-top:12px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--paper);
+  padding:10px 16px;border-radius:6px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
+.toast.show{opacity:1}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;
+  vertical-align:-2px;margin-right:6px;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}.toast{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>TerraVow</h1>
+    <p>Fix it now, or wait? See what waiting costs in rupees and emissions.</p>
+  </div>
+  <div class="who">
+    <fieldset>
+      <legend>Role</legend>
+      <label><input type="radio" name="role" value="REPORTER" checked> Reporter</label>
+      <label><input type="radio" name="role" value="RESOLVER"> Resolver</label>
+    </fieldset>
+    <label for="handle"><b>Handle</b></label>
+    <input type="text" id="handle" maxlength="32" placeholder="e.g. reporter_01" autocomplete="off" aria-describedby="handleErr">
+    <span class="err" id="handleErr" role="alert"></span>
+  </div>
+  <div class="chips" id="chips" aria-label="System status"></div>
+</header>
+
+<nav class="navtabs" role="tablist" aria-label="Sections">
+  <button role="tab" id="tab-fix" aria-controls="panel-fix" aria-selected="true">Fix-first</button>
+  <button role="tab" id="tab-report" aria-controls="panel-report" aria-selected="false" tabindex="-1">Report a snag</button>
+  <button role="tab" id="tab-resolver" aria-controls="panel-resolver" aria-selected="false" tabindex="-1">Resolver queue</button>
+  <button role="tab" id="tab-health" aria-controls="panel-health" aria-selected="false" tabindex="-1">Machine health</button>
+  <button role="tab" id="tab-sustain" aria-controls="panel-sustain" aria-selected="false" tabindex="-1">Sustainability</button>
+</nav>
+
+<div class="panel" id="panel-report" role="tabpanel" aria-labelledby="tab-report" tabindex="-1" hidden>
+  <section class="card" aria-labelledby="rph">
+    <h2 id="rph">Report a snag: choose the machine model</h2>
+    <p class="sub">Pick the industry, then search the catalogue. The first time a model is used, Gemini writes a deep maintenance and snag template for it and saves it for everyone.</p>
+    <div class="grid2">
+      <div>
+        <label class="f" for="indSel">Industry</label>
+        <select id="indSel"></select>
+      </div>
+      <div class="combo">
+        <label class="f" for="mq">Machine model</label>
+        <input type="text" id="mq" role="combobox" aria-autocomplete="list" aria-expanded="false"
+               aria-controls="mlist" aria-activedescendant="" maxlength="80" autocomplete="off"
+               placeholder="Type a manufacturer or model, e.g. bru">
+        <ul id="mlist" role="listbox" aria-label="Matching machine models" hidden></ul>
+      </div>
+    </div>
+    <p class="note" id="catNotice"></p>
+    <div id="noMatch" hidden>
+      <p class="kv"><b>No match.</b> The model is not in the sample catalogue.</p>
+      <button class="btn ghost small" id="addManualBtn" type="button">Add machine manually</button>
+    </div>
+    <form id="manualForm" hidden>
+      <h3 style="font-size:19px;margin-top:14px">Add a machine manually</h3>
+      <p class="sub">Gemini looks up public specifications with Google Search. Results are AI-retrieved and unverified.</p>
+      <div class="grid2">
+        <div><label class="f" for="mManu">Manufacturer</label><input type="text" id="mManu" maxlength="80" required></div>
+        <div><label class="f" for="mModel">Model</label><input type="text" id="mModel" maxlength="80" required></div>
+      </div>
+      <div class="row"><button class="btn brand" id="manualBtn" type="submit">Look up and add</button></div>
+      <div class="err" id="manualErr" role="alert"></div>
+    </form>
+    <div id="manualResult" aria-live="polite"></div>
+  </section>
+
+  <section class="card tpl" aria-labelledby="tph" id="tplCard" hidden>
+    <h2 id="tph">Machine template</h2>
+    <p class="sub" id="tplModel"></p>
+    <div id="tplStatus" class="status-line" aria-live="polite"></div>
+    <div class="err" id="tplErr" role="alert"></div>
+    <div id="tplBox"></div>
+  </section>
+
+  <section class="card" aria-labelledby="snh" id="snagCard" hidden>
+    <h2 id="snh">Report a snag</h2>
+    <div class="grid2">
+      <div><label class="f" for="instSel">Machine</label><select id="instSel"></select></div>
+      <div class="row" style="align-items:flex-end"><button class="btn ghost small" id="newInstBtn" type="button">New machine</button></div>
+    </div>
+    <form id="instForm" hidden>
+      <div class="grid2">
+        <div><label class="f" for="instTag">Shop-floor tag</label><input type="text" id="instTag" maxlength="40" required></div>
+        <div><label class="f" for="instYear">Install year (optional)</label><input type="number" id="instYear" min="1950" max="2100"></div>
+      </div>
+      <div class="row"><button class="btn brand small" type="submit">Register machine</button></div>
+      <div class="err" id="instErr" role="alert"></div>
+    </form>
+    <form id="snagForm" novalidate>
+      <div id="snagFields"></div>
+      <p class="note">Phone-like digit groups and email addresses are removed from free text before saving.</p>
+      <div class="row"><button class="btn brand" id="snagBtn" type="submit">Submit snag</button></div>
+      <div class="err" id="snagErr" role="alert"></div>
+    </form>
+    <div id="guidance" aria-live="polite"></div>
+  </section>
+</div>
+
+<div class="panel" id="panel-resolver" role="tabpanel" aria-labelledby="tab-resolver" tabindex="-1" hidden>
+  <section class="card"><h2>Resolver queue</h2>
+    <p class="sub">Open and assigned snags, highest severity first. Switch the role to Resolver to act. The role switch is workflow guidance, not access control.</p>
+    <div class="row"><button class="btn ghost small" id="queueRefresh" type="button">Refresh</button></div>
+    <div class="err" id="queueErr" role="alert"></div>
+    <div id="queueBox" aria-live="polite"></div>
+  </section>
+</div>
+<div class="panel" id="panel-health" role="tabpanel" aria-labelledby="tab-health" tabindex="-1" hidden>
+  <section class="card"><h2>Machine health</h2>
+    <p class="sub">Health score, remaining lifespan and pollution intensity computed from the snag history by the deterministic engine. Illustrative estimate, not a measurement.</p>
+    <label class="f" for="hSel">Machine</label><select id="hSel"></select>
+    <div class="err" id="hErr" role="alert"></div>
+    <div id="hBox" aria-live="polite"></div>
+  </section>
+</div>
+<div class="panel" id="panel-sustain" role="tabpanel" aria-labelledby="tab-sustain" tabindex="-1" hidden>
+  <section class="card"><h2>Sustainability</h2>
+    <p class="sub">Sustainable machine alternatives, operating-process and assembly changes, and India incentives for small (MSME) and large enterprises. Every number is computed by the deterministic engine and every item passes the safety check.</p>
+    <label class="f" for="sSel">Machine</label><select id="sSel"></select>
+    <fieldset class="row" style="border:0;padding:0;margin:8px 0"><legend class="f">Enterprise size</legend>
+      <label><input type="radio" name="esize" value="MSME" checked> Small (MSME)</label>
+      <label><input type="radio" name="esize" value="LARGE"> Large</label>
+    </fieldset>
+    <div class="row"><button class="btn brand" id="sGo" type="button">Analyse alternatives</button></div>
+    <div class="err" id="sErr" role="alert"></div>
+    <div id="sBox" aria-live="polite"></div>
+    <p class="note">Informational estimate, not a quotation, engineering design, tax or legal advice; confirm eligibility with the issuing authority.</p>
+  </section>
+</div>
+
+<main id="panel-fix" role="tabpanel" aria-labelledby="tab-fix" tabindex="-1">
+  <aside>
+    <section class="card" aria-labelledby="fh">
+      <h2 id="fh">Fix-first ranking</h2>
+      <p class="sub">Machines ranked by what their current defect costs each day.</p>
+      <ul class="fleet" id="fleet"></ul>
+      <p class="note" id="fleetNote"></p>
+    </section>
+    <section class="card impact" aria-labelledby="ih">
+      <h2 id="ih">Fleet impact</h2>
+      <p class="sub">What happens over the next 30 days if the machines marked "Fix now" are repaired.</p>
+      <div id="impact" aria-live="polite"></div>
+    </section>
+  </aside>
+
+  <div id="detail">
+    <section class="card" id="head" aria-live="polite"></section>
+
+    <section class="card" aria-labelledby="ah">
+      <h2 id="ah">1. Assess the condition</h2>
+      <p class="sub">Add a photo of the part and any maintenance notes. Gemini reads them and returns a structured assessment.</p>
+      <div class="assess">
+        <div>
+          <label class="f" for="photo">Photo of the component</label>
+          <input id="photo" type="file" accept="image/*">
+          <div class="samples" id="samplesA" hidden>Sample (illustrative image): <button class="btn ghost small" type="button" id="useBefore">Use sample burner photo</button></div>
+          <img id="thumb" class="thumb" alt="Selected component photo preview">
+          <label class="f" for="notes" style="margin-top:10px">Maintenance notes or log extract</label>
+          <textarea id="notes" placeholder="Example: Flame has turned yellow-orange for two weeks. Stack temperature up 18 C. Soot on the nozzle at last inspection."></textarea>
+          <div class="row">
+            <button class="btn" id="analyzeBtn">Analyze with Gemini</button>
+            <button class="btn ghost small" id="resetBtn" title="Clears live assessments so the demo can be re-run">Reset demo</button>
+          </div>
+          <div class="err" id="analyzeErr" role="alert"></div>
+        </div>
+        <div id="healthBox"></div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="ch">
+      <h2 id="ch">2. What waiting costs</h2>
+      <p class="sub">Drag the slider to choose how many days to defer the repair.</p>
+      <div class="hero">
+        <div>
+          <svg id="chart" viewBox="0 0 640 300" role="img" aria-label="Chart of the cost of waiting against days deferred"></svg>
+          <input type="range" id="slider" min="0" max="90" value="0" aria-label="Days to defer the repair">
+          <div class="verdict" id="verdict"></div>
+        </div>
+        <div class="meter" aria-live="polite">
+          <div class="big" id="bigNum">₹0</div>
+          <div class="lbl" id="bigLbl">Excess cost if you wait 0 days</div>
+          <div class="m2" id="m2a">0</div><div class="lbl">Extra CO2 released (kg)</div>
+          <div class="m2" id="m2b">0</div><div class="lbl">Downtime cost saved by waiting</div>
+          <div class="m2" id="m2c">0</div><div class="lbl">Extra cost per day, today</div>
+        </div>
+      </div>
+      <details>
+        <summary>How this is calculated</summary>
+        <pre id="formula"></pre>
+      </details>
+    </section>
+
+    <section class="card" aria-labelledby="fph">
+      <h2 id="fph">3. Carbon footprint of what this machine makes</h2>
+      <p class="sub">Direct CO2 per unit of output, healthy versus now. A customer could use this figure instead of an industry average.</p>
+      <div class="stats" id="fp"></div>
+      <p class="note" id="fpNote"></p>
+    </section>
+
+    <section class="card" aria-labelledby="eh">
+      <h2 id="eh">4. Explain it to the people who decide</h2>
+      <p class="sub">Gemini calls our verified calculator for every figure, then explains the result for each audience.</p>
+      <div class="row" style="margin-top:0"><button class="btn" id="explainBtn">Explain this decision</button></div>
+      <div class="err" id="explainErr" role="alert"></div>
+      <div id="explainBox" class="expl"></div>
+    </section>
+
+    <section class="card" aria-labelledby="oh">
+      <h2 id="oh">5. Safety check on each option</h2>
+      <p class="sub">The Decision Gate blocks anything that raises total emissions or just moves pollution from air to water, however confident the model is.</p>
+      <div class="opts" id="opts"></div>
+    </section>
+
+    <section class="card" aria-labelledby="vh">
+      <h2 id="vh">6. After the repair: verify the improvement</h2>
+      <p class="sub">Upload an after-repair photo. Gemini re-assesses the part, and an improvement is recorded only if the evidence supports it. This is an evidence record, not an official certification.</p>
+      <div class="assess">
+        <div>
+          <label class="f" for="vphoto">After-repair photo</label>
+          <input id="vphoto" type="file" accept="image/*">
+          <div class="samples" id="samplesV" hidden>Samples (illustrative images): <button class="btn ghost small" type="button" id="useAfterSame">Use cleaned-nozzle photo</button> <button class="btn ghost small" type="button" id="useAfterDiff">Use a different part (should be rejected)</button></div>
+          <label class="f" for="vnotes" style="margin-top:10px">What was done</label>
+          <textarea id="vnotes" placeholder="Example: Nozzle cleaned and swirl vanes replaced. Flame is blue and stable again."></textarea>
+          <div class="row"><button class="btn" id="verifyBtn">Verify improvement</button></div>
+          <div class="err" id="verifyErr" role="alert"></div>
+        </div>
+        <div id="vbox" aria-live="polite"></div>
+      </div>
+      <h3 style="font-size:19px;margin-top:18px">Verified improvements</h3>
+      <div class="scroll"><table>
+        <thead><tr><th>Time</th><th>Machine</th><th>Severity</th><th>CO2 avoided (30 days)</th><th>Entry hash</th></tr></thead>
+        <tbody id="vlist"></tbody>
+      </table></div>
+    </section>
+
+    <section class="card" aria-labelledby="rh">
+      <h2 id="rh">7. Decision record</h2>
+      <p class="sub" id="regSub">Every assessment, explanation and decision is saved with a hash of the entry before it.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Time</th><th>Machine</th><th>What happened</th><th>Verdict</th><th>Entry hash</th></tr></thead>
+        <tbody id="reg"></tbody>
+      </table></div>
+    </section>
+  </div>
+</main>
+<footer>Demo prototype: no authentication. The role switch is not a security control. Not an official certification.</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const S = { fleet: [], id: "B-2", d: null, day: 0, tab: "engineer", explain: null, samples: {} };
+const inr = (n) => "₹" + Math.round(n).toLocaleString("en-IN");
+const short = (n) => n >= 1e5 ? "₹" + (n / 1e5).toFixed(1).replace(/\.0$/, "") + "L" : "₹" + Math.round(n / 1000) + "k";
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v; else if (k === "text") e.textContent = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v);
+  }
+  for (const c of kids) if (c != null) e.append(c.nodeType ? c : document.createTextNode(c));
+  return e;
+}
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 3200); }
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  if (!r.ok) {
+    let m = r.statusText, err422 = null;
+    try {
+      const d = (await r.json()).detail;
+      if (Array.isArray(d)) { err422 = d; m = d.map(x => x.field ? x.field + ": " + x.reason : (x.loc ? x.loc[x.loc.length - 1] + ": " : "") + x.msg).join("; "); }
+      else if (d) m = d;
+    } catch (e) {}
+    const err = new Error(m); err.status = r.status; err.fields = err422; throw err;
+  }
+  return r.json();
+}
+/* Links from AI or user data: http/https only, never javascript:/data:. Falls back to text. */
+function safeLink(url, label) {
+  try {
+    const u = new URL(url);
+    if (u.protocol === "http:" || u.protocol === "https:") {
+      const a = document.createElement("a");
+      a.setAttribute("href", u.href); a.setAttribute("target", "_blank"); a.setAttribute("rel", "noopener noreferrer");
+      a.textContent = label || u.hostname; return a;
+    }
+  } catch (e) {}
+  return document.createTextNode(label || String(url));
+}
+const postJSON = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+
+/* ---------- status chips ---------- */
+async function loadHealth() {
+  try {
+    const h = await api("/api/health");
+    $("chips").replaceChildren(
+      el("span", { class: "chip " + (h.gemini_mode !== "not-configured" ? "ok" : "warn") }, "Gemini: ", el("b", { text: h.gemini_mode + " / " + h.gemini_model })),
+      el("span", { class: "chip " + (h.store_backend === "firestore" ? "ok" : "warn") }, "Store: ", el("b", { text: h.store_backend })),
+      el("span", { class: "chip" }, "Runtime: ", el("b", { text: h.runtime }))
+    );
+  } catch (e) { $("chips").replaceChildren(el("span", { class: "chip warn", text: "API unreachable" })); }
+}
+
+/* ---------- fleet ---------- */
+async function loadFleet() {
+  const f = await api("/api/fleet");
+  S.fleet = f.machines; $("fleetNote").textContent = f.label; loadImpact();
+  const max = Math.max(...S.fleet.map(m => m.daily_liability_today));
+  $("fleet").replaceChildren(...S.fleet.map(m => {
+    const b = el("button", { "aria-current": m.id === S.id ? "true" : "false", onclick: () => select(m.id) },
+      el("span", { class: "rk", text: m.rank }),
+      el("span", { class: "nm", text: m.name }),
+      el("span", { class: "rs" }, inr(m.daily_liability_today), el("small", { text: "per day" })),
+      el("span", { class: "df" }, (m.health.defect || "") + " ",
+        el("span", { class: "tag " + (m.recommendation === "FIX_NOW" ? "fix" : "wait"), text: m.recommendation === "FIX_NOW" ? "Fix now" : "Can wait" })),
+      el("span", { class: "bar" }, el("i", { style: `width:${(m.daily_liability_today / max * 100).toFixed(0)}%` }))
+    );
+    return el("li", {}, b);
+  }));
+}
+
+/* ---------- machine ---------- */
+async function select(id) {
+  S.id = id; S.explain = null; $("vbox").replaceChildren(); $("verifyErr").textContent = ""; $("explainBox").replaceChildren(); $("explainErr").textContent = ""; $("analyzeErr").textContent = "";
+  S.d = await api("/api/machine/" + id);
+  S.day = Math.min(S.d.planned_window_day, 90); $("slider").value = S.day;
+  renderAll(); loadFleet();
+}
+function renderAll() { renderHead(); renderHealth(); renderChart(); renderFootprint(); renderOptions(); }
+
+function renderHead() {
+  const d = S.d;
+  $("head").replaceChildren(el("div", { class: "mhead" },
+    el("div", {}, el("h2", { text: d.name }), el("p", { class: "sub", style: "margin:0", text: `${d.kind}, runs on ${d.fuel.toLowerCase()}, about ${d.base_fuel_per_day.toLocaleString("en-IN")} ${d.fuel_unit} a day` })),
+    el("div", {}, el("span", { class: "tag " + (d.recommendation === "FIX_NOW" ? "fix" : "wait"), text: d.recommendation === "FIX_NOW" ? "Recommendation: fix now" : `Recommendation: wait for the day ${d.planned_window_day} shutdown` }))
+  ), el("p", { class: "kv" }, "Repair costs ", el("b", { text: inr(d.repair_cost) }), ". Stopping now costs ", el("b", { text: inr(d.downtime_cost_now) }),
+    " in lost production, versus ", el("b", { text: inr(d.downtime_cost_planned) }), " in the planned shutdown on day ", el("b", { text: d.planned_window_day }), "."));
+}
+
+function renderHealth() {
+  const h = S.d.health, box = $("healthBox");
+  const pips = el("span", { class: "pips", role: "img", "aria-label": `Severity ${h.severity} of 5` }, ...[1,2,3,4,5].map(i => el("i", { class: i <= h.severity ? "on" : "" })));
+  const g = h.source === "gemini";
+  box.replaceChildren(el("div", { class: "health" },
+    el("h3", {}, h.component_name || "Component", pips),
+    el("p", { class: "kv", style: "margin-top:4px" }, el("b", { text: h.defect || "" })),
+    el("p", { class: "kv" }, "Assessment confidence ", el("b", { text: Math.round((h.confidence || 0) * 100) + "%" }),
+      ". Data trust ", el("b", { text: Math.round(S.d.data_trust * 100) + "%" }), g ? (h.had_image ? " (photo and notes)" : " (notes only, capped at 70%)") : ""),
+    g ? el("p", { class: "kv" }, "Source: ", el("b", { text: "Gemini (" + (h.model || "") + ")" })) : el("p", { class: "kv" }, "Source: ", el("b", { text: "seeded demo value, not yet assessed" })),
+    (h.evidence && h.evidence.length) ? el("ul", {}, ...h.evidence.map(t => el("li", { text: t }))) : null,
+    h.uncertainty ? el("p", { class: "kv" }, "Unsure about: ", el("b", { text: h.uncertainty })) : null,
+    h.suggested_inspection ? el("p", { class: "kv" }, "Confirm by: ", el("b", { text: h.suggested_inspection })) : null
+  ));
+}
+
+/* ---------- chart ---------- */
+function renderChart() {
+  const d = S.d, c = d.curve, W = 640, H = 300, L = 54, R = 14, T = 16, B = 38;
+  const maxY = Math.max(d.downtime_savings_if_wait * 1.25, c[c.length - 1].waiting_cost * 1.05, 1);
+  const x = (day) => L + (day / 90) * (W - L - R), y = (v) => T + (1 - v / maxY) * (H - T - B);
+  const path = c.map((p, i) => (i ? "L" : "M") + x(p.day).toFixed(1) + " " + y(p.waiting_cost).toFixed(1)).join(" ");
+  const area = path + ` L ${x(90)} ${y(0)} L ${x(0)} ${y(0)} Z`;
+  let h = "";
+  for (let i = 0; i <= 4; i++) { const v = maxY * i / 4; h += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--rule)"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${i ? short(v) : "₹0"}</text>`; }
+  for (const dd of [0, 15, 30, 45, 60, 75, 90]) h += `<text x="${x(dd)}" y="${H - 20}" text-anchor="middle">${dd}</text>`;
+  h += `<text x="${(L + W - R) / 2}" y="${H - 5}" text-anchor="middle">Days the repair is deferred</text>`;
+  h += `<path d="${area}" fill="var(--cost-soft)"/><path d="${path}" fill="none" stroke="var(--cost)" stroke-width="2.5"/>`;
+  const ys = y(d.downtime_savings_if_wait);
+  h += `<line x1="${L}" x2="${W - R}" y1="${ys}" y2="${ys}" stroke="var(--allow)" stroke-width="2" stroke-dasharray="6 4"/>`;
+  h += `<text x="${L + 6}" y="${ys - 6}" text-anchor="start" style="fill:var(--allow);font-weight:600">Downtime saved by waiting: ${inr(d.downtime_savings_if_wait)}</text>`;
+  const pw = Math.min(d.planned_window_day, 90);
+  h += `<line x1="${x(pw)}" x2="${x(pw)}" y1="${T}" y2="${H - B}" stroke="var(--ask)" stroke-width="1.5" stroke-dasharray="2 3"/><text x="${x(pw) + 4}" y="${T + 10}" style="fill:var(--ask);font-weight:600">Planned shutdown, day ${d.planned_window_day}</text>`;
+  if (d.break_even_day) {
+    const bx = x(d.break_even_day), by = y(c[d.break_even_day].waiting_cost);
+    h += `<line x1="${bx}" x2="${bx}" y1="${T}" y2="${H - B}" stroke="var(--cost)" stroke-width="1.5"/><circle cx="${bx}" cy="${by}" r="5.5" fill="var(--cost)"/>`;
+    const right = bx < W * 0.62;
+    h += `<text x="${bx + (right ? 8 : -8)}" y="${H - B - 8}" text-anchor="${right ? "start" : "end"}" style="fill:var(--cost);font-weight:600;font-size:12px">Break-even, day ${d.break_even_day}</text>`;
+  }
+  h += `<g id="cursor"></g>`;
+  $("chart").innerHTML = h;
+  S._x = x; S._y = y; moveCursor();
+  $("formula").textContent = d.formula + "\n\nAssumptions (illustrative):\n" + JSON.stringify(d.assumptions, null, 2);
+}
+let tw;
+function moveCursor() {
+  const d = S.d, p = d.curve[S.day], cur = document.getElementById("cursor"); if (!cur) return;
+  const cx = S._x(S.day), cy = S._y(p.waiting_cost);
+  cur.innerHTML = `<line x1="${cx}" x2="${cx}" y1="${cy}" y2="${S._y(0)}" stroke="var(--ink)" stroke-width="1"/><circle cx="${cx}" cy="${cy}" r="6" fill="var(--panel)" stroke="var(--ink)" stroke-width="2.5"/>`;
+  const target = p.cum_liability, from = +$("bigNum").dataset.v || 0;
+  $("bigNum").dataset.v = target;
+  cancelAnimationFrame(tw);
+  if (reduce) $("bigNum").textContent = inr(target);
+  else { const t0 = performance.now(); (function step(t) { const k = Math.min(1, (t - t0) / 220); $("bigNum").textContent = inr(from + (target - from) * k); if (k < 1) tw = requestAnimationFrame(step); })(t0); }
+  $("bigLbl").textContent = `Excess cost if you wait ${S.day} day${S.day === 1 ? "" : "s"}`;
+  $("m2a").textContent = Math.round(p.cum_co2_kg).toLocaleString("en-IN");
+  $("m2b").textContent = inr(d.downtime_savings_if_wait);
+  $("m2c").textContent = inr(d.daily_liability_today);
+  const worse = p.waiting_cost > d.downtime_savings_if_wait, v = $("verdict");
+  const net = Math.abs(d.downtime_savings_if_wait - p.waiting_cost);
+  v.className = "verdict " + (worse ? "fix" : "wait");
+  v.textContent = worse
+    ? `Waiting ${S.day} days costs ${inr(net)} more than it saves. Fix it before day ${d.break_even_day || S.day}.`
+    : `Waiting ${S.day} days still saves ${inr(net)} compared with stopping now.`;
+}
+
+/* ---------- options ---------- */
+function renderOptions() {
+  $("opts").replaceChildren(...S.d.options.map(o => {
+    const kg = Object.entries(o.deltas_kg).filter(([, v]) => v !== 0).map(([k, v]) => `${k} ${v > 0 ? "+" : ""}${Math.round(v).toLocaleString("en-IN")} kg`).join(", ") || "no change";
+    return el("div", { class: "opt " + o.gate.verdict },
+      el("div", {}, el("h3", { text: o.label }), el("p", { text: o.detail })),
+      el("span", { class: "badge " + o.gate.verdict, text: o.gate.verdict }),
+      el("div", { class: "why" }, el("b", { text: "Next 30 days: " }), kg + ". " + o.gate.reason),
+      el("div", {}, el("button", { class: "btn small ghost", onclick: (e) => decide(o.id, e.target) }, "Record this decision"))
+    );
+  }));
+}
+async function decide(optId, btn) {
+  btn.disabled = true;
+  try {
+    const r = await api("/api/decide", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ machine_id: S.id, option_id: optId }) });
+    toast(`Recorded: ${r.option.label} is ${r.audit.verdict}`); loadRegistry();
+  } catch (e) { toast(e.message); }
+  btn.disabled = false;
+}
+
+/* ---------- analyze / explain ---------- */
+$("photo").addEventListener("change", (e) => { const f = e.target.files[0], t = $("thumb"); if (f) { t.src = URL.createObjectURL(f); t.style.display = "block"; } else t.style.display = "none"; });
+
+/* ---------- illustrative sample photos (optional; buttons appear only if the files exist) ---------- */
+function setInputFile(input, file) {
+  try { const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files; } catch (e) {}
+  input.dispatchEvent(new Event("change"));
+}
+async function loadSamples() {
+  try {
+    const m = await (await fetch("/static/samples/manifest.json")).json();
+    for (const [k, v] of Object.entries(m)) {
+      if (!v || !v.file) continue;
+      try { const r = await fetch("/static/samples/" + encodeURIComponent(v.file), { method: "HEAD" }); if (r.ok) S.samples[k] = v; } catch (e) {}
+    }
+  } catch (e) { return; }
+  $("samplesA").hidden = !S.samples.before;
+  $("samplesV").hidden = !(S.samples.after_same || S.samples.after_different);
+  $("useAfterSame").hidden = !S.samples.after_same;
+  $("useAfterDiff").hidden = !S.samples.after_different;
+}
+async function useSample(key, inputId, notesId) {
+  const s = S.samples[key]; if (!s) return;
+  try {
+    const blob = await (await fetch("/static/samples/" + encodeURIComponent(s.file))).blob();
+    setInputFile($(inputId), new File([blob], s.file, { type: blob.type || "image/jpeg" }));
+    if (s.notes && !$(notesId).value.trim()) $(notesId).value = s.notes;
+  } catch (e) { toast("Could not load the sample image."); }
+}
+$("useBefore").addEventListener("click", () => useSample("before", "photo", "notes"));
+$("useAfterSame").addEventListener("click", () => useSample("after_same", "vphoto", "vnotes"));
+$("useAfterDiff").addEventListener("click", () => useSample("after_different", "vphoto", "vnotes"));
+$("analyzeBtn").addEventListener("click", async () => {
+  const btn = $("analyzeBtn"), err = $("analyzeErr"); err.textContent = "";
+  const fd = new FormData(); fd.append("machine_id", S.id); fd.append("notes", $("notes").value);
+  const f = $("photo").files[0]; if (f) fd.append("image", f);
+  btn.disabled = true; btn.replaceChildren(el("span", { class: "spin" }), "Gemini is reading it");
+  try {
+    const before = S.fleet.findIndex(m => m.id === S.id);
+    S.d = await api("/api/analyze", { method: "POST", body: fd });
+    S.explain = null; $("explainBox").replaceChildren();
+    S.day = Math.min(S.d.planned_window_day, 90); $("slider").value = S.day;
+    renderAll(); await loadFleet(); loadRegistry();
+    const after = S.fleet.findIndex(m => m.id === S.id);
+    toast(after !== before ? `Fleet re-ranked: ${S.d.name} moved to #${after + 1}` : "Assessment saved");
+  } catch (e) { err.textContent = e.message; }
+  btn.disabled = false; btn.textContent = "Analyze with Gemini";
+});
+$("resetBtn").addEventListener("click", async () => { await api("/api/demo/reset", { method: "POST" }); await select(S.id); toast("Demo reset"); });
+$("explainBtn").addEventListener("click", async () => {
+  const btn = $("explainBtn"), err = $("explainErr"); err.textContent = "";
+  btn.disabled = true; btn.replaceChildren(el("span", { class: "spin" }), "Gemini is checking the numbers");
+  try {
+    S.explain = await api("/api/explain", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ machine_id: S.id, defer_days: S.day }) });
+    renderExplain(); loadRegistry();
+  } catch (e) { err.textContent = e.message; }
+  btn.disabled = false; btn.textContent = "Explain this decision";
+});
+function renderExplain() {
+  const x = S.explain, box = $("explainBox"); if (!x) return;
+  const mk = (key, label) => el("button", { role: "tab", "aria-selected": String(S.tab === key), onclick: () => { S.tab = key; renderExplain(); } }, label);
+  box.replaceChildren(
+    el("div", { class: "tabs", role: "tablist" }, mk("engineer", "For the engineer"), mk("cfo", "For the CFO")),
+    el("p", { text: x[S.tab] || "" }),
+    x.caveat ? el("p", { class: "kv", text: "Limits: " + x.caveat }) : null,
+    el("div", { class: "cites" }, el("span", { text: `${x.tool_calls} verified calculator call${x.tool_calls === 1 ? "" : "s"}` }),
+      ...(x.citations || []).map(c => el("span", { text: "Cites " + c })))
+  );
+}
+
+
+/* ---------- footprint ---------- */
+function renderFootprint() {
+  const f = S.d.footprint, u = f.unit, n = (v) => v.toLocaleString("en-IN", { maximumFractionDigits: 1 });
+  const stat = (v, l, cls) => el("div", { class: "stat" }, el("div", { class: "v " + (cls || ""), text: v }), el("div", { class: "l", text: l }));
+  $("fp").replaceChildren(
+    stat(n(f.healthy_kg_per_unit) + " kg", `CO2 per ${u} when healthy`),
+    stat(n(f.current_kg_per_unit) + " kg", `CO2 per ${u} now`),
+    stat("+" + n(f.extra_kg_per_unit) + " kg (+" + n(f.extra_pct) + "%)", `extra per ${u} caused by the defect`, "extra"));
+  $("fpNote").textContent = `Based on about ${n(f.output_per_day)} ${u}${u.startsWith("tonne") ? "s" : ""} a day. Illustrative demo values.`;
+}
+
+/* ---------- fleet impact ---------- */
+async function loadImpact() {
+  try {
+    const i = await api("/api/impact"), n = (v, d = 1) => v.toLocaleString("en-IN", { maximumFractionDigits: d });
+    const ids = i.fix_now_ids.length ? i.fix_now_ids.join(", ") : "none";
+    $("impact").replaceChildren(
+      el("div", { class: "v", text: n(i.fix_now_co2_t) + " t CO2" }),
+      el("p", { class: "l", text: `avoided by repairing the ${i.fix_now_ids.length} "Fix now" machine${i.fix_now_ids.length === 1 ? "" : "s"} (${ids})` }),
+      el("div", { class: "v", text: inr(i.fix_now_cost) }),
+      el("p", { class: "l", text: "excess fuel and exposure cost avoided, before repair and downtime costs" }),
+      el("p", { class: "note", text: `The whole fleet currently loses ${inr(i.fleet_daily_liability)} a day to defects. ${i.note}` }));
+  } catch (e) { $("impact").textContent = "Impact unavailable."; }
+}
+
+/* ---------- verify improvement ---------- */
+const pipsEl = (sev) => el("span", { class: "pips", role: "img", "aria-label": `Severity ${sev} of 5` }, ...[1, 2, 3, 4, 5].map(i => el("i", { class: i <= sev ? "on" : "" })));
+$("verifyBtn").addEventListener("click", async () => {
+  const btn = $("verifyBtn"), err = $("verifyErr"); err.textContent = "";
+  const fd = new FormData(); fd.append("machine_id", S.id); fd.append("notes", $("vnotes").value);
+  const f = $("vphoto").files[0]; if (f) fd.append("image", f);
+  btn.disabled = true; btn.replaceChildren(el("span", { class: "spin" }), "Gemini is re-checking");
+  try {
+    const r = await api("/api/verify_improvement", { method: "POST", body: fd });
+    const im = r.improvement, n = (v, d = 1) => v.toLocaleString("en-IN", { maximumFractionDigits: d });
+    $("vbox").replaceChildren(el("div", { class: "vres" },
+      el("span", { class: "status " + r.status, text: r.status.replace("_", " ") }),
+      el("div", { class: "ba" }, pipsEl(im.before_severity), el("span", { class: "arrow", text: "became" }), pipsEl(im.after_severity)),
+      el("p", { class: "kv" }, r.gate.reason),
+      r.improvement.avoided_co2_kg_horizon > 0 ? el("p", { class: "kv" }, "Avoids ", el("b", { text: n(im.avoided_co2_kg_horizon / 1000) + " t CO2" }), " and ", el("b", { text: inr(im.avoided_cost_horizon) }), ` over ${im.horizon_days} days. Footprint falls from `, el("b", { text: n(im.footprint_before.current_kg_per_unit) }), " to ", el("b", { text: n(im.footprint_after.current_kg_per_unit) }), ` kg CO2 per ${im.footprint_after.unit}.`) : null,
+      el("p", { class: "kv" }, "Gate rule: ", el("b", { text: r.gate.rule }))));
+    S.d = r.machine; S.explain = null; $("explainBox").replaceChildren();
+    S.day = Math.min(S.d.planned_window_day, 90); $("slider").value = S.day;
+    renderAll(); await loadFleet(); loadRegistry(); loadImprovements();
+    toast(r.status === "VERIFIED" ? "Improvement verified and recorded" : "Not verified: " + r.status.replace("_", " ").toLowerCase());
+  } catch (e) { err.textContent = e.message; }
+  btn.disabled = false; btn.textContent = "Verify improvement";
+});
+async function loadImprovements() {
+  const r = await api("/api/improvements");
+  $("vlist").replaceChildren(...(r.entries.length ? r.entries.map(e => el("tr", {},
+    el("td", { text: e.ts }), el("td", { text: e.machine }),
+    el("td", { text: `${e.before_severity} to ${e.after_severity}` }),
+    el("td", { text: (e.avoided_co2_kg_horizon / 1000).toLocaleString("en-IN", { maximumFractionDigits: 1 }) + " t" }),
+    el("td", { class: "h", text: e.hash.slice(0, 10) }))) :
+    [el("tr", {}, el("td", { colspan: 5, text: "None yet. Verified improvements appear here, with the evidence behind each. " + r.disclaimer }))]));
+}
+
+/* ---------- registry ---------- */
+async function loadRegistry() {
+  const r = await api("/api/registry");
+  $("regSub").textContent = `Saved in ${r.backend === "firestore" ? "Firestore" : "memory (local mode)"}. Chain check: ${r.chain.chain_intact ? "intact" : "BROKEN"} across ${r.chain.entries_checked} entries.`;
+  $("reg").replaceChildren(...(r.entries.length ? r.entries.map(e => el("tr", {},
+    el("td", { text: e.ts }), el("td", { text: e.machine }), el("td", { text: e.summary }),
+    el("td", {}, e.verdict ? el("span", { class: "badge " + e.verdict, style: "font-size:15px", text: e.verdict }) : "-"),
+    el("td", { class: "h", text: e.hash.slice(0, 10) + " (after " + e.prev_hash.slice(0, 6) + ")" }))) :
+    [el("tr", {}, el("td", { colspan: 5, text: "Nothing recorded yet. Run an assessment or record a decision." }))]));
+}
+
+$("slider").addEventListener("input", (e) => { S.day = +e.target.value; moveCursor(); });
+
+/* ---------- tabs ---------- */
+const TABS = ["fix", "report", "resolver", "health", "sustain"];
+function showTab(name, focus) {
+  for (const t of TABS) {
+    const on = t === name, b = $("tab-" + t);
+    b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1;
+    $("panel-" + t).hidden = !on;
+  }
+  if (name === "resolver") loadQueue();
+  if (name === "health") loadHealthSelector();
+  if (name === "sustain") loadSustainSelector();
+  if (focus) $("tab-" + name).focus();
+}
+for (const t of TABS) {
+  $("tab-" + t).addEventListener("click", () => showTab(t));
+  $("tab-" + t).addEventListener("keydown", (e) => {
+    const i = TABS.indexOf(t);
+    if (e.key === "ArrowRight") { e.preventDefault(); showTab(TABS[(i + 1) % TABS.length], true); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); showTab(TABS[(i + TABS.length - 1) % TABS.length], true); }
+  });
+}
+
+/* ---------- role and handle (workflow guidance only, NOT access control) ---------- */
+const HANDLE_RE = /^[A-Za-z0-9_-]{3,32}$/;
+const WHO = { role: sessionStorage.getItem("tv_role") || "REPORTER", handle: sessionStorage.getItem("tv_handle") || "" };
+function initWho() {
+  for (const r of document.querySelectorAll('input[name="role"]')) {
+    r.checked = r.value === WHO.role;
+    r.addEventListener("change", () => { if (r.checked) { WHO.role = r.value; sessionStorage.setItem("tv_role", r.value); } });
+  }
+  const h = $("handle"); h.value = WHO.handle;
+  h.addEventListener("input", () => {
+    const v = h.value.trim(), ok = v === "" || HANDLE_RE.test(v);
+    $("handleErr").textContent = ok ? "" : "3 to 32 letters, digits, _ or -";
+    h.setAttribute("aria-invalid", String(!ok));
+    if (ok) { WHO.handle = v; sessionStorage.setItem("tv_handle", v); }
+  });
+}
+
+/* ---------- report a snag: industry + catalogue autocomplete ---------- */
+const R = { industries: [], results: [], active: -1, ctl: null, timer: null, entry: null, tplTimer: null };
+async function loadIndustries() {
+  try {
+    const d = await api("/api/industries"); R.industries = d.industries;
+    $("indSel").replaceChildren(...d.industries.map(i => {
+      const o = document.createElement("option"); o.value = i.id; o.textContent = `${i.name} (${i.domains.join(", ")})`; return o;
+    }));
+    $("indSel").value = "textile";
+  } catch (e) { toast("Industries unavailable: " + e.message); }
+}
+function closeList() { $("mlist").hidden = true; $("mq").setAttribute("aria-expanded", "false"); $("mq").setAttribute("aria-activedescendant", ""); R.active = -1; }
+function renderResults(d) {
+  R.results = d.results; R.active = -1;
+  $("catNotice").textContent = d.notice || "";
+  $("noMatch").hidden = !d.manual_entry_offered;
+  const ul = $("mlist");
+  ul.replaceChildren(...d.results.map((r, i) => {
+    const li = el("li", { id: "opt" + i, role: "option", "aria-selected": "false" },
+      el("b", { text: r.manufacturer + " " + r.model }), el("span", { class: "mt", text: r.machine_type || "" }),
+      el("span", { class: "pill" + (r.origin === "sample" ? "" : " warn"), text: r.label }));
+    li.addEventListener("mousedown", (e) => { e.preventDefault(); pickResult(i); });
+    return li;
+  }));
+  const open = d.results.length > 0;
+  ul.hidden = !open; $("mq").setAttribute("aria-expanded", String(open));
+}
+function search() {
+  clearTimeout(R.timer);
+  R.timer = setTimeout(async () => {
+    if (R.ctl) R.ctl.abort();
+    R.ctl = new AbortController();
+    const qs = new URLSearchParams({ industry: $("indSel").value, q: $("mq").value });
+    try { renderResults(await api("/api/catalogue/search?" + qs, { signal: R.ctl.signal })); }
+    catch (e) { if (e.name !== "AbortError") $("catNotice").textContent = e.message; }
+  }, 250);
+}
+function setActive(i) {
+  const items = $("mlist").children; if (!items.length) return;
+  R.active = (i + items.length) % items.length;
+  [...items].forEach((li, k) => li.setAttribute("aria-selected", String(k === R.active)));
+  $("mq").setAttribute("aria-activedescendant", "opt" + R.active);
+  items[R.active].scrollIntoView({ block: "nearest" });
+}
+function pickResult(i) {
+  const r = R.results[i]; if (!r) return;
+  $("mq").value = r.manufacturer + " " + r.model; closeList();
+  useModel(r);
+}
+function initCatalogue() {
+  $("indSel").addEventListener("change", () => { $("mq").value = ""; $("manualResult").replaceChildren(); $("manualForm").hidden = true; search(); });
+  $("mq").addEventListener("input", search);
+  $("mq").addEventListener("focus", search);
+  $("mq").addEventListener("blur", () => setTimeout(closeList, 150));
+  $("mq").addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); if ($("mlist").hidden && R.results.length) { $("mlist").hidden = false; $("mq").setAttribute("aria-expanded", "true"); } setActive(R.active + 1); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActive(R.active - 1); }
+    else if (e.key === "Enter") { if (R.active >= 0) { e.preventDefault(); pickResult(R.active); } }
+    else if (e.key === "Escape") { closeList(); }
+  });
+  $("addManualBtn").addEventListener("click", () => { $("manualForm").hidden = false; $("mManu").value = ""; $("mModel").value = $("mq").value; $("mManu").focus(); });
+  $("manualForm").addEventListener("submit", (e) => { e.preventDefault(); manualLookup(); });
+}
+
+/* ---------- manual entry with grounded spec lookup ---------- */
+async function manualLookup(retryOf) {
+  const body = retryOf || { industry: $("indSel").value, manufacturer: $("mManu").value, model: $("mModel").value };
+  const btn = $("manualBtn"); $("manualErr").textContent = "";
+  btn.disabled = true; btn.replaceChildren(el("span", { class: "spin" }), "Looking up specifications");
+  try { renderManual(await postJSON("/api/catalogue/manual", body)); }
+  catch (e) { $("manualErr").textContent = e.message; }
+  btn.disabled = false; btn.textContent = "Look up and add";
+}
+function renderManual(d) {
+  const e = d.entry, kids = [el("h3", { style: "font-size:19px;margin-top:14px", text: `${e.manufacturer} ${e.model}` }),
+    el("p", { class: "kv" }, el("span", { class: "pill warn", text: e.label }), " ", d.message)];
+  if (e.specs && e.specs.length) {
+    kids.push(el("p", { class: "kv" }, el("span", { class: "pill ai", text: "Grounded with Google Search, AI-retrieved and unverified" })));
+    const dl = el("dl");
+    for (const s of e.specs) dl.append(el("dt", { text: s.name }), el("dd", { text: s.value + (s.unit ? " " + s.unit : "") }));
+    kids.push(el("div", { class: "tpl" }, dl));
+  }
+  if (e.sources && e.sources.length) kids.push(el("p", { class: "kv" }, "Sources: ", ...e.sources.flatMap((s, i) => [i ? ", " : "", safeLink(s.uri, s.title)])));
+  const row = el("div", { class: "row" }, el("button", { class: "btn brand", type: "button", onclick: () => useModel(e) }, "Use this model"));
+  if (e.spec_lookup === "retry") row.append(el("button", { class: "btn ghost small", type: "button",
+    onclick: () => manualLookup({ industry: e.industry, manufacturer: e.manufacturer, model: e.model }) }, "Retry specification lookup"));
+  kids.push(row);
+  $("manualResult").replaceChildren(...kids);
+}
+
+/* ---------- template ensure + display ---------- */
+const STATUS_TEXT = {
+  "cache-hit": "Loaded the saved template", "generated": "Generated now and saved",
+  "fallback": "Generic industry template, not generated for this model", "generated-unsaved": "Generated but not saved",
+  "pending": "Another request is preparing this template",
+};
+async function useModel(entry) {
+  R.entry = entry;
+  $("tplCard").hidden = false; $("tplErr").textContent = ""; $("tplBox").replaceChildren();
+  $("tplModel").textContent = `${entry.manufacturer} ${entry.model}${entry.machine_type ? " (" + entry.machine_type + ")" : ""}`;
+  const t0 = Date.now(), status = $("tplStatus"); status.className = "status-line";
+  const tick = () => status.replaceChildren(el("span", { class: "spin" }),
+    `Preparing the template. First use of a model can take up to about a minute (${Math.round((Date.now() - t0) / 1000)} s).`);
+  tick(); clearInterval(R.tplTimer); R.tplTimer = setInterval(tick, 1000);
+  try {
+    let d;
+    for (;;) {
+      d = await postJSON("/api/template/ensure", { industry: entry.industry, manufacturer: entry.manufacturer, model: entry.model });
+      if (d.cache_status !== "pending" || Date.now() - t0 > 320000 || R.entry !== entry) break;
+      await new Promise(r => setTimeout(r, (d.retry_after_s || 15) * 1000));
+    }
+    clearInterval(R.tplTimer);
+    if (R.entry !== entry) return;
+    renderTemplate(d);
+  } catch (e) { clearInterval(R.tplTimer); status.replaceChildren(); $("tplErr").textContent = e.message; }
+}
+function list(items) { return el("ul", {}, ...(items || []).map(t => el("li", { text: t }))); }
+function kv(pairs) { const dl = el("dl"); for (const [k, v] of pairs) if (v != null && v !== "") dl.append(el("dt", { text: k }), el("dd", {}, v)); return dl; }
+function section(title, open, ...kids) { const d = el("details", {}, el("summary", { text: title }), ...kids); if (open) d.open = true; return d; }
+function renderTemplate(d) {
+  const st = $("tplStatus"); st.className = "status-line" + (d.source === "ai" ? "" : " fallback");
+  st.replaceChildren(
+    el("b", { text: STATUS_TEXT[d.cache_status] || d.cache_status }), ". ", d.user_message || "",
+    el("br"), "Source: ", el("b", { text: d.source === "ai" ? "AI-generated (" + (d.model_used || "Gemini") + ")" : "generic industry Base_Template" }),
+    d.generated_at ? " · generated " + d.generated_at : "",
+    " · labels: ", ...(d.labels || []).map(l => el("span", { class: "pill" + (l === "AI-generated" ? " ai" : " warn"), text: l })),
+    ...(d.grounding_sources && d.grounding_sources.length ? [el("br"), "Grounding sources: ", ...d.grounding_sources.flatMap((s, i) => [i ? ", " : "", safeLink(s.uri, s.title)])] : []));
+  if (!d.template) return;
+  showSnagForm(d);
+  const t = d.template, p = t.machine_profile;
+  $("tplBox").replaceChildren(
+    section("Machine profile", true, el("p", { text: p.summary }), kv([["Typical duty", p.typical_duty]]),
+      el("p", { class: "kv", text: "Key components:" }), list(p.key_components),
+      p.specs && p.specs.length ? kv(p.specs.map(s => [s.name, s.value + (s.unit ? " " + s.unit : "")])) : null),
+    section(`Operating parameters (${t.operating_parameters.length})`, false,
+      el("div", { class: "scroll" }, el("table", {}, el("thead", {}, el("tr", {}, ...["Parameter", "Unit", "Typical range", "Why it matters"].map(h => el("th", { text: h })))),
+        el("tbody", {}, ...t.operating_parameters.map(o => el("tr", {}, el("td", { text: o.label }), el("td", { text: o.unit }), el("td", { text: o.typical_range }), el("td", { text: o.why_it_matters }))))))),
+    section(`Job types (${t.job_types.length})`, false, ...t.job_types.map(j => section(j.name, false,
+      kv([["Trigger", j.trigger], ["Schedule", j.schedule], ["Downtime", j.est_downtime_hours + " h"],
+          ["Cost band", inr(j.est_cost_band.low_inr) + " to " + inr(j.est_cost_band.high_inr)]]),
+      el("p", { class: "kv", text: "Checklist:" }), list(j.checklist),
+      el("p", { class: "kv", text: "Parts and tools:" }), list(j.parts_and_tools),
+      el("p", { class: "kv", text: "Safety and permits:" }), list(j.safety_and_permit_notes)))),
+    section(`Snag taxonomy (${t.snag_types.length})`, false, ...t.snag_types.map(s => {
+      const job = t.job_types.find(j => j.id === s.recommended_job_id);
+      return section(`${s.name} (${s.category.replace(/_/g, " ")})`, false,
+        el("p", { class: "kv", text: "Symptoms:" }), list(s.symptoms),
+        el("p", { class: "kv", text: "Root causes:" }), list(s.root_causes),
+        kv([["Detection", s.detection_method], ["Immediate action", s.immediate_action],
+            ["Recommended job", job ? job.name : s.recommended_job_id], ["Time to fix", s.time_to_fix_hours + " h"],
+            ["Escalate when", s.escalation_criteria]]),
+        el("p", { class: "kv", text: "Severity levels:" }), el("ol", {}, ...s.severity_levels.slice().sort((a, b) => a.level - b.level).map(v => el("li", { text: v.definition }))),
+        el("p", { class: "kv", text: "Safety hazards:" }), list(s.safety_hazards),
+        el("p", { class: "kv", text: "Pollution effects:" }), list(s.pollution_effects.map(e => e.domain + ": " + e.effect)));
+    })),
+    section(`Report form and pollutant capture fields (${(d.form_schema || []).length})`, false,
+      list((d.form_schema || []).map(f => `${f.label} (${f.type}${f.required ? ", required" : ""}${f.domain ? ", " + f.domain : ""})`))),
+    el("p", { class: "note", text: d.disclaimer || "" }));
+}
+
+
+/* ---------- snag submission (Reporter) ---------- */
+const SN = { tpl: null, fields: new Map(), instances: [] };
+function who() { if (!HANDLE_RE.test(WHO.handle)) throw new Error("Enter a handle (3 to 32 letters, digits, _ or -) in the header first."); return { handle: WHO.handle, role: WHO.role }; }
+async function loadInstances(key, pick) {
+  const d = await api("/api/instances?" + new URLSearchParams({ model_key: key }));
+  SN.instances = d.instances;
+  $("instSel").replaceChildren(...d.instances.map(i => { const o = document.createElement("option"); o.value = i.machine_id;
+    o.textContent = `${i.tag} (${i.machine_id}${i.synthetic ? ", synthetic demo history" : ""})`; return o; }));
+  if (pick) $("instSel").value = pick;
+}
+function renderField(def, i) {
+  const id = "f" + i, wrap = el("div", { class: "fld" });
+  wrap.append(el("label", { class: "f", for: id, text: def.label + (def.required ? " (required)" : "") }));
+  let input;
+  if (def.type === "dropdown") {
+    input = document.createElement("select");
+    const blank = document.createElement("option"); blank.value = ""; blank.textContent = "Choose"; input.append(blank);
+    (def.options || []).forEach((v, k) => { const o = document.createElement("option"); o.value = v; o.textContent = (def.option_labels || def.options)[k]; input.append(o); });
+  } else {
+    input = document.createElement(def.max_length > 200 ? "textarea" : "input");
+    if (input.tagName === "INPUT") input.type = "text";
+    if (def.max_length) input.maxLength = def.max_length;
+  }
+  input.id = id; input.setAttribute("aria-describedby", id + "-h " + id + "-e");
+  wrap.append(input, el("p", { class: "note", id: id + "-h", text: def.help_text || "" }), el("span", { class: "err", id: id + "-e", role: "alert" }));
+  SN.fields.set(def.id, { def, input, err: wrap.lastChild });
+  return wrap;
+}
+async function showSnagForm(d) {
+  SN.tpl = d; SN.fields = new Map();
+  $("snagCard").hidden = false; $("guidance").replaceChildren(); $("snagErr").textContent = "";
+  $("snagFields").replaceChildren(...(d.form_schema || []).map(renderField));
+  try { await loadInstances(d.key); } catch (e) { $("snagErr").textContent = e.message; }
+}
+function collectSnag() {
+  const answers = {}; let snag_type_id = null, severity = null;
+  for (const [fid, f] of SN.fields) {
+    f.err.textContent = ""; f.input.removeAttribute("aria-invalid");
+    const v = f.input.value;
+    if (fid === "snag_type") snag_type_id = v && v !== "other" ? v : null;
+    else if (fid === "severity") severity = v ? Number(v) : null;
+    else if (v.trim()) answers[fid] = v;
+  }
+  return { snag_type_id, severity, answers };
+}
+async function submitSnag() {
+  $("snagErr").textContent = ""; $("guidance").replaceChildren();
+  try {
+    const body = { machine_id: $("instSel").value, ...who(), ...collectSnag(), photo_analysis_ref: null };
+    $("snagBtn").disabled = true;
+    const d = await postJSON("/api/snags", body);
+    renderGuidance($("guidance"), d.recommendation, d.snag);
+    toast("Snag " + d.snag.snag_id + " recorded");
+  } catch (e) {
+    $("snagErr").textContent = e.message;
+    for (const x of e.fields || []) {
+      const k = (x.field || "").replace(/^answers\./, "").replace(/_id$/, "");
+      const f = SN.fields.get(k) || SN.fields.get(x.field);
+      if (f) { f.err.textContent = x.reason; f.input.setAttribute("aria-invalid", "true"); }
+    }
+  }
+  $("snagBtn").disabled = false;
+}
+function renderGuidance(box, g, snag) {
+  const kids = [el("h3", { style: "font-size:18px;margin-top:12px", text: snag ? "Recorded " + snag.snag_id + " (" + snag.status + ")" : "Guidance" }),
+    el("p", { class: "kv" }, el("span", { class: "pill" + (g.guidance_source === "ai" ? " ai" : " warn"), text: "guidance: " + g.guidance_source }), " ", g.label)];
+  if (g.recommended_job) kids.push(kv([["Recommended job", g.recommended_job.job_name], ["Immediate action", g.immediate_action],
+    ["Time to fix", g.time_to_fix_hours != null ? g.time_to_fix_hours + " h" : null], ["Escalate when", g.escalation_criteria]]),
+    el("p", { class: "kv", text: "Safety hazards:" }), list(g.safety_hazards));
+  box.replaceChildren(...kids);
+}
+function initSnag() {
+  $("newInstBtn").addEventListener("click", () => { $("instForm").hidden = false; $("instTag").focus(); });
+  $("instForm").addEventListener("submit", async (e) => {
+    e.preventDefault(); $("instErr").textContent = "";
+    try {
+      const y = $("instYear").value;
+      const d = await postJSON("/api/instances", { model_key: SN.tpl.key, tag: $("instTag").value, install_year: y ? Number(y) : null, ...who() });
+      await loadInstances(SN.tpl.key, d.machine_id); $("instForm").hidden = true;
+    } catch (err) { $("instErr").textContent = err.message; }
+  });
+  $("snagForm").addEventListener("submit", (e) => { e.preventDefault(); submitSnag(); });
+  $("queueRefresh").addEventListener("click", loadQueue);
+  $("hSel").addEventListener("change", () => loadMachineHealth($("hSel").value));
+}
+
+/* ---------- resolver queue ---------- */
+const GLYPH = ["", "\u25CB", "\u25D4", "\u25D1", "\u25D5", "\u25CF"];
+async function loadQueue() {
+  $("queueErr").textContent = "";
+  try {
+    const d = await api("/api/resolver/queue");
+    $("queueBox").replaceChildren(...(d.queue.length ? d.queue.map(queueCard) : [el("p", { class: "sub", text: "No open snags." })]));
+  } catch (e) { $("queueErr").textContent = e.message; }
+}
+function queueCard(item) {
+  const s = item.snag, card = el("article", { class: "card", style: "margin:10px 0" });
+  const msg = el("div", { class: "err", role: "alert" });
+  const act = async (action, extra) => {
+    msg.textContent = "";
+    try {
+      const d = await postJSON(`/api/snags/${encodeURIComponent(s.snag_id)}/${action}`, { ...who(), ...(extra || {}) });
+      if (action === "close" && d.health) toast(`Closed. Health ${d.health.health.score} (${d.health.health.band}), lifespan about ${d.health.lifespan.remaining_days} days (estimate)`);
+      loadQueue();
+    } catch (e) { msg.textContent = (e.status ? e.status + ": " : "") + e.message; }
+  };
+  const form = el("form", { hidden: "" },
+    el("label", { class: "f", for: "rn-" + s.snag_id, text: "Resolution notes" }), el("textarea", { id: "rn-" + s.snag_id, maxlength: "2000" }),
+    el("label", { class: "f", for: "ra-" + s.snag_id, text: "Actions taken" }), el("textarea", { id: "ra-" + s.snag_id, maxlength: "2000" }),
+    el("label", { class: "f", for: "rd-" + s.snag_id, text: "Downtime (hours)" }), el("input", { id: "rd-" + s.snag_id, type: "number", min: "0", max: "8760", value: "0" }),
+    el("label", { class: "f", for: "rc-" + s.snag_id, text: "Cost (INR)" }), el("input", { id: "rc-" + s.snag_id, type: "number", min: "0", value: "0" }),
+    el("div", { class: "row" }, el("button", { class: "btn brand small", type: "submit" }, "Save resolution")));
+  form.addEventListener("submit", (e) => { e.preventDefault(); act("resolve", {
+    notes: form.querySelector("#rn-" + CSS.escape(s.snag_id)).value, actions_taken: form.querySelector("#ra-" + CSS.escape(s.snag_id)).value,
+    downtime_hours: Number(form.querySelector("#rd-" + CSS.escape(s.snag_id)).value || 0), cost_inr: Number(form.querySelector("#rc-" + CSS.escape(s.snag_id)).value || 0) }); });
+  const g = el("div"); renderGuidance(g, item, null);
+  card.append(
+    el("h3", { style: "font-size:18px" }, el("span", { "aria-hidden": "true", text: GLYPH[s.severity] + " " }),
+      `Severity ${s.severity} of 5 · ${item.snag_type_name || s.category} · ${s.machine_id}`),
+    el("p", { class: "kv", text: `${s.snag_id} · ${s.status} · reported ${s.reported_at} by ${s.reporter_handle}` }),
+    el("p", { text: (s.answers && s.answers.description) || "" }), g,
+    el("div", { class: "row" },
+      el("button", { class: "btn ghost small", type: "button", onclick: () => act("accept") }, "Accept"),
+      el("button", { class: "btn ghost small", type: "button", onclick: () => { form.hidden = !form.hidden; } }, "Resolve"),
+      el("button", { class: "btn ghost small", type: "button", onclick: () => act("close") }, "Close")),
+    form, msg);
+  return card;
+}
+
+/* ---------- machine health ---------- */
+const SVGNS = "http://www.w3.org/2000/svg";
+function svg(tag, attrs) { const e = document.createElementNS(SVGNS, tag); for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v); return e; }
+async function loadHealthSelector() {
+  try {
+    const d = await api("/api/instances");
+    const cur = $("hSel").value;
+    $("hSel").replaceChildren(...d.instances.map(i => { const o = document.createElement("option"); o.value = i.machine_id; o.textContent = `${i.tag} (${i.machine_id})`; return o; }));
+    $("hSel").value = cur && d.instances.some(i => i.machine_id === cur) ? cur : (d.instances.find(i => i.machine_id === "K-4") || d.instances[0] || {}).machine_id || "";
+    if ($("hSel").value) loadMachineHealth($("hSel").value);
+  } catch (e) { $("hErr").textContent = e.message; }
+}
+function gauge(score, band) {
+  const g = svg("svg", { viewBox: "0 0 200 120", width: "220", role: "img", "aria-label": `Health ${score} of 100, ${band}` });
+  const arc = (frac) => { const a = Math.PI * (1 - frac); return `M 20 100 A 80 80 0 0 1 ${100 + 80 * Math.cos(a)} ${100 - 80 * Math.sin(a)}`; };
+  g.append(svg("path", { d: arc(1), fill: "none", stroke: "#ddd", "stroke-width": "16" }),
+    svg("path", { d: arc(Math.max(0.001, score / 100)), fill: "none", stroke: "currentColor", "stroke-width": "16" }));
+  const t = svg("text", { x: "100", y: "95", "text-anchor": "middle", "font-size": "28" }); t.textContent = String(score); g.append(t);
+  return g;
+}
+function lineChart(points, label) {
+  const W = 600, H = 180, P = 30, vals = points.map(p => p.v), lo = Math.min(...vals), hi = Math.max(...vals), span = hi - lo || 1;
+  const c = svg("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": label });
+  const xy = (i, v) => [P + i * (W - 2 * P) / Math.max(1, points.length - 1), H - P - (v - lo) / span * (H - 2 * P)];
+  c.append(svg("polyline", { fill: "none", stroke: "currentColor", "stroke-width": "2", points: points.map((p, i) => xy(i, p.v).join(",")).join(" ") }));
+  points.forEach((p, i) => { const [x, y] = xy(i, p.v); c.append(svg("circle", { cx: x, cy: y, r: "3" })); });
+  return c;
+}
+async function loadMachineHealth(id) {
+  $("hErr").textContent = "";
+  try {
+    const d = await api(`/api/machines/${encodeURIComponent(id)}/health`);
+    const h = d.health, l = d.lifespan, p = d.pollution;
+    const inds = Object.keys(p.per_day);
+    const sel = document.createElement("select"); sel.id = "indPick";
+    for (const k of inds) { const o = document.createElement("option"); o.value = k; o.textContent = p.per_day[k].unit; sel.append(o); }
+    const chartBox = el("div");
+    const drawInd = () => { const k = sel.value; chartBox.replaceChildren(lineChart(d.timeline.map(t => ({ v: t.per_day[k] })), "Trend of " + p.per_day[k].unit + " over 12 months")); };
+    sel.addEventListener("change", drawInd);
+    const tl = el("table", {}, el("thead", {}, el("tr", {}, ...["Date", "Health"].map(x => el("th", { text: x })))),
+      el("tbody", {}, ...d.timeline.map(t => el("tr", {}, el("td", { text: t.as_of }), el("td", { text: String(t.health) })))));
+    const marks = el("table", {}, el("thead", {}, el("tr", {}, ...["Snag", "Date", "Severity", "Status"].map(x => el("th", { text: x })))),
+      el("tbody", {}, ...d.snag_markers.map(m => el("tr", {}, el("td", { text: m.snag_id }), el("td", { text: m.date }), el("td", { text: String(m.severity) }), el("td", { text: m.status })))));
+    $("hBox").replaceChildren(
+      el("div", { class: "row" }, gauge(h.score, h.band), el("div", {},
+        el("p", { class: "kv" }, el("b", { text: `Health ${h.score} / 100: ${h.band}` }), ` · confidence ${h.confidence}`, h.confidence_reason ? " (" + h.confidence_reason + ")" : ""),
+        el("p", { class: "kv", text: `Wear ${h.wear_pct}% · severity trend ${h.trend_label} · age ${d.age_years == null ? "unknown" : d.age_years + " years"} of ${d.design_life_years} design years (age penalty ${d.age_factor_penalty})` }),
+        el("p", { class: "kv" }, el("b", { text: `Remaining lifespan about ${l.remaining_days} days` }), ` (range ${l.low_days} to ${l.high_days}). ${l.label}.`),
+        el("p", { class: "note", text: l.basis }),
+        d.synthetic ? el("span", { class: "pill warn", text: "synthetic demo history" }) : null)),
+      section("How this is calculated", false, el("div", { class: "scroll" }, el("table", {},
+        el("thead", {}, el("tr", {}, ...["Factor", "Penalty", "Detail"].map(x => el("th", { text: x })))),
+        el("tbody", {}, ...h.factors.map(f => el("tr", {}, el("td", { text: f.label }), el("td", { text: String(f.penalty) }), el("td", { text: f.detail }))))))),
+      el("h3", { style: "font-size:18px", text: "Pollution intensity linked to health" }),
+      el("p", { class: "note", text: `${p.label}. Domains: ${p.domains.join(", ")}. Equivalent severity ${p.sev_equiv}. Air: ${p.air_source}.` }),
+      el("div", { class: "scroll" }, el("table", {},
+        el("thead", {}, el("tr", {}, ...["Indicator", "Per day now", "Reference baseline (healthy machine about +0.5% to +1.5%)", "Over remaining lifespan", "Source"].map(x => el("th", { text: x })))),
+        el("tbody", {}, ...inds.map(k => el("tr", {}, el("td", { text: p.per_day[k].unit }), el("td", { text: String(p.per_day[k].value) }),
+          el("td", { text: String(p.per_day[k].baseline_reference) }), el("td", { text: String(p.over_remaining_lifespan[k]) }),
+          el("td", {}, el("span", { class: "pill", text: p.per_day[k].factor_source })))))) ),
+      el("label", { class: "f", for: "indPick", text: "Trend indicator" }), sel, chartBox,
+      el("h3", { style: "font-size:18px", text: "Health over the last 12 months" }),
+      lineChart(d.timeline.map(t => ({ v: t.health })), "Health score trend over 12 months"), section("Health timeline table", false, tl),
+      section(`Snag timeline (${d.snag_markers.length})`, false, el("div", { class: "scroll" }, marks)),
+      el("p", { class: "note", text: "Labels: " + d.labels.join(", ") }));
+    if (inds.length) drawInd();
+  } catch (e) { $("hErr").textContent = e.message; }
+}
+
+/* ---------- sustainability (E12): text only via textContent / el() ---------- */
+const SUS = { d: null };
+async function loadSustainSelector() {
+  try {
+    const d = await api("/api/instances");
+    const cur = $("sSel").value;
+    $("sSel").replaceChildren(...d.instances.map(i => { const o = document.createElement("option"); o.value = i.machine_id; o.textContent = `${i.tag} (${i.machine_id})`; return o; }));
+    $("sSel").value = cur && d.instances.some(i => i.machine_id === cur) ? cur : (d.instances.find(i => i.machine_id === "B-2") || d.instances[0] || {}).machine_id || "";
+  } catch (e) { $("sErr").textContent = e.message; }
+}
+const sizeSel = () => (document.querySelector('input[name="esize"]:checked') || {}).value || "MSME";
+const yrs = (v) => v == null ? "no payback" : `${Number(v).toFixed(1)} years`;
+function paybackText(v, status, horizon) {
+  if (status === "no-payback" || v == null) return "no payback";
+  if (status === "beyond-design-life") return `not reached within the ${horizon}-year design life (${Number(v).toFixed(1)} years)`;
+  return `${Number(v).toFixed(1)} years`;
+}
+function bar(pct) {
+  const w = Math.max(0, Math.min(100, Math.abs(Number(pct) || 0)));
+  const outer = el("span", { style: "display:inline-block;width:120px;height:8px;background:#e5e5e5;vertical-align:middle;margin:0 6px" });
+  outer.append(el("span", { style: `display:block;height:8px;width:${w}%;background:var(--brand-green)` }));
+  return outer;
+}
+function sustainItem(it, size) {
+  const e = it.economics, g = it.gate;
+  const card = el("article", { class: "card", style: "margin:10px 0" });
+  const glyph = g.verdict === "BLOCK" ? "\u2716 " : g.verdict === "ASK" ? "? " : "\u2714 ";
+  card.append(el("h4", { style: "font-size:16px;margin:0", text: it.name }),
+    el("div", { class: "row" },
+      el("span", { class: "pill", text: it.source === "ai-suggested" ? "AI-suggested" : "Curated fallback" }),
+      el("span", { class: "pill " + (g.verdict === "BLOCK" ? "warn" : ""), text: glyph + g.badge })),
+    el("p", { text: it.rationale }),
+    el("p", { class: "note", text: `Safety check: ${g.reason}` }));
+  if (it.status !== "ok") { card.append(el("p", { class: "err", text: "Undetermined: " + (e.reason || "") })); return card; }
+  const bs = (e.by_size || {})[size];
+  card.append(kv([
+    ["Capex", inr(e.capex_inr)], ["Efficiency gain", `${e.efficiency_gain_pct}%`],
+    ["Production-margin effect", inr(e.production_margin_inr_per_year) + " / year"],
+    ["Cash benefit", inr(e.cash_benefit_inr_per_year) + " / year"],
+    ["Cash payback", paybackText(e.payback_cash_years, e.payback_cash_status, e.payback_horizon_years)],
+    ["Payback including a notional exposure proxy (not cash)", paybackText(e.payback_with_exposure_years, e.payback_with_exposure_status, e.payback_horizon_years)],
+  ]));
+  const red = el("ul");
+  for (const [dom, r] of Object.entries(e.reduction_per_domain || {})) red.append(el("li", {}, `${dom}`, bar(r.pct), `${r.pct}%`));
+  card.append(el("p", { class: "f", text: "Reduction per pollution domain" }), red);
+  if (bs) {
+    const tag = bs.uses_illustrative_values ? " (uses illustrative demo values)" : "";
+    card.append(el("p", { class: "f", text: `With incentives (${size === "MSME" ? "Small (MSME)" : "Large"})` }), kv([
+      ["Adjusted capex", inr(bs.adjusted_capex_inr) + tag],
+      ["Adjusted cash payback", paybackText(bs.adjusted_payback_cash_years, bs.adjusted_payback_cash_status, e.payback_horizon_years) + tag],
+      ["Adjusted payback with exposure proxy", paybackText(bs.adjusted_payback_with_exposure_years, bs.adjusted_payback_with_exposure_status, e.payback_horizon_years) + tag],
+      ["Scheme applied", bs.schemes_applied.length ? bs.schemes_applied.join(", ") : "none quantifiable"],
+    ]));
+  }
+  if (it.sources && it.sources.length) { const p = el("p", { class: "note" }, "Sources: "); it.sources.forEach((s, i) => { if (i) p.append(", "); p.append(safeLink(s.uri, s.title)); }); card.append(p); }
+  card.append(el("p", { class: "note", text: "Labels: " + it.labels.join(", ") }));
+  return card;
+}
+function renderSustain() {
+  const d = SUS.d; if (!d) return;
+  const size = sizeSel(), c = d.current;
+  const cur = el("section", { class: "card" }, el("h3", { style: "font-size:18px", text: "Current usage" }),
+    el("p", { class: "kv", text: `Health ${c.health} / 100: ${c.band} (${c.confidence})` }),
+    el("ul", {}, ...Object.values(c.per_day).map(v => el("li", { text: `${v.value} ${v.unit} (${v.factor_source})` }))));
+  const group = (title, pred) => { const its = d.items.filter(pred); return its.length ? el("div", {}, el("h3", { style: "font-size:18px", text: title }), ...its.map(i => sustainItem(i, size))) : null; };
+  const schemes = d.schemes[size] || [];
+  const sl = el("div", {}, el("h3", { style: "font-size:18px", text: "Incentive schemes (" + (size === "MSME" ? "Small (MSME)" : "Large") + ")" }),
+    el("p", { class: "note", text: d.name_note }));
+  if (d.schemes_message[size]) sl.append(el("p", { class: "sub", text: d.schemes_message[size] }));
+  for (const s of schemes) {
+    const li = el("article", { class: "card", style: "margin:8px 0" },
+      el("h4", { style: "font-size:15px;margin:0", text: s.name }),
+      el("div", { class: "row" }, el("span", { class: "pill warn", text: s.status }), el("span", { class: "pill", text: s.benefit_type }),
+        el("span", { class: "pill", text: s.quantifiable ? "quantifiable" : "qualitative (not in the calculation)" })),
+      el("p", { text: `${s.authority}. ${s.benefit_description}` }), el("p", { class: "note", text: s.eligibility_notes }),
+      el("p", { class: "note" }, s.source_url ? safeLink(s.source_url, "Issuing body") : "No source link (illustrative demo record)", " · ", s.retrieval_label));
+    if (s.uses_illustrative_values && s.quantifiable) li.append(el("p", { class: "note", text: "uses illustrative demo values" }));
+    sl.append(li);
+  }
+  $("sBox").replaceChildren(
+    el("p", { class: d.source === "ai-suggested" ? "sub" : "err", text: `${d.message} (source: ${d.source}; alternatives cache: ${d.alternatives_cache_status})` }),
+    cur,
+    group("Sustainable machine alternatives", i => i.kind === "machine_alternative"),
+    group("Sustainable process changes: operating process", i => i.kind === "process_change" && i.stage !== "assembly"),
+    group("Sustainable process changes: assembly / build stage", i => i.kind === "process_change" && i.stage === "assembly"),
+    sl, el("p", { class: "note", text: d.disclaimer + ` Audit entry ${d.audit_id}.` }));
+}
+async function analyseSustain() {
+  $("sErr").textContent = "";
+  const id = $("sSel").value; if (!id) return;
+  $("sBox").replaceChildren(el("p", { class: "sub", text: "Analysing alternatives…" }));
+  try { SUS.d = await postJSON(`/api/machines/${encodeURIComponent(id)}/recommendations`, { enterprise_size: null, country: "IN" }); renderSustain(); }
+  catch (e) { $("sBox").replaceChildren(); $("sErr").textContent = e.message; }
+}
+function initSustain() {
+  $("sGo").addEventListener("click", analyseSustain);
+  for (const r of document.querySelectorAll('input[name="esize"]')) r.addEventListener("change", renderSustain);
+  $("sSel").addEventListener("change", () => { SUS.d = null; $("sBox").replaceChildren(); });
+}
+
+(async function init() {
+  initWho(); initCatalogue(); initSnag(); initSustain(); loadIndustries();
+  await loadHealth(); await loadFleet(); await select("B-2"); loadRegistry(); loadImprovements(); loadSamples();
+})();
+</script>
+</body>
+</html>

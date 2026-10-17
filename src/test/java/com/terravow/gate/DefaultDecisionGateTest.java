@@ -18,6 +18,7 @@ class DefaultDecisionGateTest {
 
     private final DecisionGate gate = new DefaultDecisionGate();
     private final GateThresholds thresholds = new GateThresholds(0.8, 0.5);
+    private static final TrustContext NO_TRUST_CAP = new TrustContext(1.0, 0.0);
 
     private static EvidenceChain readingChain() {
         return EvidenceChain.EMPTY.with(
@@ -31,7 +32,7 @@ class DefaultDecisionGateTest {
     // Req 8.1 — confidence at/above the allow threshold yields ALLOW; ALLOW is not routed to review.
     @Test
     void confidenceAtOrAboveAllowThresholdYieldsAllow() {
-        GateVerdict verdict = gate.classify(rec(0.8), thresholds, HarmDelta.NONE);
+        GateVerdict verdict = gate.classify(rec(0.8), thresholds, HarmDelta.NONE, NO_TRUST_CAP);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.ALLOW);
         assertThat(verdict.vetoApplied()).isFalse();
@@ -41,7 +42,7 @@ class DefaultDecisionGateTest {
     // Req 8.1 — confidence in [ask, allow) yields ASK and routes to human review (Req 8.2).
     @Test
     void confidenceInAskBandYieldsAskAndRoutesToReview() {
-        GateVerdict verdict = gate.classify(rec(0.5), thresholds, HarmDelta.NONE);
+        GateVerdict verdict = gate.classify(rec(0.5), thresholds, HarmDelta.NONE, NO_TRUST_CAP);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.ASK);
         assertThat(verdict.routedToHumanReview()).isTrue();
@@ -51,7 +52,7 @@ class DefaultDecisionGateTest {
     // Req 8.1 — confidence below the ask threshold yields BLOCK and routes to review (Req 8.2).
     @Test
     void confidenceBelowAskThresholdYieldsBlock() {
-        GateVerdict verdict = gate.classify(rec(0.49), thresholds, HarmDelta.NONE);
+        GateVerdict verdict = gate.classify(rec(0.49), thresholds, HarmDelta.NONE, NO_TRUST_CAP);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.BLOCK);
         assertThat(verdict.routedToHumanReview()).isTrue();
@@ -62,7 +63,7 @@ class DefaultDecisionGateTest {
     @Test
     void hardVetoOnMassIncreaseForcesBlockRegardlessOfConfidence() {
         GateVerdict verdict =
-                gate.classify(rec(1.0), thresholds, new HarmDelta(0.0001, 0.0));
+                gate.classify(rec(1.0), thresholds, new HarmDelta(0.0001, 0.0), NO_TRUST_CAP);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.BLOCK);
         assertThat(verdict.vetoApplied()).isTrue();
@@ -73,7 +74,7 @@ class DefaultDecisionGateTest {
     @Test
     void hardVetoOnCrossMediaIncreaseForcesBlock() {
         GateVerdict verdict =
-                gate.classify(rec(1.0), thresholds, new HarmDelta(0.0, 0.0001));
+                gate.classify(rec(1.0), thresholds, new HarmDelta(0.0, 0.0001), NO_TRUST_CAP);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.BLOCK);
         assertThat(verdict.vetoApplied()).isTrue();
@@ -83,7 +84,7 @@ class DefaultDecisionGateTest {
     @Test
     void hardVetoAttachesSupportingReadings() {
         Recommendation r = rec(0.1);
-        GateVerdict verdict = gate.classify(r, thresholds, new HarmDelta(1.0, 0.0));
+        GateVerdict verdict = gate.classify(r, thresholds, new HarmDelta(1.0, 0.0), NO_TRUST_CAP);
 
         assertThat(verdict.evidence()).isEqualTo(r.evidence());
         assertThat(verdict.evidence().links())
@@ -97,7 +98,7 @@ class DefaultDecisionGateTest {
         Recommendation noConfidence = Recommendation.withoutConfidence("rec-1", readingChain());
 
         GateVerdict verdict =
-                gate.classify(noConfidence, thresholds, new HarmDelta(2.0, 0.0));
+                gate.classify(noConfidence, thresholds, new HarmDelta(2.0, 0.0), NO_TRUST_CAP);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.BLOCK);
         assertThat(verdict.vetoApplied()).isTrue();
@@ -108,7 +109,7 @@ class DefaultDecisionGateTest {
     void absentConfidenceFailsClosedToBlockAndReview() {
         Recommendation noConfidence = Recommendation.withoutConfidence("rec-1", readingChain());
 
-        GateVerdict verdict = gate.classify(noConfidence, thresholds, HarmDelta.NONE);
+        GateVerdict verdict = gate.classify(noConfidence, thresholds, HarmDelta.NONE, NO_TRUST_CAP);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.BLOCK);
         assertThat(verdict.vetoApplied()).isFalse();
@@ -118,7 +119,7 @@ class DefaultDecisionGateTest {
     // Req 8.1 — zero harm with zero deltas does not trip the veto; classification proceeds normally.
     @Test
     void zeroHarmDeltaDoesNotTripVeto() {
-        GateVerdict verdict = gate.classify(rec(0.9), thresholds, HarmDelta.NONE);
+        GateVerdict verdict = gate.classify(rec(0.9), thresholds, HarmDelta.NONE, NO_TRUST_CAP);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.ALLOW);
         assertThat(verdict.vetoApplied()).isFalse();
@@ -128,7 +129,7 @@ class DefaultDecisionGateTest {
     @Test
     void negativeHarmDeltaDoesNotTripVeto() {
         GateVerdict verdict =
-                gate.classify(rec(0.95), thresholds, new HarmDelta(-5.0, -2.0));
+                gate.classify(rec(0.95), thresholds, new HarmDelta(-5.0, -2.0), NO_TRUST_CAP);
 
         assertThat(verdict.decision()).isEqualTo(GateDecision.ALLOW);
         assertThat(verdict.vetoApplied()).isFalse();

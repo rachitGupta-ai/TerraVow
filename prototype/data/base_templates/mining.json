@@ -1,0 +1,1337 @@
+{
+ "base_template_id": "base-mining-1",
+ "industry": "mining",
+ "template": {
+  "machine_profile": {
+   "summary": "Generic template for mining and mineral-processing equipment: rotary kilns, crushers, grinding mills, haul trucks and gensets.",
+   "typical_duty": "Continuous heavy-duty operation in abrasive, dusty conditions; mobile equipment runs 18 to 22 hours a day.",
+   "key_components": [
+    "Kiln shell and refractory",
+    "Kiln seals and girth gear",
+    "Preheater cyclones",
+    "Burner and fuel system",
+    "Crusher liners and mantle",
+    "Mill liners and trunnion bearings",
+    "Conveyors",
+    "Dust suppression system",
+    "Tailings and slurry lines",
+    "Engine fuel injectors and sensors",
+    "Hydraulics and tyres"
+   ],
+   "specs": []
+  },
+  "operating_parameters": [
+   {
+    "id": "kiln-shell-temp",
+    "label": "Kiln shell temperature",
+    "unit": "C",
+    "typical_range": "200 to 350",
+    "why_it_matters": "Hot spots warn of refractory loss."
+   },
+   {
+    "id": "kiln-inlet-o2",
+    "label": "Kiln inlet oxygen",
+    "unit": "% O2",
+    "typical_range": "1.5 to 3",
+    "why_it_matters": "Controls combustion efficiency and CO."
+   },
+   {
+    "id": "preheater-dp",
+    "label": "Preheater pressure drop",
+    "unit": "mbar",
+    "typical_range": "Per design",
+    "why_it_matters": "A rise signals cyclone build-up and blockage."
+   },
+   {
+    "id": "kiln-speed",
+    "label": "Kiln speed",
+    "unit": "rpm",
+    "typical_range": "2 to 4",
+    "why_it_matters": "Speed changes affect the coating and product quality."
+   },
+   {
+    "id": "mill-power",
+    "label": "Mill power draw",
+    "unit": "kW",
+    "typical_range": "Per design",
+    "why_it_matters": "Power per tonne is the main grinding energy indicator."
+   },
+   {
+    "id": "crusher-css",
+    "label": "Crusher closed-side setting",
+    "unit": "mm",
+    "typical_range": "Per product",
+    "why_it_matters": "Liner wear opens the setting and the product size grows."
+   },
+   {
+    "id": "engine-exhaust-temp",
+    "label": "Engine exhaust temperature",
+    "unit": "C",
+    "typical_range": "Per OEM band",
+    "why_it_matters": "Rising exhaust temperature at the same load means injector or turbo trouble."
+   },
+   {
+    "id": "slurry-density",
+    "label": "Tailings slurry density",
+    "unit": "% solids",
+    "typical_range": "Per design",
+    "why_it_matters": "Low density wastes water; high density risks line blockage."
+   },
+   {
+    "id": "ambient-dust",
+    "label": "Ambient dust at the transfer points",
+    "unit": "mg/m3",
+    "typical_range": "Below the workplace limit",
+    "why_it_matters": "Dust is both a health and an air-pollution indicator."
+   }
+  ],
+  "job_types": [
+   {
+    "id": "injector-service",
+    "name": "Fuel injector test and replacement",
+    "trigger": "Rising exhaust temperature spread, or by engine hours",
+    "schedule": "By engine hours",
+    "checklist": [
+     "Check the cylinder exhaust temperatures",
+     "Remove and bench-test the injectors",
+     "Replace drifting injectors",
+     "Run the engine and re-check the spread"
+    ],
+    "parts_and_tools": [
+     "Injector test bench",
+     "Injectors",
+     "Seals"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Fuel spill tray",
+     "Heat-resistant gloves and face shield; allow cooling to below 50 C"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 40000,
+     "high_inr": 250000
+    }
+   },
+   {
+    "id": "sensor-calibration",
+    "name": "Engine and process sensor calibration",
+    "trigger": "Sensor drift or alarms without cause",
+    "schedule": "Half-yearly",
+    "checklist": [
+     "Compare the sensors against reference instruments",
+     "Recalibrate or replace",
+     "Check the wiring and the connectors",
+     "Clear false alarms and record"
+    ],
+    "parts_and_tools": [
+     "Calibrator",
+     "Spare sensors"
+    ],
+    "safety_and_permit_notes": [
+     "Inform the control room before forcing signals"
+    ],
+    "est_downtime_hours": 3.0,
+    "est_cost_band": {
+     "low_inr": 10000,
+     "high_inr": 60000
+    }
+   },
+   {
+    "id": "kiln-shell-repair",
+    "name": "Kiln refractory reline at a hot spot",
+    "trigger": "Shell hot spot above the limit",
+    "schedule": "At planned stops",
+    "checklist": [
+     "Map the hot spot with the shell scanner",
+     "Cool the kiln",
+     "Remove the damaged bricks",
+     "Reline and cure"
+    ],
+    "parts_and_tools": [
+     "Refractory bricks",
+     "Mortar",
+     "Shell scanner"
+    ],
+    "safety_and_permit_notes": [
+     "Confined-space entry permit, gas test and standby attendant",
+     "Hot-work permit if cutting, welding or grinding",
+     "Silica dust control"
+    ],
+    "est_downtime_hours": 96.0,
+    "est_cost_band": {
+     "low_inr": 800000,
+     "high_inr": 4000000
+    }
+   },
+   {
+    "id": "preheater-cleaning",
+    "name": "Preheater cyclone cleaning",
+    "trigger": "Preheater dP up or cyclone blockage alarm",
+    "schedule": "By condition",
+    "checklist": [
+     "Use the air blasters",
+     "Open the poke holes and clean with lances",
+     "Inspect the flap valves",
+     "Restart and watch the dP"
+    ],
+    "parts_and_tools": [
+     "Cleaning lances",
+     "Air blaster parts"
+    ],
+    "safety_and_permit_notes": [
+     "Hot meal outburst risk: exclusion zone and full hot-meal PPE"
+    ],
+    "est_downtime_hours": 8.0,
+    "est_cost_band": {
+     "low_inr": 30000,
+     "high_inr": 150000
+    }
+   },
+   {
+    "id": "girth-gear-realign",
+    "name": "Girth gear and pinion realignment",
+    "trigger": "Gear noise, vibration or a poor contact pattern",
+    "schedule": "Annual",
+    "checklist": [
+     "Inspect the tooth contact pattern",
+     "Measure the root clearance and the run-out",
+     "Adjust the pinion alignment",
+     "Check the lubrication spray"
+    ],
+    "parts_and_tools": [
+     "Dial gauges",
+     "Gear lubricant",
+     "Thermal camera"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Rotating kiln: barring permit"
+    ],
+    "est_downtime_hours": 24.0,
+    "est_cost_band": {
+     "low_inr": 200000,
+     "high_inr": 900000
+    }
+   },
+   {
+    "id": "kiln-seal-replace",
+    "name": "Kiln inlet or outlet seal replacement",
+    "trigger": "False air ingress or visible leakage",
+    "schedule": "Annual",
+    "checklist": [
+     "Inspect the seal segments",
+     "Replace worn segments",
+     "Adjust the seal tension",
+     "Check the inlet O2 after restart"
+    ],
+    "parts_and_tools": [
+     "Seal segments",
+     "Springs"
+    ],
+    "safety_and_permit_notes": [
+     "Hot-work permit if cutting, welding or grinding",
+     "Heat-resistant gloves and face shield; allow cooling to below 50 C"
+    ],
+    "est_downtime_hours": 16.0,
+    "est_cost_band": {
+     "low_inr": 100000,
+     "high_inr": 500000
+    }
+   },
+   {
+    "id": "liner-change",
+    "name": "Crusher or mill liner change",
+    "trigger": "Liner thickness below the limit",
+    "schedule": "By wear measurement",
+    "checklist": [
+     "Measure the liner thickness",
+     "Isolate and lock the drive",
+     "Use the liner handler to remove and fit liners",
+     "Torque the bolts and record"
+    ],
+    "parts_and_tools": [
+     "Liners",
+     "Liner handler",
+     "Bolts"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Heavy-lift plan",
+     "Confined space inside the mill"
+    ],
+    "est_downtime_hours": 36.0,
+    "est_cost_band": {
+     "low_inr": 500000,
+     "high_inr": 3000000
+    }
+   },
+   {
+    "id": "belt-tracking-adjust",
+    "name": "Conveyor belt tracking adjustment",
+    "trigger": "Belt running off centre",
+    "schedule": "Weekly inspection",
+    "checklist": [
+     "Inspect the idlers and the pulleys",
+     "Clean build-up from the pulleys",
+     "Adjust the training idlers",
+     "Check the skirting and the scrapers"
+    ],
+    "parts_and_tools": [
+     "Idlers",
+     "Scrapers",
+     "Skirt rubber"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Never adjust a running belt"
+    ],
+    "est_downtime_hours": 4.0,
+    "est_cost_band": {
+     "low_inr": 10000,
+     "high_inr": 80000
+    }
+   },
+   {
+    "id": "dust-system-service",
+    "name": "Dust suppression system service",
+    "trigger": "Visible dust at transfer points",
+    "schedule": "Weekly",
+    "checklist": [
+     "Check the spray nozzles",
+     "Clean the strainers",
+     "Verify the water pressure and the dosing",
+     "Repair the hoses"
+    ],
+    "parts_and_tools": [
+     "Spray nozzles",
+     "Strainers",
+     "Hoses"
+    ],
+    "safety_and_permit_notes": [
+     "Wet slippery surfaces"
+    ],
+    "est_downtime_hours": 4.0,
+    "est_cost_band": {
+     "low_inr": 10000,
+     "high_inr": 60000
+    }
+   },
+   {
+    "id": "tailings-line-repair",
+    "name": "Tailings line inspection and repair",
+    "trigger": "Pressure drop or a visible leak",
+    "schedule": "Weekly patrol",
+    "checklist": [
+     "Isolate and drain the section",
+     "Replace the worn spool or the liner",
+     "Inspect the supports",
+     "Pressure-test"
+    ],
+    "parts_and_tools": [
+     "Spool pieces",
+     "Gaskets",
+     "Clamps"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "Slurry under pressure"
+    ],
+    "est_downtime_hours": 12.0,
+    "est_cost_band": {
+     "low_inr": 50000,
+     "high_inr": 400000
+    }
+   },
+   {
+    "id": "hydraulic-hose-replace",
+    "name": "Hydraulic hose replacement",
+    "trigger": "Leak or a visibly damaged hose",
+    "schedule": "By condition",
+    "checklist": [
+     "Lower the attachments to the ground",
+     "Release the stored pressure",
+     "Replace the hose with the correct rating",
+     "Clean up the oil and refill"
+    ],
+    "parts_and_tools": [
+     "Hoses",
+     "Fittings",
+     "Hydraulic oil",
+     "Spill kit"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening",
+     "High-pressure injection injury risk"
+    ],
+    "est_downtime_hours": 3.0,
+    "est_cost_band": {
+     "low_inr": 15000,
+     "high_inr": 80000
+    }
+   },
+   {
+    "id": "tyre-change",
+    "name": "Haul truck tyre inspection and change",
+    "trigger": "Cut, bulge or low tread",
+    "schedule": "Daily pre-start check",
+    "checklist": [
+     "Park on level ground and chock",
+     "Deflate before removal",
+     "Use the tyre handler",
+     "Inflate in a cage and check the pressure"
+    ],
+    "parts_and_tools": [
+     "Tyre handler",
+     "Inflation cage"
+    ],
+    "safety_and_permit_notes": [
+     "Tyre explosion risk: exclusion zone"
+    ],
+    "est_downtime_hours": 6.0,
+    "est_cost_band": {
+     "low_inr": 300000,
+     "high_inr": 1500000
+    }
+   },
+   {
+    "id": "bearing-lube-service",
+    "name": "Trunnion and roller bearing lubrication service",
+    "trigger": "Bearing temperature rising",
+    "schedule": "Weekly",
+    "checklist": [
+     "Check the lube flow and the oil temperature",
+     "Sample the oil",
+     "Clean the filters",
+     "Top up"
+    ],
+    "parts_and_tools": [
+     "Lube oil",
+     "Filters",
+     "Sample bottles"
+    ],
+    "safety_and_permit_notes": [
+     "Lock-out / tag-out and zero-energy verification before opening"
+    ],
+    "est_downtime_hours": 4.0,
+    "est_cost_band": {
+     "low_inr": 15000,
+     "high_inr": 100000
+    }
+   }
+  ],
+  "snag_types": [
+   {
+    "id": "injector-drift",
+    "name": "Fuel injector drift",
+    "category": "mechanical",
+    "symptoms": [
+     "Exhaust temperature spread between cylinders",
+     "Black smoke on load",
+     "Misfire, knocking or rising fuel use"
+    ],
+    "root_causes": [
+     "Nozzle wear",
+     "Fuel contamination",
+     "Deposits"
+    ],
+    "detection_method": "Cylinder exhaust temperatures and fuel per hour",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of fuel injector drift: exhaust temperature spread between cylinders noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: exhaust temperature spread between cylinders confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: black smoke on load; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: misfire, knocking or rising fuel use; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate on misfire alarms or knocking"
+     }
+    ],
+    "immediate_action": "Reduce the load and plan an injector test",
+    "recommended_job_id": "injector-service",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Injectors",
+     "Seals"
+    ],
+    "safety_hazards": [
+     "Hot exhaust",
+     "Fuel spray"
+    ],
+    "escalation_criteria": "Escalate on misfire alarms or knocking",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Incomplete combustion raises CO2, NOx and soot."
+     }
+    ]
+   },
+   {
+    "id": "sensor-drift",
+    "name": "Sensor drift",
+    "category": "instrumentation_control",
+    "symptoms": [
+     "Readings that disagree with a portable instrument",
+     "Nuisance alarms",
+     "Control loop hunting or wrong trips"
+    ],
+    "root_causes": [
+     "Calibration drift",
+     "Fouled probes",
+     "Wiring faults"
+    ],
+    "detection_method": "Cross-check against a portable reference",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of sensor drift: readings that disagree with a portable instrument noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: readings that disagree with a portable instrument confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: nuisance alarms; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: control loop hunting or wrong trips; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if a safety-critical sensor is affected"
+     }
+    ],
+    "immediate_action": "Put the loop in manual if safe and book a calibration",
+    "recommended_job_id": "sensor-calibration",
+    "time_to_fix_hours": 3.0,
+    "parts": [
+     "Spare sensor"
+    ],
+    "safety_hazards": [
+     "Wrong trips"
+    ],
+    "escalation_criteria": "Escalate if a safety-critical sensor is affected",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Mis-controlled combustion or dust systems raise emissions."
+     }
+    ]
+   },
+   {
+    "id": "kiln-shell-hotspot",
+    "name": "Kiln shell hot spot",
+    "category": "thermal",
+    "symptoms": [
+     "Shell scanner shows a local rise",
+     "Glowing shell at night",
+     "Shell above 400 C"
+    ],
+    "root_causes": [
+     "Refractory loss",
+     "Coating loss",
+     "Flame shape problems"
+    ],
+    "detection_method": "Continuous shell scanner and night inspection",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of kiln shell hot spot: shell scanner shows a local rise noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: shell scanner shows a local rise confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: glowing shell at night; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: shell above 400 c; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the shell exceeds 450 C or deforms"
+     }
+    ],
+    "immediate_action": "Use the shell cooling fans and adjust the flame; plan a reline",
+    "recommended_job_id": "kiln-shell-repair",
+    "time_to_fix_hours": 96.0,
+    "parts": [
+     "Refractory bricks"
+    ],
+    "safety_hazards": [
+     "Shell deformation",
+     "Burns"
+    ],
+    "escalation_criteria": "Escalate if the shell exceeds 450 C or deforms",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Heat loss raises fuel per tonne and CO2."
+     },
+     {
+      "domain": "soil",
+      "effect": "Spent refractory becomes solid waste."
+     }
+    ]
+   },
+   {
+    "id": "preheater-fouling",
+    "name": "Preheater fouling",
+    "category": "process_chemical",
+    "symptoms": [
+     "Rising preheater dP",
+     "Cyclone outlet temperature changes",
+     "Cyclone blockage or meal flushes"
+    ],
+    "root_causes": [
+     "Volatile cycles (sulphur, chlorine, alkali)",
+     "Meal chemistry",
+     "False air"
+    ],
+    "detection_method": "Preheater dP and cyclone temperatures; blockage alarms",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of preheater fouling: rising preheater dp noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: rising preheater dp confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: cyclone outlet temperature changes; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: cyclone blockage or meal flushes; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if a cyclone blocks"
+     }
+    ],
+    "immediate_action": "Run the air blasters and check the meal chemistry",
+    "recommended_job_id": "preheater-cleaning",
+    "time_to_fix_hours": 8.0,
+    "parts": [
+     "Air blaster parts"
+    ],
+    "safety_hazards": [
+     "Hot meal outburst"
+    ],
+    "escalation_criteria": "Escalate if a cyclone blocks",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "More fan power and fuel raise CO2."
+     },
+     {
+      "domain": "soil",
+      "effect": "Bypass dust needs disposal."
+     }
+    ]
+   },
+   {
+    "id": "girth-gear-wear",
+    "name": "Girth gear wear",
+    "category": "mechanical",
+    "symptoms": [
+     "Gear noise",
+     "Poor contact pattern",
+     "Vibration or pitting and tooth damage"
+    ],
+    "root_causes": [
+     "Misalignment",
+     "Lubrication failure",
+     "Kiln crank or ovality"
+    ],
+    "detection_method": "Contact pattern check, vibration and gear temperature",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of girth gear wear: gear noise noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: gear noise confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: poor contact pattern; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: vibration or pitting and tooth damage; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate on any broken tooth"
+     }
+    ],
+    "immediate_action": "Check the lubrication spray and plan alignment",
+    "recommended_job_id": "girth-gear-realign",
+    "time_to_fix_hours": 24.0,
+    "parts": [
+     "Gear lubricant"
+    ],
+    "safety_hazards": [
+     "Rotating kiln"
+    ],
+    "escalation_criteria": "Escalate on any broken tooth",
+    "pollution_effects": [
+     {
+      "domain": "soil",
+      "effect": "Spent gear lubricant is a contaminated waste."
+     },
+     {
+      "domain": "air",
+      "effect": "Unplanned kiln stops and restarts burn extra fuel."
+     }
+    ]
+   },
+   {
+    "id": "kiln-seal-leak",
+    "name": "Kiln seal leak",
+    "category": "structural",
+    "symptoms": [
+     "False air at the kiln inlet or outlet",
+     "Meal spillage",
+     "Inlet O2 rises with lower temperatures"
+    ],
+    "root_causes": [
+     "Seal segment wear",
+     "Kiln ovality",
+     "Spring failure"
+    ],
+    "detection_method": "Inlet O2 and a visual check of the seals",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of kiln seal leak: false air at the kiln inlet or outlet noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: false air at the kiln inlet or outlet confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: meal spillage; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: inlet o2 rises with lower temperatures; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if spillage reaches unpaved ground"
+     }
+    ],
+    "immediate_action": "Clean the spillage and plan seal replacement",
+    "recommended_job_id": "kiln-seal-replace",
+    "time_to_fix_hours": 16.0,
+    "parts": [
+     "Seal segments"
+    ],
+    "safety_hazards": [
+     "Hot meal",
+     "Burns"
+    ],
+    "escalation_criteria": "Escalate if spillage reaches unpaved ground",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "False air raises fuel use and CO2."
+     },
+     {
+      "domain": "soil",
+      "effect": "Spilled meal contaminates the ground."
+     }
+    ]
+   },
+   {
+    "id": "liner-wear",
+    "name": "Crusher or mill liner wear",
+    "category": "mechanical",
+    "symptoms": [
+     "Product size growing",
+     "Lower throughput",
+     "Liner bolts loose or liners cracked"
+    ],
+    "root_causes": [
+     "Abrasive ore",
+     "Overdue liner change"
+    ],
+    "detection_method": "Liner thickness measurement and product sizing",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of crusher or mill liner wear: product size growing noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: product size growing confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: lower throughput; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: liner bolts loose or liners cracked; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the liner bolts break"
+     }
+    ],
+    "immediate_action": "Adjust the setting and plan a liner change",
+    "recommended_job_id": "liner-change",
+    "time_to_fix_hours": 36.0,
+    "parts": [
+     "Liners",
+     "Bolts"
+    ],
+    "safety_hazards": [
+     "Heavy parts",
+     "Confined space"
+    ],
+    "escalation_criteria": "Escalate if the liner bolts break",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "More grinding energy per tonne."
+     },
+     {
+      "domain": "soil",
+      "effect": "More fines to tailings."
+     }
+    ]
+   },
+   {
+    "id": "conveyor-belt-mistracking",
+    "name": "Conveyor belt mistracking",
+    "category": "mechanical",
+    "symptoms": [
+     "Belt running off centre",
+     "Spillage along the conveyor",
+     "Edge damage or belt rubbing the structure"
+    ],
+    "root_causes": [
+     "Material build-up on pulleys",
+     "Seized idlers",
+     "Off-centre loading"
+    ],
+    "detection_method": "Patrol inspection and belt-drift switches",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of conveyor belt mistracking: belt running off centre noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: belt running off centre confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: spillage along the conveyor; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: edge damage or belt rubbing the structure; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate on belt damage or fire risk from friction"
+     }
+    ],
+    "immediate_action": "Clean the spillage and plan tracking adjustment",
+    "recommended_job_id": "belt-tracking-adjust",
+    "time_to_fix_hours": 4.0,
+    "parts": [
+     "Idlers",
+     "Scrapers"
+    ],
+    "safety_hazards": [
+     "Nip points"
+    ],
+    "escalation_criteria": "Escalate on belt damage or fire risk from friction",
+    "pollution_effects": [
+     {
+      "domain": "soil",
+      "effect": "Spilled material contaminates the ground."
+     },
+     {
+      "domain": "air",
+      "effect": "Spillage becomes airborne dust."
+     }
+    ]
+   },
+   {
+    "id": "dust-suppression-failure",
+    "name": "Dust suppression failure",
+    "category": "emissions_control",
+    "symptoms": [
+     "Visible dust at the transfer points",
+     "Dry spray nozzles",
+     "Dust plume leaving the site"
+    ],
+    "root_causes": [
+     "Blocked nozzles",
+     "Pump failure",
+     "Low water pressure"
+    ],
+    "detection_method": "Visual check and dust monitor readings",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of dust suppression failure: visible dust at the transfer points noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: visible dust at the transfer points confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: dry spray nozzles; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: dust plume leaving the site; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if the dust monitor exceeds the permit limit"
+     }
+    ],
+    "immediate_action": "Switch to manual water spray and inform EHS",
+    "recommended_job_id": "dust-system-service",
+    "time_to_fix_hours": 4.0,
+    "parts": [
+     "Nozzles",
+     "Strainers"
+    ],
+    "safety_hazards": [
+     "Dust exposure"
+    ],
+    "escalation_criteria": "Escalate if the dust monitor exceeds the permit limit",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "PM10 and PM2.5 emissions."
+     },
+     {
+      "domain": "soil",
+      "effect": "Dust deposition on nearby land."
+     }
+    ]
+   },
+   {
+    "id": "tailings-line-leak",
+    "name": "Tailings line leak",
+    "category": "hydraulic_pneumatic",
+    "symptoms": [
+     "Pressure drop along the line",
+     "Wet ground along the route",
+     "Slurry spraying or flowing"
+    ],
+    "root_causes": [
+     "Pipe wear",
+     "Joint failure",
+     "Blockage"
+    ],
+    "detection_method": "Pressure monitoring and route patrols",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of tailings line leak: pressure drop along the line noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: pressure drop along the line confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: wet ground along the route; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: slurry spraying or flowing; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if slurry reaches a watercourse"
+     }
+    ],
+    "immediate_action": "Stop the pump, contain the slurry, and inform EHS",
+    "recommended_job_id": "tailings-line-repair",
+    "time_to_fix_hours": 12.0,
+    "parts": [
+     "Spool pieces"
+    ],
+    "safety_hazards": [
+     "Slurry under pressure"
+    ],
+    "escalation_criteria": "Escalate if slurry reaches a watercourse",
+    "pollution_effects": [
+     {
+      "domain": "water",
+      "effect": "Turbid discharge to water."
+     },
+     {
+      "domain": "soil",
+      "effect": "Tailings on unprotected ground."
+     }
+    ]
+   },
+   {
+    "id": "hydraulic-hose-burst",
+    "name": "Hydraulic hose burst",
+    "category": "hydraulic_pneumatic",
+    "symptoms": [
+     "Oil weeping at a fitting",
+     "Oil spray",
+     "Sudden loss of function and oil on the ground"
+    ],
+    "root_causes": [
+     "Hose ageing",
+     "Chafing",
+     "Wrong pressure rating"
+    ],
+    "detection_method": "Pre-start inspection",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of hydraulic hose burst: oil weeping at a fitting noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: oil weeping at a fitting confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: oil spray; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: sudden loss of function and oil on the ground; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate if oil reaches a drain or watercourse"
+     }
+    ],
+    "immediate_action": "Stop, lower the attachments, and deploy the spill kit",
+    "recommended_job_id": "hydraulic-hose-replace",
+    "time_to_fix_hours": 3.0,
+    "parts": [
+     "Hoses",
+     "Spill kit"
+    ],
+    "safety_hazards": [
+     "Injection injury",
+     "Slips"
+    ],
+    "escalation_criteria": "Escalate if oil reaches a drain or watercourse",
+    "pollution_effects": [
+     {
+      "domain": "soil",
+      "effect": "Hydraulic oil contaminates soil."
+     },
+     {
+      "domain": "water",
+      "effect": "Oil can reach drains."
+     }
+    ]
+   },
+   {
+    "id": "haul-tyre-damage",
+    "name": "Haul truck tyre damage",
+    "category": "mechanical",
+    "symptoms": [
+     "Cuts or low pressure",
+     "Uneven wear",
+     "Bulge or heat separation"
+    ],
+    "root_causes": [
+     "Poor haul roads",
+     "Overloading",
+     "Wrong pressure"
+    ],
+    "detection_method": "Daily pre-start check and pressure monitoring",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of haul truck tyre damage: cuts or low pressure noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: cuts or low pressure confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: uneven wear; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: bulge or heat separation; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate on any bulge or heat damage"
+     }
+    ],
+    "immediate_action": "Park the truck safely and inspect",
+    "recommended_job_id": "tyre-change",
+    "time_to_fix_hours": 6.0,
+    "parts": [
+     "Tyre"
+    ],
+    "safety_hazards": [
+     "Tyre explosion"
+    ],
+    "escalation_criteria": "Escalate on any bulge or heat damage",
+    "pollution_effects": [
+     {
+      "domain": "air",
+      "effect": "Rolling resistance raises diesel use and CO2."
+     },
+     {
+      "domain": "soil",
+      "effect": "Scrap tyres are a solid waste stream."
+     }
+    ]
+   },
+   {
+    "id": "mill-trunnion-bearing-heat",
+    "name": "Mill trunnion bearing overheating",
+    "category": "mechanical",
+    "symptoms": [
+     "Rising bearing temperature",
+     "Lube oil darkening",
+     "Bearing temperature alarm"
+    ],
+    "root_causes": [
+     "Lube flow loss",
+     "Contamination",
+     "Misalignment"
+    ],
+    "detection_method": "Bearing temperature and lube oil analysis",
+    "severity_levels": [
+     {
+      "level": 1,
+      "definition": "First sign of mill trunnion bearing overheating: rising bearing temperature noticed at inspection; no measurable effect on output, energy use or emissions. Log it and watch at the next round."
+     },
+     {
+      "level": 2,
+      "definition": "Minor: rising bearing temperature confirmed; energy or quality penalty under about 2%. Plan the repair job for the next planned stop."
+     },
+     {
+      "level": 3,
+      "definition": "Moderate: lube oil darkening; fuel use, emissions or product quality measurably worse. Repair within 7 days and check every shift."
+     },
+     {
+      "level": 4,
+      "definition": "Serious: bearing temperature alarm; a process, safety or permit limit is at risk. Repair within 48 hours and inform the shift supervisor."
+     },
+     {
+      "level": 5,
+      "definition": "Severe or failing: trip, damage or a permit breach is imminent. Stop the machine safely, isolate, and escalate: escalate on an alarm or a trip"
+     }
+    ],
+    "immediate_action": "Check the lube system and reduce the load",
+    "recommended_job_id": "bearing-lube-service",
+    "time_to_fix_hours": 4.0,
+    "parts": [
+     "Lube filters"
+    ],
+    "safety_hazards": [
+     "Hot oil"
+    ],
+    "escalation_criteria": "Escalate on an alarm or a trip",
+    "pollution_effects": [
+     {
+      "domain": "soil",
+      "effect": "Used lube oil is hazardous waste."
+     },
+     {
+      "domain": "air",
+      "effect": "Unplanned mill stops waste energy at restart."
+     }
+    ]
+   }
+  ],
+  "pollutant_capture": [
+   {
+    "id": "dust-level",
+    "label": "Dust level at the location",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "None",
+     "Light",
+     "Heavy",
+     "Plume leaving the site"
+    ],
+    "help_text": "What you see at the transfer point or road.",
+    "domain": "air"
+   },
+   {
+    "id": "exhaust-smoke",
+    "label": "Engine or stack smoke",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Clear",
+     "Light grey",
+     "Black smoke"
+    ],
+    "help_text": "Exhaust or stack appearance.",
+    "domain": "air"
+   },
+   {
+    "id": "discharge-turbidity",
+    "label": "Water discharge appearance",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "No discharge",
+     "Clear",
+     "Cloudy",
+     "Muddy"
+    ],
+    "help_text": "Look at any water leaving the area.",
+    "domain": "water"
+   },
+   {
+    "id": "water-discharge-point",
+    "label": "Discharge point",
+    "type": "text",
+    "required": false,
+    "max_length": 60,
+    "options": null,
+    "help_text": "Drain, pond or watercourse name, if known.",
+    "domain": "water"
+   },
+   {
+    "id": "tailings-overburden-handling",
+    "label": "Tailings or overburden handling",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Contained in the facility",
+     "Minor spill on a haul road",
+     "Spill on unprotected ground"
+    ],
+    "help_text": "Where the material went.",
+    "domain": "soil"
+   },
+   {
+    "id": "soil-spill-extent",
+    "label": "Soil spill extent",
+    "type": "text",
+    "required": false,
+    "max_length": 60,
+    "options": null,
+    "help_text": "Approximate area in square metres.",
+    "domain": "soil"
+   }
+  ],
+  "form_fields": [
+   {
+    "id": "machine-state",
+    "label": "Machine state when noticed",
+    "type": "dropdown",
+    "required": true,
+    "max_length": null,
+    "options": [
+     "Running normally",
+     "Running at reduced load",
+     "Stopped",
+     "Tripped"
+    ],
+    "help_text": "What the machine was doing when the snag was seen.",
+    "domain": null
+   },
+   {
+    "id": "shift",
+    "label": "Shift",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Morning",
+     "Evening",
+     "Night",
+     "General"
+    ],
+    "help_text": "Shift during which the snag was noticed.",
+    "domain": null
+   },
+   {
+    "id": "observed-by",
+    "label": "Observed by",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Operator",
+     "Fitter / mechanic",
+     "Electrician",
+     "Instrument technician",
+     "Supervisor",
+     "EHS officer"
+    ],
+    "help_text": "Trade of the person reporting (no names).",
+    "domain": null
+   },
+   {
+    "id": "hours-since-service",
+    "label": "Operating hours since last service",
+    "type": "text",
+    "required": false,
+    "max_length": 12,
+    "options": null,
+    "help_text": "Approximate number from the log book; leave blank if unknown.",
+    "domain": null
+   },
+   {
+    "id": "site-area",
+    "label": "Site area",
+    "type": "dropdown",
+    "required": false,
+    "max_length": null,
+    "options": [
+     "Pit",
+     "Crushing",
+     "Grinding",
+     "Kiln / pyro",
+     "Tailings",
+     "Workshop"
+    ],
+    "help_text": "Which part of the site.",
+    "domain": null
+   }
+  ]
+ }
+}

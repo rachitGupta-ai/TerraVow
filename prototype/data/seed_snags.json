@@ -1,0 +1,139 @@
+{
+ "anchor_date": "2026-10-17",
+ "seed_version": "s1",
+ "note": "Synthetic demo snag histories (design E7.4 table). Offsets are days before anchor_date; resolved_days_before null means still open.",
+ "machines": {
+  "D-3": [
+   {
+    "snag_type_id": "insulation-wear",
+    "severity": 1,
+    "reported_days_before": 200,
+    "resolved_days_before": 190
+   }
+  ],
+  "B-2": [
+   {
+    "snag_type_id": "burner-fouling",
+    "severity": 2,
+    "reported_days_before": 300,
+    "resolved_days_before": 295
+   },
+   {
+    "snag_type_id": "burner-fouling",
+    "severity": 2,
+    "reported_days_before": 120,
+    "resolved_days_before": 118
+   },
+   {
+    "snag_type_id": "refractory-wear",
+    "severity": 3,
+    "reported_days_before": 40,
+    "resolved_days_before": 35
+   }
+  ],
+  "G-5": [
+   {
+    "snag_type_id": "injector-drift",
+    "severity": 2,
+    "reported_days_before": 180,
+    "resolved_days_before": 170
+   },
+   {
+    "snag_type_id": "injector-drift",
+    "severity": 2,
+    "reported_days_before": 60,
+    "resolved_days_before": 55
+   },
+   {
+    "snag_type_id": "sensor-drift",
+    "severity": 2,
+    "reported_days_before": 15,
+    "resolved_days_before": null
+   }
+  ],
+  "F-1": [
+   {
+    "snag_type_id": "door-seal",
+    "severity": 3,
+    "reported_days_before": 330,
+    "resolved_days_before": 320
+   },
+   {
+    "snag_type_id": "door-seal",
+    "severity": 3,
+    "reported_days_before": 200,
+    "resolved_days_before": 190
+   },
+   {
+    "snag_type_id": "recuperator-leak",
+    "severity": 4,
+    "reported_days_before": 80,
+    "resolved_days_before": 60
+   },
+   {
+    "snag_type_id": "door-seal",
+    "severity": 3,
+    "reported_days_before": 20,
+    "resolved_days_before": null
+   }
+  ],
+  "C-7": [
+   {
+    "snag_type_id": "pump-seal",
+    "severity": 3,
+    "reported_days_before": 100,
+    "resolved_days_before": 95
+   },
+   {
+    "snag_type_id": "filter-clog",
+    "severity": 4,
+    "reported_days_before": 45,
+    "resolved_days_before": null
+   },
+   {
+    "snag_type_id": "pump-seal",
+    "severity": 3,
+    "reported_days_before": 12,
+    "resolved_days_before": null
+   }
+  ],
+  "K-4": [
+   {
+    "snag_type_id": "kiln-shell-hotspot",
+    "severity": 4,
+    "reported_days_before": 350,
+    "resolved_days_before": 300
+   },
+   {
+    "snag_type_id": "preheater-fouling",
+    "severity": 3,
+    "reported_days_before": 260,
+    "resolved_days_before": 250
+   },
+   {
+    "snag_type_id": "preheater-fouling",
+    "severity": 3,
+    "reported_days_before": 150,
+    "resolved_days_before": 140
+   },
+   {
+    "snag_type_id": "girth-gear-wear",
+    "severity": 4,
+    "reported_days_before": 70,
+    "resolved_days_before": null
+   },
+   {
+    "snag_type_id": "preheater-fouling",
+    "severity": 3,
+    "reported_days_before": 30,
+    "resolved_days_before": null
+   },
+   {
+    "snag_type_id": "kiln-seal-leak",
+    "severity": 4,
+    "reported_days_before": 10,
+    "resolved_days_before": null
+   }
+  ]
+ }
+}

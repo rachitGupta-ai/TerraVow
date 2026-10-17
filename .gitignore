@@ -31,3 +31,10 @@ build/
 
 ### macOS ###
 .DS_Store
+
+### Python prototype ###
+prototype/.venv/
+__pycache__/
+.hypothesis/
+### Agent working artifacts ###
+.agents/

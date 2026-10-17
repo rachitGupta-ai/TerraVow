@@ -45,8 +45,9 @@ class ConfidenceClassificationPartitionProperties {
             @ForAll @DoubleRange(min = 0.0, max = 1.0) double confidence) {
         Recommendation rec =
                 Recommendation.of("rec-1", new Confidence(confidence), readingChain());
+        TrustContext noTrustCap = new TrustContext(1.0, 0.0);
 
-        GateVerdict verdict = gate.classify(rec, thresholds, HarmDelta.NONE);
+        GateVerdict verdict = gate.classify(rec, thresholds, HarmDelta.NONE, noTrustCap);
 
         GateDecision expected;
         if (confidence >= thresholds.allowThreshold()) {
@@ -69,8 +70,9 @@ class ConfidenceClassificationPartitionProperties {
             @ForAll @DoubleRange(min = 0.0, max = 1.0) double confidence) {
         Recommendation rec =
                 Recommendation.of("rec-1", new Confidence(confidence), readingChain());
+        TrustContext noTrustCap = new TrustContext(1.0, 0.0);
 
-        GateVerdict verdict = gate.classify(rec, thresholds, HarmDelta.NONE);
+        GateVerdict verdict = gate.classify(rec, thresholds, HarmDelta.NONE, noTrustCap);
 
         // The partition is total: the decision is always exactly one of the three bands.
         assertThat(verdict.decision())
@@ -101,8 +103,9 @@ class ConfidenceClassificationPartitionProperties {
             @ForAll @DoubleRange(min = 0.0, max = 1.0) double confidence) {
         Recommendation rec =
                 Recommendation.of("rec-1", new Confidence(confidence), readingChain());
+        TrustContext noTrustCap = new TrustContext(1.0, 0.0);
 
-        GateVerdict verdict = gate.classify(rec, thresholds, HarmDelta.NONE);
+        GateVerdict verdict = gate.classify(rec, thresholds, HarmDelta.NONE, noTrustCap);
 
         // Any below-allow decision (ASK or BLOCK) withholds automatic application and routes to
         // human review; ALLOW is applied automatically and is never routed (Req 8.2, 15.9).

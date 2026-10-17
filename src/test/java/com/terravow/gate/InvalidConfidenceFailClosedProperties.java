@@ -51,7 +51,8 @@ class InvalidConfidenceFailClosedProperties {
 
         // HarmDelta.NONE guarantees the hard veto (step 1) does not pre-empt the confidence-validity
         // check, so the outcome under test is the fail-closed path, not the veto path.
-        GateVerdict verdict = gate.classify(rec, thresholds, HarmDelta.NONE);
+        TrustContext noTrustCap = new TrustContext(1.0, 0.0);
+        GateVerdict verdict = gate.classify(rec, thresholds, HarmDelta.NONE, noTrustCap);
 
         // Fail-closed: BLOCK and routed to human review, regardless of the thresholds (Req 8.5).
         assertThat(verdict.decision()).isEqualTo(GateDecision.BLOCK);

@@ -11,6 +11,7 @@ import com.terravow.gate.GateThresholds;
 import com.terravow.gate.GateVerdict;
 import com.terravow.gate.HarmDelta;
 import com.terravow.gate.Recommendation;
+import com.terravow.gate.TrustContext;
 import com.terravow.pii.MaskingGate;
 import com.terravow.pii.MaskingResult;
 import com.terravow.pii.SupplierData;
@@ -150,7 +151,8 @@ public class DefaultCrossCuttingControlFlow implements CrossCuttingControlFlow {
         // Step 1 — route the recommendation through the Decision_Gate (Req 8.1).
         Recommendation recommendation = Recommendation.of(
                 recommendationId, determination.confidence(), determination.evidence());
-        GateVerdict verdict = decisionGate.classify(recommendation, thresholds, harm);
+        TrustContext noTrustCap = new TrustContext(1.0, 0.0);  // TODO: wire real trust score when Req 16 is implemented
+        GateVerdict verdict = decisionGate.classify(recommendation, thresholds, harm, noTrustCap);
 
         // Step 2 — persist the classification synchronously BEFORE any output is returned
         // (Req 10.3). persistDecision returns only once the entry is durably recorded.

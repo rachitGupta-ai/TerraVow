@@ -18,14 +18,17 @@ package com.terravow.gate;
 public interface DecisionGate {
 
     /**
-     * Classifies a recommendation against the given thresholds and harm delta (Req 8.1–8.5).
+     * Classifies a recommendation against the given thresholds, harm delta, and trust context
+     * (Req 8.1–8.6, 16.15–16.16).
      *
-     * @param rec        the recommendation to classify; never {@code null}
-     * @param thresholds the confidence thresholds partitioning ALLOW/ASK/BLOCK; never {@code null}
-     * @param harm       the change in harm the recommendation would cause, driving the hard veto;
-     *                   never {@code null}
-     * @return the gate verdict carrying the decision, veto flag, human-review routing, and
-     *         supporting Evidence_Chain
+     * @param rec          the recommendation to classify; never {@code null}
+     * @param thresholds   the confidence thresholds partitioning ALLOW/ASK/BLOCK; never {@code null}
+     * @param harm         the change in harm the recommendation would cause, driving the hard veto;
+     *                     never {@code null}
+     * @param trustContext the governing trust score and threshold, driving the trust cap;
+     *                     never {@code null}
+     * @return the gate verdict carrying the decision, veto flag, human-review routing, trust-cap flag,
+     *         and supporting Evidence_Chain
      */
-    GateVerdict classify(Recommendation rec, GateThresholds thresholds, HarmDelta harm);
+    GateVerdict classify(Recommendation rec, GateThresholds thresholds, HarmDelta harm, TrustContext trustContext);
 }
