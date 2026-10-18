@@ -41,7 +41,7 @@ gcloud run deploy "$SERVICE" \
   --source . \
   --region "$REGION" \
   --allow-unauthenticated \
-  --memory 512Mi \
+  --memory 1Gi \
   --min-instances 1 \
   --max-instances 1 \
   --set-env-vars "GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${VERTEX_LOCATION},USE_FIRESTORE=true,GEMINI_MODEL=${GEMINI_MODEL},GEMINI_HEAVY_DISABLED=${GEMINI_HEAVY_DISABLED},GEMINI_CACHE=${GEMINI_CACHE}"

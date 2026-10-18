@@ -60,13 +60,17 @@ def _cache_get(key: str):
         return _RESP_CACHE.get(key)
 
 
+_CACHE_MAX = 4096
+
+
 def _cache_put(key: str, value):
     if not settings.GEMINI_CACHE:
         return
     with _RESP_LOCK:
-        if len(_RESP_CACHE) > 256:
-            _RESP_CACHE.clear()
+        _RESP_CACHE.pop(key, None)          # re-insert at the end (most-recently-used)
         _RESP_CACHE[key] = value
+        while len(_RESP_CACHE) > _CACHE_MAX:  # evict oldest, never wipe the whole cache
+            _RESP_CACHE.pop(next(iter(_RESP_CACHE)))
 
 
 class GeminiNotConfigured(RuntimeError):
