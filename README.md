@@ -1,497 +1,510 @@
 # TerraVow
 
-**Enforce. Certify. Track.**
+**Machine health meets environmental accountability.**
 
-TerraVow is an AI-powered environmental compliance, remediation-advisory, and certification
-platform for manufacturing supply chains, designed for Google Cloud.
-
-> **What actually runs today (the working prototype):** a Python FastAPI app and a Java Spring Boot
-> engine in one container on **Cloud Run**, using **Gemini on Vertex AI** (photo assessment,
-> function-calling explanations, industry templates) and **Firestore** (hash-chained decision record),
-> behind a tested Decision Gate. Vertex AI Agent Engine, BigQuery, Pub/Sub and Vertex AI Search are
-> part of the target design: their Java code runs against in-memory stubs and is **not connected** to
-> the live managed services. See [Honesty about scope](#honesty-about-scope).
-
-This README covers both the product story and the architecture:
-
-- **Part 1 — Product Overview**: what problem we're solving, who it's for, and why it matters.
-  Written for a general audience and judges without a technical background.
-- **Part 2 — Design Deep Dive**: how the system actually works, the architecture, the AI
-  reasoning pipeline, and the safety/correctness guarantees. Written for technical judges.
+TerraVow is an AI-powered environmental compliance and remediation-advisory platform that links factory machine health to pollution intensity, financial liability, and sustainable alternatives — with India government incentive schemes.
 
 ---
 
-# Part 1 — Product Overview
+## TL;DR
 
-## The problem, in one sentence
-
-**A factory's broken machine is an unpriced pollution event, and nobody currently prices it.**
-
-## The thesis
-
-Every factory has machines that are quietly degrading — a worn seal, a drifting burner, a
-clogged filter. When maintenance on that machine is deferred, three things happen that no
-existing system connects:
-
-1. The machine burns more energy and emits more pollution **per unit of output** than it did
-   when it was healthy.
-2. That extra pollution is a **real, growing financial liability** — regulatory penalties,
-   wasted energy cost, forfeited efficiency incentives — that compounds for every hour the
-   machine keeps running degraded.
-3. That liability is **completely invisible** to the people who could act on it. Maintenance
-   teams track downtime cost. Finance tracks capital budgets. Compliance teams file reports
-   after the fact. Nobody connects "we deferred this repair" to "we just created ₹X of
-   regulatory exposure and Y kilograms of avoidable emissions."
-
-Conventional systems don't close this loop:
-
-- **MES/ERP/CMMS systems** optimize for downtime cost, not emissions cost.
-- **ESG reporting tools** produce threshold-based compliance snapshots after the fact — they
-  don't predict or price the liability while it's still accruing.
-- **Carbon-accounting tools** use industry-average emission factors, not the actual, current
-  health state of the specific machine that made the specific batch.
-
-TerraVow is built to close exactly this loop: **link machine health → emissions → financial
-liability → actionable remediation → verified improvement**, continuously, automatically, and
-auditably.
-
-## Who this is for
-
-| User | What they get |
+| | |
 |---|---|
-| **Plant reliability engineer** | A number that separates "pollution we caused by neglect" from "pollution the process can't avoid" — so maintenance decisions can be defended on environmental grounds, not just downtime cost. |
-| **CFO / finance leader** | Deferred maintenance expressed as an accruing balance-sheet liability (Environmental Regulatory Debt), not a hidden engineering judgment call. |
-| **Environmental compliance officer** | Continuous air/water monitoring with a guardrail that catches "fixes" that just move pollution from air to water instead of actually reducing it. |
-| **Operations director** | AI-generated, cited counterfactuals for replacing a machine or process step — emissions, energy, cost, and payback, before committing capital. |
-| **Compliance & finance analyst** | Penalty exposure and incentive eligibility reasoned from real regulatory instruments, with a citation back to the primary source for every figure — never an invented number. |
-| **Supply-chain sustainability lead** | A per-batch, machine-health-adjusted emissions footprint that follows the batch through every downstream tier, replacing industry-average Scope-3 guesswork with actual values. |
-| **Procurement manager** | A public registry of facilities certified on *verified improvement trajectory* — not a single audit-day snapshot that can be staged. |
-| **Auditor / regulator** | Every number traceable back to its primary-source reading, filing, or regulatory text — a complete, retained decision trail. |
-
-## What TerraVow actually does (the pipeline)
-
-1. **Attributes pollution to machine health.** TerraVow computes **EID (Emissions-Intensity
-   Degradation)** — the excess emissions per unit of output caused specifically by the
-   machine's current health state, isolated from the pollution the process itself inherently
-   requires.
-2. **Prices the liability.** TerraVow computes **ERD (Environmental Regulatory Debt)** — a
-   single, continuously-accruing monetary figure combining expected regulatory penalty
-   exposure, excess energy cost, forgone efficiency-certificate value, forgone tax
-   depreciation benefit, and cross-media treatment cost.
-3. **Monitors pollution with a guardrail against gaming.** Stack, effluent, and sensor
-   readings are checked against regulatory thresholds and statistical anomalies — and a
-   **Cross-Media Guardrail** specifically catches "fixes" that reduce air pollution by
-   dumping more into water (or vice versa).
-4. **Measures *when* pollution happens, not just how much.** The **Avoidable Exposure Index
-   (AEI)** values the same tonnage of emissions differently depending on *when* it's released
-   relative to weather and population exposure — and recommends re-scheduling flexible
-   operations to reduce public-health harm at zero additional emissions.
-5. **Synthesizes sustainable alternatives.** The **Substitution Dossier** generates AI-reasoned
-   counterfactuals for replacing a machine or process step — each with emissions delta, energy
-   delta, cost delta, payback period, and a mandatory "requires vendor validation" flag, so it's
-   a lead for engineers, never an auto-approved decision.
-6. **Reasons over real regulation, not invented numbers.** The **Economics Engine** retrieves
-   actual regulatory instrument structures — the real Environmental Compensation formula shape,
-   PAT/ESCerts eligibility, Income Tax Act Section 32 depreciation — and cites the primary
-   source for every figure it produces. Every output is explicitly labeled a cited draft for
-   professional review, never legal or tax advice.
-7. **Carries the footprint through the supply chain.** The **Embedded Pollution Passport**
-   attaches a machine-health-adjusted emissions footprint to each batch and propagates it
-   proportionally into every downstream batch that consumes it — replacing industry-average
-   Scope-3 factors with real, machine-conditioned values.
-8. **Gates every recommendation with a hard safety veto.** The **Decision Gate** classifies
-   every recommendation ALLOW / ASK / BLOCK by confidence — and applies a **hard veto that
-   blocks any recommendation that would increase total pollution or shift it between media**,
-   regardless of how confident the system is. Nothing auto-applies beyond its own confidence.
-9. **Certifies real, sustained improvement.** **Trajectory Certification** publishes facilities
-   to a public global registry based on verified improvement measured over time — at least two
-   separated measurement points — specifically designed to resist a single staged "audit-day"
-   snapshot.
-10. **Proves every number.** Every counterfactual, penalty figure, and certification carries a
-    machine-checkable **Evidence Chain** back to its primary source, and every decision is
-    persisted to an audit trail retained for at least 7 years.
-
-## Why this is hard (and why it matters that we got it right)
-
-The obvious failure mode for a platform like this is: it becomes a black box that invents
-numbers, or it becomes gameable by the exact people it's supposed to be holding accountable.
-We treated both as first-class design problems, not afterthoughts:
-
-- **Every number is either a cited fact or a disclosed counterfactual.** Nothing is a bare
-  LLM assertion. Regulatory figures are retrieved and cited; everything else carries a
-  confidence value and a full evidence chain.
-- **The system cannot be gamed by its own data.** We built a dedicated **data-authenticity and
-  integrity layer** (detailed in Part 2) specifically because the parties being monitored have
-  a direct financial incentive to under-report emissions or fake a maintenance record to reset
-  their liability clock. This is not a bolt-on — it's structural, and it's informed by real
-  fraud patterns documented in carbon-credit markets and false-data-injection-attack research.
-- **Safety never degrades silently.** Every AI/network/cloud dependency has a defined fallback
-  that *lowers* confidence rather than failing outright — and no fallback, no managed service,
-  and no "high confidence" reading can ever override the hard pollution-increase veto.
-
-## The honest caveat
-
-TerraVow produces **cited drafts and advisory determinations**, not authoritative legal, tax, or
-engineering sign-off. Every substitution dossier is flagged as requiring vendor validation and
-process-safety review. Every economics-engine output is labeled as a draft for qualified
-professional review. The platform is designed to make the right decision obvious and
-well-evidenced — the accountable human or regulator still makes the call.
+| **What it is** | A prototype (Requirements 18–30) showing machine-health-driven pollution tracking, snag reporting, resolver workflow, health scoring, and sustainability recommendations with incentive schemes. |
+| **Who it's for** | Plant reliability engineers, CFOs, environmental compliance officers, operations directors. |
+| **What runs today** | Python FastAPI prototype with in-memory store or Firestore, Gemini 2.5 Flash for AI generation, Java Decision_Gate (tested but import fixes pending). No Vertex AI Agent Engine, Pub/Sub, BigQuery, or Cloud Storage used. |
+| **What needs work** | Multi-replica safety (cross-replica lease), Integrity_Gate (Req 16), detection hardening (Req 17), verified trajectory certification, cross-replica lease. |
 
 ---
 
-# Part 2 — Design Deep Dive (for Technical Judges)
+## The Problem
 
-## Two design principles that govern everything
+Factories are the growth engine of the world — but they're also the largest source of air, water, chemical, and soil pollution. A worn machine doesn't just cause downtime; it:
 
-1. **Every produced number is either a cited fact or a disclosed counterfactual.** Values that
-   exist in a database (a regulatory rate, a filed reading) are retrieved and cited. Values
-   that don't exist anywhere — a counterfactual substitution, a timing-optimized schedule, a
-   certification verdict — are reasoned by a Gemini agent, schema-validated, and carry a
-   machine-checkable Evidence Chain back to a primary source. Deterministic arithmetic (the
-   Environmental Compensation formula, ERD summation, mass-preservation checks, net-position)
-   is never free-generated by the model — it runs as a **verified tool** the agent calls via
-   Gemini function calling.
-2. **Safety is structural, not advisory.** The Decision Gate applies a **hard veto** against
-   any recommendation that would increase total emission mass or shift load between
-   environmental media — applied *before* confidence classification, so a vetoed
-   recommendation is BLOCK regardless of how confident the system is. Every enrichment path
-   degrades gracefully by lowering confidence, never by failing silently or guessing.
+1. **Burns more energy and emits more pollution per unit of output** than when healthy.
+2. **Creates an invisible financial liability** — regulatory penalties, wasted energy cost, forfeited efficiency incentives — that compounds hourly.
+3. **Stays invisible to the people who could act** — maintenance tracks downtime cost, finance tracks capital budgets, compliance files reports after the fact. Nobody connects "deferred repair" to "₹X regulatory exposure and Y kilograms of avoidable emissions."
 
-## System architecture
+Existing systems don't close this loop: MES/ERP/CMMS optimize for downtime, not emissions; ESG tools produce threshold snapshots after the fact; carbon-accounting uses industry averages, not actual machine health.
 
-> **Target architecture (the full design).** In the working prototype only Gemini on Vertex AI, Firestore and
-> Cloud Run are live. Components that call Pub/Sub, BigQuery, Vertex AI Search or Agent Engine are specified and
-> have Java domain logic, but run against in-memory stubs.
+---
+
+## The Solution
+
+TerraVow links **machine health → emissions → financial liability → actionable remediation** continuously and auditably:
+
+1. **Machine health drives pollution intensity.** Health score (0–100) degrades from deferred maintenance. Degraded machines emit more — per day and over remaining lifespan.
+2. **Deterministic engine computes every number.** Health score, lifespan, pollution intensity, capex, payback — all computed by pure Python, never by Gemini.
+3. **AI generates deep per-model templates.** Gemini creates machine-specific snag taxonomies, job types, operating parameters — cached once per model.
+4. **Sustainability recommendations with Decision Gate.** AI-suggested or curated alternatives pass through a safety gate (hard veto → confidence → trust cap). All items in demo are ASK or BLOCK.
+5. **India incentives included.** Real-named schemes (UNVERIFIED/illustrative) + demo-synthetic schemes (ILLUSTRATIVE), filtered by enterprise size (MSME/Large).
+6. **Graceful degradation.** No Gemini? Templates fall back to industry Base_Templates. Alternatives fall back to curated set. The flow never blocks.
+
+---
+
+## Features by Capability
+
+### ✅ Built and Tested
+
+| Feature | User Value | Status |
+|---------|-----------|--------|
+| **Four Industries** | Select textile, metals, chemicals, or mining — each with its pollution domains (air/water/chemical/soil) | Built |
+| **Catalogue Search** | Search 20 sample machines (5 per industry) with auto-complete, scoped to industry | Built |
+| **Manual Entry + Spec Lookup** | Add machines not in catalogue; Gemini retrieves specs via Google Search (T1+) | Built |
+| **AI Deep Templates** | Gemini generates per-model snag taxonomy (≥12 snag types, ≥6 jobs, ≥8 parameters), cached once | Built |
+| **Base_Template Fallback** | Deterministic industry template when Gemini unavailable | Built |
+| **Dynamic Snag Form** | Form fields driven by stored template (3 core + template fields + pollutant-capture) | Built |
+| **PII Redaction** | Emails and 10–15-digit phone numbers removed before storage | Built |
+| **Reporter/Resolver Roles** | Role switch (workflow guidance only, no auth) | Built |
+| **Status Transitions** | OPEN → ASSIGNED → RESOLVED → CLOSED with append-only events | Built |
+| **Resolver Queue** | Open/Assigned snags sorted by severity | Built |
+| **Health Score** | 6 penalty terms computed deterministically (frequency, severity, recurrence, trend, unresolved, age) | Built |
+| **Remaining Lifespan** | Formula: `(design_life × 365 − age_days) × (health_score/100)^1.5`, ±15% band | Built |
+| **Pollution Intensity** | Per-day kg CO2e/NOx/COD/BOD/effluent/chemical/solid/soil, scaled by health degradation | Built |
+| **Health Timeline** | 12-point history (1 per month) showing health and pollution trends | Built |
+| **Sustainable Alternatives** | Machine alternatives, operating-process changes, assembly changes — with economics | Built |
+| **Decision Gate** | Hard veto (mass increase → BLOCK) → confidence classification (ALLOW/ASK/BLOCK) | Built |
+| **Incentives (India)** | 7 real-named schemes (UNVERIFIED) + 2 demo-synthetic (ILLUSTRATIVE), filtered by MSME/Large | Built |
+| **Audit Trail** | Hash-chained append-only audit entries | Built |
+| **Demo Reset** | Restore seeded snags, delete demo data, preserve templates/alternatives | Built |
+
+### 📋 Specified Only (Not Built)
+
+| Feature | User Value | Status |
+|---------|-----------|--------|
+| **Integrity_Gate** | Source auth, calibration/health gating, replay defense, authorized-actor check, Data_Trust_Score | Specified (Req 16) |
+| **Detection Hardening** | Baseline plausibility, independent verification source, trust-weighted profile, anchored hash root | Specified (Req 17) |
+| **Multi-replica Safety** | Cross-replica lease, request deadline, waiter semaphore | Specified (task 14) |
+| **Vertex AI Agent Engine** | Managed multi-agent runtime | Specified, prototype uses direct Gemini |
+| **Pub/Sub + BigQuery** | Streaming ingestion, continuous queries | Specified, prototype uses polling |
+| **Trajectory Certification** | Publish to public registry after verified improvement | Specified, not wired |
+| **Java Requirements 16–17** | Core logic exists; test import fixes pending | Specified, tests not green |
+
+---
+
+## User Flows
+
+### Reporter Journey: Report a Snag
 
 ```mermaid
-graph TB
-    subgraph Ingestion
-        EXT[External MES / ERP / CMMS records]
-        TEL[Machine telemetry]
-        READ[Stack / effluent / sensor readings]
-        MET[Meteorological forecast + Receptor Map]
-    end
-
-    subgraph EventPath["Event-Driven Ingestion & Triage"]
-        PS[Pub/Sub: readings, telemetry, job events]
-        CQ[BigQuery Continuous Queries: threshold / anomaly triage]
-    end
-
-    subgraph TrustBoundary["Data Trust Boundary (runs first, every path)"]
-        INTEG[Integrity_Gate: source auth, calibration/health,\nreplay/freshness, authorized actor, corroboration]
-        IVS[Independent_Verification_Source reconciliation]
-        BPC[Baseline_Plausibility_Check at registration]
-        ANCHOR[Externally-anchored tamper-evident log]
-    end
-
-    subgraph Core["TerraVow on Google Cloud (Cloud Run)"]
-        PII[PII / Confidentiality Masking]
-        DOMAIN[Domain Core: Machine_Asset, Maintenance_Event,\nJob_Run, Health_State, Operating_Log]
-        subgraph Capabilities["Capability Services"]
-            EID[EID Attribution]
-            ERD[ERD Quantification]
-            MON[Pollution Monitor + Cross-Media Guardrail]
-            AEI[AEI + Harm-Aware Rescheduler]
-            SUB[Substitution Dossier]
-            ECON[Economics Engine]
-            EPP[Embedded Pollution Passport]
-            CERT[Trajectory Certification]
-            LIFE[Emissions-Aware Maintenance Lifecycle]
-        end
-        subgraph Agents["Vertex AI Agent Engine (ADK)"]
-            ROOT[Root Orchestrator Agent]
-            SPEC[Per-capability Specialist Agents]
-            TOOLS[Verified Tools: EC formula, ERD sum,\nmass-check, net-position]
-        end
-        GATE[Decision_Gate: hard veto -> confidence -> trust cap]
-        EV[Evidence_Chain & Audit Service]
-    end
-
-    subgraph Grounding["Managed Retrieval"]
-        VAIS[Vertex AI Search: regulatory corpus + citations]
-        BQV[BigQuery embeddings + vector search]
-    end
-
-    subgraph Storage
-        BQ[(BigQuery: telemetry, analytics, embeddings)]
-        CS[(Cloud Storage: regulatory corpus)]
-        FS[(Firestore: registry, certificates, audit trail)]
-    end
-
-    EXT --> INTEG
-    TEL --> PS --> INTEG
-    READ --> PS
-    MET --> AEI
-    INTEG --> IVS
-    INTEG --> BPC
-    INTEG --> ANCHOR
-    INTEG --> PII --> DOMAIN --> Capabilities
-    CQ --> MON
-    Capabilities --> Agents --> TOOLS
-    Agents --> VAIS --> CS
-    VAIS --> BQV --> BQ
-    Capabilities --> GATE --> EV --> FS
-    DOMAIN --> BQ
+%%{init: {"flowchart": {"nodeSpacing": 22, "rankSpacing": 32}}}%%
+flowchart LR
+    Start(["Open Report tab"]) --> Industry["Pick industry"] --> Search["Search model"] --> Match{"Found?"}
+    Match -->|Yes| Template["Ensure template"]
+    Match -->|No| Manual["Add manually"] --> Template
+    Template --> Machine["Select machine"] --> Fill["Fill form"] --> Submit["Submit snag"] --> Valid{"Valid?"}
+    Valid -->|No| Errors["422 errors"] --> Fill
+    Valid -->|Yes| Done(["Snag OPEN<br/>+ guidance"])
 ```
 
-## The AI reasoning pipeline
+### Resolver Journey: Accept → Resolve → Close
 
-Every determination flows through the same disciplined pipeline:
+The queue shows open snags worst-first. Each snag moves `OPEN -> ASSIGNED -> RESOLVED -> CLOSED`; every action checks the role is `RESOLVER` (else 403) and the status is valid for that step (else 409).
+
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 22, "rankSpacing": 34}}}%%
+flowchart LR
+    Queue(["Queue"]) --> Accept["Accept"] --> Assigned["ASSIGNED"]
+    Assigned --> Resolve["Resolve<br/>redact notes"] --> Resolved["RESOLVED"]
+    Resolved --> Close["Close"] --> Closed["CLOSED"]
+    Closed --> Health["Recompute health<br/>+ audit entry"] --> Queue
+    Accept -. "403 / 409" .-> Queue
+    Resolve -. "403 / 409" .-> Queue
+    Close -. "403 / 409" .-> Queue
+```
+
+### Machine Health View
+
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 22, "rankSpacing": 32}}}%%
+flowchart LR
+    Start(["Health tab"]) --> Select["Select machine"] --> Replay["Replay snags"]
+    Replay --> Score["Score = 100 - penalties"] --> Lifespan["Remaining days"] --> Intensity["Pollution/day"] --> Show(["Gauge + timeline"])
+```
+
+### Sustainability View
+
+```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 22, "rankSpacing": 32}}}%%
+flowchart LR
+    Start(["Sustainability tab"]) --> Size["Pick MSME / Large"] --> Analyse["Analyse"] --> Source{"AI or<br/>curated?"}
+    Source -->|AI| Suggest["Gemini + Search"]
+    Source -->|curated| Curated["Curated set"]
+    Suggest --> Economics["Engine economics<br/>capex, payback"]
+    Curated --> Economics
+    Economics --> Gate["Decision Gate<br/>ALLOW / ASK / BLOCK"] --> Incentives["Apply incentive"] --> Show(["Show options"])
+```
+
+### Cache-Once Template Sequence
 
 ```mermaid
 sequenceDiagram
-    participant C as Capability Service
-    participant A as Reasoning Orchestrator
-    participant AE as Agent Engine (ADK root + specialist)
-    participant T as Verified Tools (function calling)
-    participant S as Vertex AI Search / BigQuery vector
-    participant V as Gemini (Pro / Flash)
-    participant G as Decision_Gate
-    participant E as Evidence / Audit
-
-    C->>A: request determination (schema)
-    loop up to retryLimit (default 3)
-        A->>AE: invoke agent (masked inputs, schema)
-        AE->>S: ground on regulatory corpus (if needed)
-        S-->>AE: passages + citations
-        AE->>V: reason / plan (Pro) or classify (Flash)
-        AE->>T: call verified tool for deterministic value
-        T-->>AE: computed number
-        AE-->>A: structured output + citations
-        A->>A: validate against schema
-        alt valid
-            A-->>C: accepted determination
-        else invalid, attempts remain
-            A->>A: retry
-        else attempts exhausted
-            A->>E: record failure, escalate to human review
+    participant C as Caller
+    participant E as ensure_once
+    participant S as Store
+    participant F as Flight
+    participant G as Gemini
+    
+    C->>E: ensure_once(key, generate, fallback)
+    E->>S: get_doc(key)
+    
+    alt doc exists (cache-hit)
+        S-->>E: doc
+        E-->>C: EnsureOutcome(doc, "cache-hit")
+    else doc absent
+        E->>F: _join_or_create(key)
+        
+        alt leader
+            E->>S: re-read (double-check)
+            alt now cached
+                S-->>E: doc
+                E-->>C: EnsureOutcome(doc, "cache-hit")
+            else still absent
+                E->>G: generate (only call site)
+                G-->>E: template
+                E->>S: create_if_absent
+                alt created
+                    S-->>E: stored
+                    E-->>C: EnsureOutcome(stored, "generated")
+                else another writer won
+                    S-->>E: stored
+                    E-->>C: EnsureOutcome(stored, "cache-hit")
+                end
+            end
+        else waiter
+            F->>F: wait for leader
+            alt leader finished
+                F-->>E: outcome
+                E-->>C: outcome
+            else timeout
+                E->>S: re-read once
+                alt now cached
+                    S-->>E: doc
+                    E-->>C: EnsureOutcome(doc, "cache-hit")
+                else
+                    E-->>C: EnsureOutcome(fallback(), "fallback")
+                end
+            end
         end
     end
-    C->>G: recommendation
-    G->>G: hard veto check (mass / cross-media)
-    G->>G: confidence classification ALLOW/ASK/BLOCK
-    G->>G: trust-score cap (never raises, only lowers)
-    G->>E: persist audit entry (synchronous, before output returns)
 ```
-
-**Why this pipeline, concretely:**
-
-- **Gemini 3.1 Pro** handles deep, multi-step reasoning — substitution dossiers, economics
-  timing optimization, certification trajectory analysis — using its long context and native
-  tool use.
-- **Gemini Flash** handles high-volume, latency-sensitive classification — threshold checks,
-  masking triage, intent routing — where speed matters more than depth.
-- **Function calling** keeps arithmetic honest: the Environmental Compensation formula,
-  ERD summation, mass-preservation checks, and net-position math are executed as verified
-  application code the agent calls, not generated text the agent might get wrong.
-- **Vertex AI Search + BigQuery vector search** ground the Economics Engine on an actual
-  regulatory corpus with native citations, so "Section 32 depreciation" is a retrieved,
-  cited passage, not a model guess.
-- **Bounded retries, hard escalation.** A determination that fails schema validation retries
-  up to a configured limit (1–5, default 3); exhausting retries doesn't produce a guess — it
-  escalates to human review with a complete failure record.
-
-## The Decision Gate — the single safety chokepoint
-
-Every recommendation, from every capability, passes through one gate before it can be surfaced
-or applied:
-
-1. **Hard veto first.** If the recommendation would increase total emission mass or shift
-   pollutant load between environmental media by any amount above zero — **BLOCK**,
-   unconditionally, before confidence is even considered.
-2. **Confidence validity.** A missing or out-of-range confidence value — **BLOCK**, routed to
-   human review (fail-closed, never fail-open).
-3. **Confidence classification.** Above the allow threshold → ALLOW. Between the ask and allow
-   thresholds → ASK. Below the ask threshold → BLOCK.
-4. **Trust-score cap.** If the governing Data_Trust_Score (see below) is below its configured
-   threshold, the classification is capped at ASK — **this step can only lower a
-   classification, never raise one, and never lifts the hard veto.**
-
-No managed Google service, no fallback path, and no AI output can skip this ordering or
-override the veto.
-
-## Data authenticity and integrity — why this exists and how deep it goes
-
-A platform that prices financial liability and issues public certifications from fed-in sensor
-and maintenance data is a direct fraud target: an operator has a financial incentive to
-under-report emissions or forge a maintenance record to reset their liability clock. We treated
-this as core architecture, not an afterthought, and hardened it in two layers after researching
-real-world fraud patterns (carbon-credit MRV scandals, false-data-injection-attack literature,
-continuous-emissions-monitoring cross-validation practice, and tamper-evident logging practice).
-
-**Layer 1 — Integrity_Gate (runs at ingestion, ahead of PII masking, ahead of any reasoning or
-persistence, on both the batch and streaming paths):**
-
-| Check | Defends against |
-|---|---|
-| Source authentication (signed payload / device credential) | An unauthenticated or spoofed data source |
-| Instrument registry + calibration/health gating | A drifted, expired-calibration, or failed sensor being trusted at full confidence |
-| Replay / freshness / monotonic-timestamp checks | Duplicate or replayed "healthy" readings |
-| Authorized-actor check on maintenance events | A forged maintenance record used to reset the ERD liability clock |
-| Cross-source corroboration (energy vs. output vs. emissions) | An internally inconsistent, implausible reading |
-
-Every outcome feeds a per-record **Data_Trust_Score in [0,1]** that bounds downstream
-confidence and caps the Decision Gate at ASK when trust is low — trust can only ever lower a
-classification, never raise one.
-
-**Layer 2 — Detection hardening (added after literature research surfaced the limits of Layer
-1 alone):**
-
-| Hardening | The gap it closes |
-|---|---|
-| **Baseline Plausibility Check** | The dominant real-world MRV fraud pattern isn't live-sensor spoofing — it's an inflated *reference baseline* set once at registration and never re-examined. We screen the Commissioning_Baseline against fleet-cohort ranges and engineering limits at registration time. |
-| **Independent Verification Source** | False-data-injection-attack research proves correlation/consistency-only detection has a mathematical ceiling: an attacker who understands their own facility can craft readings that are internally consistent and pass every self-corroboration check. We reconcile against an *exogenous* source (satellite/remote-sensing, independent meters, regulator data) the facility can't influence, and cap self-corroboration-only data below full trust. |
-| **Trust-Weighted Anomaly Profile** | A party who controls a sensor's early history can poison what "normal" looks like before detection engages. Our anomaly baseline is built only from readings at or above a trust threshold — a reduced-trust reading is still checked against the baseline, but never allowed to shape it. |
-| **Externally-Anchored Tamper Evidence** | A hash-chained log alone only proves internal consistency — it doesn't prove the keeper of the chain didn't rewrite history. We periodically publish the chain's hash root to an external, operator-uninfluenced location for independent reverification. |
-
-Every one of these four hardening mechanisms is **structurally downgrade-only** — proven as a
-correctness property — meaning none of them can ever raise a Decision Gate classification or a
-confidence value beyond what the base safety rules already allow.
-
-## Google Cloud — how the stack is used, not just named
-
-| Google Cloud capability | Role |
-|---|---|
-| **Vertex AI Agent Engine + ADK** | Managed multi-agent runtime: a root orchestrator delegates to per-capability specialist agents, with Sessions, Memory Bank (masked data only), evaluation, and sandboxed code execution. |
-| **Gemini 3.1 Pro / Gemini Flash** | Two-tier model routing — deep reasoning on Pro, high-volume classification on Flash. |
-| **Gemini function calling** | Deterministic computations run as verified tools the agent calls, not free-generated text. |
-| **Vertex AI Search** | Grounded retrieval over the regulatory corpus with native citation metadata, feeding the Economics Engine's Evidence Chain. |
-| **BigQuery (+ embeddings/vector search)** | Telemetry, emissions analytics, EID/ERD time series, and in-warehouse embedding/vector retrieval co-located with the data it corroborates. |
-| **Pub/Sub + BigQuery continuous queries** | Event-driven streaming ingestion for readings/telemetry, feeding near-real-time threshold/anomaly triage. |
-| **Cloud Storage** | Regulatory corpus, filings, and primary-source documents referenced by every Evidence Chain. |
-| **Firestore** | Public certification registry, certificates, and the 7-year-retained audit trail. |
-| **Cloud Run** | Hosts every TerraVow service. |
-
-## Correctness as a first-class deliverable, not a demo
-
-TerraVow's specification defines **95 formally stated correctness properties**:
-- **Java Properties 1–44 and 46–49** are implemented and tested (jqwik, 100+ generated cases per property)
-- **Property 45 and Properties 50–64** are specified only (depend on Requirements 16–17, which are specified but not yet implemented)
-- **Python prototype Properties 65–95** are implemented and tested (pytest + hypothesis where applicable)
-
-Each property is a universal statement like "EID attribution is additive," "a vetoed recommendation is BLOCK regardless of confidence," "trust never raises a classification," and "an out-of-tolerance baseline is never admitted at full confidence." This was a deliberate choice: a platform whose entire value is "you can trust this number" has to be able to prove it, not just assert it.
-
-## What's genuinely novel here (for judging criteria)
-
-- **EID / ERD**: a mechanism that attributes a *portion* of emissions specifically to the
-  maintenance decision, isolating it from the unavoidable process minimum, and prices it as a
-  compounding liability — not an industry-average emissions estimate.
-- **AEI**: valuing emissions by *when* they happen relative to weather and population exposure,
-  not just how much — a mass-preserving, zero-additional-emissions optimization.
-- **Trajectory Certification**: certifying *verified improvement over time* specifically to
-  resist the single-audit-day gaming that undermines conventional certification.
-- **Embedded Pollution Passport**: replacing Scope-3 industry averages with actual,
-  machine-health-conditioned values that propagate through the supply chain.
-- **Structural fraud-resistance**: a two-layer data-integrity architecture grounded in real
-  literature (MRV fraud cases, FDIA research, CEMS cross-validation, tamper-evident logging)
-  rather than a generic "add some validation" afterthought — because a certification-and-
-  liability platform is specifically the kind of system an adversary has the strongest
-  incentive to feed false data into.
-
-## Honesty about scope
-
-**Specified vs Implemented Services:**
-
-| Service | Status |
-|---|---|
-| Domain core (Machine_Asset, Maintenance, Job_Run, Health_State, Operating_Log, baselines) | ✅ Implemented (Java) |
-| Evidence_Chain & Audit (hash-chained, 7-year retention) | ✅ Implemented (Java + Python prototype) |
-| Decision_Gate (hard veto → confidence → trust cap) | ✅ Implemented (Java + Python prototype) |
-| EID Attribution, ERD Quantification, Pollution Monitor, Cross-Media Guardrail | ✅ Implemented (Java) |
-| AEI + Harm-Aware Rescheduler | ✅ Implemented (Java) |
-| Substitution Dossier, Economics Engine, Embedded Pollution Passport | ✅ Implemented (Java) |
-| Trajectory Certification | ✅ Implemented (Java) |
-| Emissions-Aware Maintenance Lifecycle | ✅ Implemented (Java) |
-| Reasoning_Agent Orchestrator (schema-validate → retry → escalate, Vertex AI Agent Engine + ADK) | 🟡 Java logic and port implemented; Agent Engine adapter is a stub, not connected |
-| Two-tier Gemini routing (Pro / Flash), Gemini function calling (verified tools) | 🟡 Routing logic in Java; live Gemini calls, including function calling, run in the Python prototype |
-| Grounding with Vertex AI Search + BigQuery vector search | 🟡 Java logic over an in-memory corpus; Vertex AI Search and BigQuery are not connected |
-| PII/confidentiality masking, synthetic data | ✅ Implemented (Java) |
-| Pub/Sub + BigQuery continuous queries (event-driven triage) | 🟡 Java logic over in-memory ports; Pub/Sub and BigQuery are not connected |
-| Storage split (BigQuery / Cloud Storage / Firestore) | 🟡 Java logic over in-memory stores; live Firestore is used by the Python prototype |
-| Graceful degradation (all managed paths) | ✅ Implemented (Java) |
-| **Python prototype:** industry templates, snag workflow, health/lifespan engine, sustainability alternatives + India incentives | ✅ Implemented (Python FastAPI, Requirements 18–30) |
-| **Integrity_Gate (Req 16):** source-auth, calibration/health, replay/freshness, authorized-actor, corroboration → Data_Trust_Score | 📋 Specified, not implemented (Java scaffolding present, wiring incomplete) |
-| **Detection hardening (Req 17):** Baseline_Plausibility_Check, Independent_Verification_Source, Trust_Weighted_Profile, Anchored_Hash_Root | 📋 Specified, not implemented |
-| **Public registry / certification publication (Req 9.5)** | 📋 Specified only (Java service exists; public registry endpoint not wired) |
-
-**How to read the table:** ✅ means the domain logic and tests exist. The Java engine has no Google Cloud client libraries and uses in-memory or stub adapters (for example `InMemoryPubSubPort` and `StubAgentEnginePort`). The only live Google Cloud services in the prototype are Gemini on Vertex AI, Firestore and Cloud Run.
-
-Regulatory figures: the design is to cite every regulatory figure back to a primary source. In the prototype the regulatory excerpts are short summaries, some still placeholders, and must be verified against primary sources. Two references have changed: the Income Tax Act 1961 (including Section 32) was replaced by the Income-tax Act 2025 from 1 April 2026, and India's PAT scheme is being transitioned into the Carbon Credit Trading Scheme.
-
-The Python prototype (`prototype/`) implements Requirements 18–30 (industry-specific machine templates generated by **Gemini 2.5 Flash** with Google Search grounding, snag workflow, health/lifespan engine, and sustainability alternatives with India incentive schemes). See [`prototype/README.md`](prototype/README.md) and [`docs/competitive-landscape.md`](docs/competitive-landscape.md) for details.
 
 ---
 
-# Appendix — Repository Guide
+## Architecture
 
-For where TerraVow sits against adjacent categories (carbon accounting, predictive maintenance,
-EHS, CEMS/PEMS, carbon-credit MRV), see [`docs/competitive-landscape.md`](docs/competitive-landscape.md).
+### Component Map
 
-The full specification lives under [`.kiro/specs/terravow/`](.kiro/specs/terravow/):
-`requirements.md` (EARS-format acceptance criteria), `design.md` (architecture and correctness
-properties), and `tasks.md` (the implementation plan).
+```mermaid
+graph TB
+    subgraph Browser
+        UI[index.html + vanilla JS]
+    end
+    
+    subgraph FastAPI
+        Main[main.py]
+        Routes[routes_ext.py]
+        
+        subgraph Domain
+            Ind[industries.py]
+            Cat[catalogue.py]
+            Tpl[templates.py]
+            Sng[snags.py]
+            Sust[sustain.py]
+            Eng[engine.py]
+        end
+        
+        Cache[cache_once.py]
+        Gemini[gemini_client.py]
+        Gate[gate.py]
+        Store[store.py]
+        Seed[seed.py]
+    end
+    
+    subgraph Storage
+        Templates["templates collection"]
+        Catalogue["catalogue collection"]
+        SnagHist["snag_history collection"]
+        Snags["snags collection"]
+        Altern["alternatives collection"]
+        Incent["incentives collection"]
+        Audit["audit collection"]
+    end
+    
+    subgraph External
+        GeminiAPI[Gemini 2.5 Flash]
+        Search[Google Search]
+    end
+    
+    UI --> Main --> Routes
+    Routes --> Ind & Cat & Tpl & Sng & Sust
+    Cat --> Cache
+    Tpl --> Cache
+    Sust --> Cache
+    Cache --> Store
+    Cache --> Gemini
+    Tpl --> Gemini
+    Cat --> Gemini
+    Sust --> Gemini
+    Gemini --> GeminiAPI & Search
+    Sng --> Eng
+    Sust --> Eng
+    Sust --> Gate
+    Store --> Templates & Catalogue & SnagHist & Snags & Altern & Incent & Audit
+```
 
-## Tech stack
+### Data Model (Collections)
 
-- **Java 17**, **Spring Boot 3.4.13**
-- **Maven** (wrapper included — no local Maven install required)
-- **JUnit 5 + jqwik** (property-based testing) + **AssertJ**
-- Target deployment: **Google Cloud** — Cloud Run, Vertex AI (Gemini 3.1 Pro / Flash), Vertex AI
-  Agent Engine, Vertex AI Search, BigQuery, Cloud Storage, Firestore, Pub/Sub
+| Collection | Key | Purpose |
+|---|---|---|
+| **industries** | `{id}` | 4 industries, domain-to-indicator map |
+| **catalogue** | `{model_key}` | 20 sample entries + manual entries |
+| **templates** | `{model_key}--{version}` | AI-generated or Base_Template |
+| **snag_history** | `{machine_id}` | Machine header (industry, model_key, install_year) |
+| **snags** | `{snag_id}` | Snag documents with events |
+| **alternatives** | `{model_key}--{country}--s1` | Cached AI alternatives |
+| **incentives** | `{country}--{scheme_id}` | 7 real-named + 2 demo-synthetic schemes |
+| **audit** | `AUD-{ts}-{hex}` | Hash-chained audit entries |
 
-## Getting started
+### API Endpoints
+
+#### Industries & Catalogue
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/api/industries` | List 4 industries |
+| GET | `/api/catalogue/search?industry={id}&q={query}` | Search catalogue (≤10, sample data) |
+| POST | `/api/catalogue/manual` | Add machine manually with specs |
+
+#### Templates
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/api/template/ensure` | Get-or-generate template (cache-once) |
+| GET | `/api/template/{key}` | Fetch cached template (never calls Gemini) |
+
+#### Instances & Snags
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/api/instances` | Register machine instance |
+| GET | `/api/instances?model_key={key}` | List machines |
+| POST | `/api/snags` | Submit snag report |
+| GET | `/api/snags?status={status}&machine_id={id}` | Query snags |
+| POST | `/api/snags/{id}/accept` | Resolver: OPEN → ASSIGNED |
+| POST | `/api/snags/{id}/resolve` | Resolver: ASSIGNED → RESOLVED |
+| POST | `/api/snags/{id}/close` | Resolver: RESOLVED → CLOSED |
+
+#### Resolver Queue
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/api/resolver/queue` | List OPEN + ASSIGNED snags (severity-first) |
+
+#### Health
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/api/machines/{id}/health?as_of={date}` | Health score, lifespan, pollution, timeline |
+| GET | `/api/machines/{id}/history` | Snag history (≤500) |
+
+#### Sustainability
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/api/machines/{id}/recommendations` | Alternatives + incentives (body: enterprise_size, country) |
+| GET | `/api/incentives?country={CC}&industry={id}&enterprise_size={size}` | List schemes |
+
+#### System
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/api/health` | Health check (gemini_mode, store_backend, seeded) |
+| POST | `/api/demo/reset` | Reset demo (gated by DEMO_RESET_ENABLED) |
+| GET | `/api/registry` | Audit chain integrity check |
+
+### Decision Gate
+
+The **Decision Gate** is the single safety chokepoint for every sustainability recommendation:
+
+```mermaid
+flowchart LR
+    Input["Recommendation<br/>deltas_kg, conf, trust"]
+    --> Veto{"Hard veto:<br/>mass increase or<br/>cross-media shift?"}
+    Veto -->|Yes| Block["BLOCK"]
+    Veto -->|No| Class{"Confidence<br/>classification"}
+    Class -->|conf ≥ 0.80| Allow["ALLOW"]
+    Class -->|0.60 ≤ conf < 0.80| Ask["ASK"]
+    Class -->|conf < 0.60| Block2["BLOCK"]
+    Ask --> Trust{"Trust score<br/>cap?"}
+    Trust -->|trust < threshold| Cap["CAP at ASK"]
+    Trust -->|OK| Out
+    Cap --> Out
+    
+    style Block fill:#e06c75,color:#ffd7db
+    style Block2 fill:#e06c75,color:#ffd7db
+    style Allow fill:#4caf7d,color:#e8f5e9
+    style Ask fill:#5b9bd5,color:#eaf2ff
+    style Cap fill:#c99a3b,color:#fff3e0
+```
+
+1. **Hard veto first** — any increase in total emission mass or shift between media → BLOCK regardless of confidence
+2. **Confidence classification** — ALLOW (≥0.80), ASK (≥0.60), BLOCK (<0.60)
+3. **Trust cap** — can only lower classification, never raise it
+
+In the demo, all items are ASK or BLOCK (tuned for human review).
+
+### Deterministic-Numbers vs. LLM Boundary
+
+- **Engine (never touches Gemini):** health_score, remaining_lifespan, pollution_intensity, health_timeline, candidate_economics, incentive filtering
+- **Gemini (orchestrated by engine):** template generation (drafts structure), spec lookup (searches web), alternatives suggestion (returns ranges, engine computes midpoint)
+
+Numbers shown to users are always computed by the deterministic engine, never free-generated.
+
+### Graceful Degradation
+
+| Path | Primary | Fallback |
+|------|---------|----------|
+| Template generation | Gemini generates deep template | Industry Base_Template (source: fallback-base) |
+| Spec lookup | Gemini + Google Search | Entry with no specs (specs_status: sample) |
+| Alternatives | Gemini suggests with ranges | Curated 5-item set (source: curated-fallback) |
+
+---
+
+## Tech Stack
+
+| Component | Technology | Used? |
+|-----------|------------|-------|
+| **Backend API** | FastAPI (Python) | ✅ Yes |
+| **Data validation** | Pydantic | ✅ Yes |
+| **LLM** | Gemini 2.5 Flash via google-genai | ✅ Yes |
+| **Grounding** | Google Search tool | ✅ Yes |
+| **Storage** | Firestore (or in-memory fallback) | ✅ Yes |
+| **Frontend** | Vanilla JS + index.html | ✅ Yes |
+| **Hosting** | Cloud Run (or local uvicorn) | ✅ Yes |
+| **Java engine** | Spring Boot 3.4.13, Java 17 | ⚠️ Partial (Decision_Gate core exists; tests pending import fixes) |
+| **Testing** | pytest (151 tests), JUnit + jqwik (490 tests) | ✅ Yes |
+
+### Explicitly NOT Used
+
+| Service | Reason |
+|---------|--------|
+| **Vertex AI Agent Engine** | Prototype uses direct Gemini calls |
+| **Pub/Sub** | Prototype uses request-response |
+| **BigQuery** | Prototype uses Firestore/in-memory |
+| **Cloud Storage** | Regulatory corpus not in prototype |
+| **Vertex AI Search** | Prototype uses direct Gemini + Google Search |
+
+---
+
+## Honesty and Limitations
+
+- **No authentication** — role switch is workflow guidance, not access control
+- **Sample data** — 20 catalogue models are illustrative, not authoritative
+- **Illustrative economics** — replacement values, degradation factors, incentive rates are demo assumptions
+- **UNVERIFIED incentives** — real-named India schemes are qualitative only; quantitative figures from demo-synthetic schemes labeled ILLUSTRATIVE
+- **Estimates, not measurements** — health, lifespan, pollution intensity are computed from snag history, not sensor data
+- **No official certification** — platform records evidence, doesn't issue certificates
+- **Single-instance cap** — cross-replica lease not implemented; demo runs one worker
+- **Java tests pending** — Decision_Gate core logic exists but test import fixes needed
+
+---
+
+## How to Run and Test
 
 ### Prerequisites
 
-- JDK 17+
+- Python 3.11+ (tested on 3.13)
+- JDK 17+ (for Java engine)
 
-### Build
+### Zero-Service Tier (No Gemini)
 
 ```bash
-./mvnw clean install
+cd /Users/rachit.gupta/IdeaProjects/terravow/prototype
+
+# Setup
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+
+# Run (no API key needed)
+.venv/bin/uvicorn app.main:app --port 8080
 ```
 
-### Run tests
+### With Gemini (Tier 1)
 
 ```bash
+export GEMINI_API_KEY=your-key
+export GOOGLE_GENAI_USE_VERTEXAI=false
+.venv/bin/uvicorn app.main:app --port 8080
+```
+
+### Demo Reset
+
+```bash
+curl -s -X POST localhost:8080/api/demo/reset
+```
+
+### Run Python Tests
+
+```bash
+cd /Users/rachit.gupta/IdeaProjects/terravow/prototype
+.venv/bin/python -m pytest tests -v
+# 151 tests: all pass
+```
+
+### Run Java Tests
+
+```bash
+cd /Users/rachit.gupta/IdeaProjects/terravow
 ./mvnw test
+# 490 tests: property-based (jqwik) + unit tests
 ```
 
-Tests include both conventional unit/integration tests (`*Test`, `*Tests`) and jqwik
-property-based tests (`*Properties`) that validate the formally stated correctness properties
-described above — e.g. "a vetoed recommendation is BLOCK regardless of confidence," "EID
-attribution is additive," "trust never raises a Decision_Gate classification."
+---
 
-### Run the application
-
-```bash
-./mvnw spring-boot:run
-```
-
-Configuration lives in `src/main/resources/application.yml` under the `terravow.*` namespace
-and is config-gated with safe, behaviour-preserving defaults.
-
-## Project structure
+## Repository Layout
 
 ```
-.kiro/specs/terravow/     Requirements, design, and task-list specification
-src/main/java/com/terravow/
-  domain/                 Machine_Asset, Maintenance_Event, Job_Run, Operating_Log, baselines
-  gate/                   Decision_Gate (hard veto -> confidence -> trust cap)
-  evidence/               Evidence_Chain & Audit service
-  reasoning/              Reasoning_Agent Orchestrator (schema-validate -> retry -> escalate)
-  llm/                    Two-tier Gemini model routing (Pro / Flash)
-  capability/             EID, ERD, pollution monitor, AEI, substitution dossier,
-                          economics engine, embedded pollution passport,
-                          certification, maintenance lifecycle
-  pii/                    PII/confidentiality masking and synthetic data
-  ingest/                 Pub/Sub + BigQuery continuous-query streaming ingestion
-  degradation/            Graceful degradation with confidence-lowering fallbacks
-  gcp/                    Agent Engine, storage adapters (BigQuery / Cloud Storage / Firestore)
-src/test/java/com/terravow/   Mirrors the main tree; property tests validate design.md's
-                               correctness properties (jqwik, @Property(tries = 100))
+terravow/
+├── .kiro/specs/terravow/     # Full specification (gitignored locally)
+├── src/main/java/com/terravow/
+│   ├── domain/               # Machine_Asset, Maintenance_Event, etc.
+│   ├── gate/                 # Decision_Gate (hard veto → confidence → trust)
+│   ├── evidence/             # Evidence_Chain & Audit
+│   ├── capability/           # EID, ERD, AEI, Substitution, etc.
+│   └── ...
+├── prototype/
+│   ├── app/                  # FastAPI application
+│   │   ├── main.py           # Entry point, seeding
+│   │   ├── routes_ext.py     # All API endpoints
+│   │   ├── engine.py         # Deterministic health/pollution/economics
+│   │   ├── gemini_client.py  # Gemini wrapper
+│   │   ├── gate.py           # Decision Gate
+│   │   └── ...
+│   ├── data/                 # Seeded JSON data
+│   ├── static/               # index.html UI
+│   └── tests/                # 151 pytest tests
+├── docs/                     # Detailed docs (do NOT delete)
+│   ├── product-features.md
+│   ├── system-architecture.md
+│   ├── user-flow.md
+│   └── demo-testing-guide.md
+├── README.md                 # ← This file (consolidated)
+└── deploy.sh                 # Cloud Run deployment
 ```
+
+---
+
+## Where to Read More
+
+- [Product Features](./docs/product-features.md) — detailed feature catalogue
+- [System Architecture](./docs/system-architecture.md) — component map, data model, cache-once design
+- [User Flow](./docs/user-flow.md) — step-by-step journey narratives with Mermaid
+- [Demo Testing Guide](./docs/demo-testing-guide.md) — test playbook, tier selection
+- `.kiro/specs/terravow/` — full requirements, design, tasks (gitignored locally)
+
+---
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT — see [LICENSE](./LICENSE).

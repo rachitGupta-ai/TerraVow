@@ -40,3 +40,7 @@ __pycache__/
 .agents/
 ### Meeting transcripts (not for the public repo) ###
 meeting-transcripts/
+### Kiro IDE specs and settings ###
+.kiro/
+### Office temp/lock files ###
+~$*
