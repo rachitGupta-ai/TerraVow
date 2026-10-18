@@ -268,6 +268,31 @@ section.card.feature::before{content:"";position:absolute;left:0;top:0;bottom:0;
 section.card.feature h2{color:var(--brand-green)}
 section.card.feature .big{font-size:clamp(40px,5vw,58px)}
 .big{font-weight:700}
+
+/* ---------- step wizard: show one step at a time ---------- */
+/* Before JS arms the wizard, hide every step card except the machine header, so the full stack
+   never flashes on load. (#head is the first .card; "~ .card" matches the 7 step cards after it.) */
+#detail:not(.wizard) > section.card ~ section.card{display:none}
+.stepper{display:flex;gap:4px;overflow-x:auto;position:sticky;top:120px;z-index:20;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(8px);padding:7px;border:1px solid var(--rule);
+  border-radius:999px;margin-bottom:16px;box-shadow:var(--shadow-sm);scrollbar-width:none}
+.stepper::-webkit-scrollbar{display:none}
+.step-dot{flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;cursor:pointer;
+  padding:6px 12px;border-radius:999px;color:var(--steel);font-weight:600;font-size:13px;white-space:nowrap;
+  transition:background .18s var(--ease),color .18s var(--ease)}
+.step-dot .sn{width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:var(--paper);border:1px solid var(--rule);
+  display:grid;place-items:center;font-size:12px;line-height:1}
+.step-dot:hover{background:var(--paper);color:var(--ink)}
+.step-dot[aria-current="step"]{background:var(--brand-grad);color:#fff}
+.step-dot[aria-current="step"] .sn{background:rgba(255,255,255,.28);border-color:transparent;color:#fff}
+.step-dot[data-done="true"]:not([aria-current="step"]) .sn{background:var(--allow-bg);border-color:var(--allow);color:var(--allow)}
+@media (max-width:820px){.step-dot .st{display:none}.step-dot{padding:6px 9px}}
+#detail.wizard > section.card{animation:stepIn .32s var(--ease)}
+@keyframes stepIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#detail.wizard > section.card{animation:none}}
+.stepnav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px}
+.stepnav .count{color:var(--steel);font-weight:600;font-size:14px;text-align:center;flex:1}
+.stepnav .btn[disabled]{visibility:hidden}
 </style>
 </head>
 <body>
@@ -444,6 +469,7 @@ section.card.feature .big{font-size:clamp(40px,5vw,58px)}
 
   <div id="detail">
     <section class="card" id="head" aria-live="polite"></section>
+    <nav class="stepper" id="stepper" aria-label="Assessment steps"></nav>
 
     <section class="card" aria-labelledby="ah">
       <h2 id="ah">1. Assess the condition</h2>
@@ -540,6 +566,7 @@ section.card.feature .big{font-size:clamp(40px,5vw,58px)}
         <tbody id="reg"></tbody>
       </table></div>
     </section>
+    <div class="stepnav" id="stepnav"></div>
   </div>
 </main>
 <footer>Demo prototype: no authentication. The role switch is not a security control. Not an official certification.</footer>
@@ -637,6 +664,7 @@ async function select(id) {
   S.d = await api("/api/machine/" + id);
   S.day = Math.min(S.d.planned_window_day, 90); $("slider").value = S.day;
   renderAll(); loadFleet();
+  if ($("detail").classList.contains("wizard")) goStep(0, false);
 }
 function renderAll() { renderHead(); renderHealth(); renderChart(); renderFootprint(); renderOptions(); }
 
@@ -908,12 +936,39 @@ $("heroTry").addEventListener("click", () => {
   showTab("fix"); $("detail").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 });
 $("heroReport").addEventListener("click", () => showTab("report", true));
-if (!reduce && "IntersectionObserver" in window) {
-  document.body.classList.add("js-reveal");
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-  }, { rootMargin: "0px 0px -8% 0px" });
-  for (const c of document.querySelectorAll("#detail > section.card")) io.observe(c);
+
+/* ---------- step wizard (show one of the 7 steps at a time) ---------- */
+const STEP_LABELS = ["Assess", "Cost of waiting", "Footprint", "Explain", "Safety gate", "Verify", "Record"];
+let curStep = 0;
+const stepSections = () => [...document.querySelectorAll("#detail > section.card")].filter((s) => s.id !== "head");
+function goStep(i, scroll) {
+  const steps = stepSections(); if (!steps.length) return;
+  curStep = Math.max(0, Math.min(steps.length - 1, i));
+  steps.forEach((s, k) => { s.hidden = k !== curStep; });
+  [...$("stepper").children].forEach((d, k) => {
+    d.setAttribute("aria-current", k === curStep ? "step" : "false");
+    d.setAttribute("data-done", String(k < curStep));
+  });
+  if ($("stepPrev")) $("stepPrev").disabled = curStep === 0;
+  if ($("stepNext")) $("stepNext").disabled = curStep === steps.length - 1;
+  if ($("stepCount")) $("stepCount").textContent = `Step ${curStep + 1} of ${steps.length} · ${STEP_LABELS[curStep]}`;
+  if (scroll) $("detail").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+}
+function buildStepper() {
+  const steps = stepSections(); if (!steps.length) return;
+  $("stepper").replaceChildren(...steps.map((s, i) =>
+    el("button", { type: "button", class: "step-dot", "aria-label": `Step ${i + 1}: ${STEP_LABELS[i]}`, onclick: () => goStep(i, true) },
+      el("span", { class: "sn", text: String(i + 1) }), el("span", { class: "st", text: STEP_LABELS[i] }))));
+  $("stepnav").replaceChildren(
+    el("button", { class: "btn ghost", id: "stepPrev", type: "button", onclick: () => goStep(curStep - 1, true) }, "← Back"),
+    el("span", { class: "count", id: "stepCount" }),
+    el("button", { class: "btn brand", id: "stepNext", type: "button", onclick: () => goStep(curStep + 1, true) }, "Next →"));
+  $("stepper").addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") { e.preventDefault(); goStep(curStep + 1, true); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); goStep(curStep - 1, true); }
+  });
+  $("detail").classList.add("wizard");
+  goStep(0, false);
 }
 
 /* ---------- role and handle (workflow guidance only, NOT access control) ---------- */
@@ -1394,7 +1449,7 @@ function initSustain() {
 
 (async function init() {
   initWho(); initCatalogue(); initSnag(); initSustain(); loadIndustries();
-  await loadHealth(); await loadFleet(); await select("B-2"); loadRegistry(); loadImprovements(); loadSamples();
+  await loadHealth(); await loadFleet(); await select("B-2"); buildStepper(); loadRegistry(); loadImprovements(); loadSamples();
 })();
 </script>
 </body>
