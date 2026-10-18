@@ -34,6 +34,12 @@ def _bool(name: str, default: bool) -> bool:
 # when grounding/thinking is unavailable on the configured Vertex endpoint.
 GEMINI_HEAVY_DISABLED = _bool("GEMINI_HEAVY_DISABLED", False)
 
+# When true, the photo assessment, after-repair re-assessment and the explain call cache their
+# result in memory keyed on their exact inputs (image bytes + notes + context). Repeating the same
+# inputs - e.g. the fixed demo sample photos - returns the real, previously generated Gemini result
+# instantly instead of making the model call again. A new/different photo still runs live.
+GEMINI_CACHE = _bool("GEMINI_CACHE", False)
+
 
 # ---- template generation (provisional until T-MEASURE) ---------------------------------
 TEMPLATE_SCHEMA_VERSION = "t1"

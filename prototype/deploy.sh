@@ -14,6 +14,9 @@ VERTEX_LOCATION="${VERTEX_LOCATION:-us-central1}"  # regional endpoint: Google S
 # fallbacks instead of calling Gemini (keeps those tabs at 2-3s). Set to false to use live generation
 # once grounding/thinking is confirmed working on your Vertex endpoint.
 GEMINI_HEAVY_DISABLED="${GEMINI_HEAVY_DISABLED:-true}"
+# Cache the photo-assessment / after-repair / explain results by input, so repeating the fixed demo
+# sample photos returns the real generated result instantly. A new photo still runs live.
+GEMINI_CACHE="${GEMINI_CACHE:-true}"
 SERVICE="terravow"
 
 gcloud config set project "$PROJECT_ID"
@@ -41,7 +44,7 @@ gcloud run deploy "$SERVICE" \
   --memory 512Mi \
   --min-instances 1 \
   --max-instances 1 \
-  --set-env-vars "GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${VERTEX_LOCATION},USE_FIRESTORE=true,GEMINI_MODEL=${GEMINI_MODEL},GEMINI_HEAVY_DISABLED=${GEMINI_HEAVY_DISABLED}"
+  --set-env-vars "GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${VERTEX_LOCATION},USE_FIRESTORE=true,GEMINI_MODEL=${GEMINI_MODEL},GEMINI_HEAVY_DISABLED=${GEMINI_HEAVY_DISABLED},GEMINI_CACHE=${GEMINI_CACHE}"
 
 URL="$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')"
 echo

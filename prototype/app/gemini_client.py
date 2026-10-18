@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import logging
+import hashlib
 import os
 import re
 import threading
@@ -35,6 +36,37 @@ EXPLAIN_MODEL = os.getenv("GEMINI_EXPLAIN_MODEL", MODEL)
 TEMPLATE_MODEL = os.getenv("TEMPLATE_MODEL", MODEL)
 
 log = logging.getLogger("terravow.gemini")
+
+# ---- in-memory response cache (opt-in via GEMINI_CACHE) --------------------------------
+# Keyed on the exact inputs. Lets the fixed demo sample photos return their real, already
+# generated Gemini result instantly instead of re-calling the model. A different input misses
+# and runs live. Thread-safe and bounded; cleared on restart.
+_RESP_CACHE: "dict[str, object]" = {}
+_RESP_LOCK = threading.Lock()
+
+
+def _cache_key(*parts) -> str:
+    h = hashlib.sha256()
+    for p in parts:
+        h.update(p if isinstance(p, bytes) else str(p).encode("utf-8"))
+        h.update(b"\x1f")
+    return h.hexdigest()
+
+
+def _cache_get(key: str):
+    if not settings.GEMINI_CACHE:
+        return None
+    with _RESP_LOCK:
+        return _RESP_CACHE.get(key)
+
+
+def _cache_put(key: str, value):
+    if not settings.GEMINI_CACHE:
+        return
+    with _RESP_LOCK:
+        if len(_RESP_CACHE) > 256:
+            _RESP_CACHE.clear()
+        _RESP_CACHE[key] = value
 
 
 class GeminiNotConfigured(RuntimeError):
@@ -104,6 +136,10 @@ ANALYZE_SYSTEM = (
 
 def analyze_condition(machine_ctx: str, notes: str, image: Optional[bytes] = None,
                       mime_type: str = "image/jpeg") -> HealthState:
+    ck = _cache_key("analyze", machine_ctx, notes, image or b"")
+    hit = _cache_get(ck)
+    if hit is not None:
+        return hit  # type: ignore[return-value]
     client = _client()
     parts: list = []
     if image:
@@ -123,9 +159,10 @@ def analyze_condition(machine_ctx: str, notes: str, image: Optional[bytes] = Non
             temperature=0.2,
         ),
     )
-    if getattr(resp, "parsed", None) is not None:
-        return resp.parsed  # type: ignore[return-value]
-    return HealthState.model_validate_json(_strip_fences(resp.text or ""))
+    out = resp.parsed if getattr(resp, "parsed", None) is not None \
+        else HealthState.model_validate_json(_strip_fences(resp.text or ""))
+    _cache_put(ck, out)
+    return out  # type: ignore[return-value]
 
 
 # ---------------------------------------------------------------- 1b. after repair
@@ -153,6 +190,10 @@ REASSESS_SYSTEM = (
 
 def reassess_after_repair(machine_ctx: str, notes: str, after_image: bytes, after_mime: str,
                           before_thumb: bytes, prior_summary: str) -> AfterAssessment:
+    ck = _cache_key("reassess", machine_ctx, notes, prior_summary, before_thumb, after_image)
+    hit = _cache_get(ck)
+    if hit is not None:
+        return hit  # type: ignore[return-value]
     client = _client()
     parts: list = [
         "BEFORE photo (from the original assessment):",
@@ -169,9 +210,10 @@ def reassess_after_repair(machine_ctx: str, notes: str, after_image: bytes, afte
             system_instruction=REASSESS_SYSTEM, response_mime_type="application/json",
             response_schema=AfterAssessment, temperature=0.0),
     )
-    if getattr(resp, "parsed", None) is not None:
-        return resp.parsed  # type: ignore[return-value]
-    return AfterAssessment.model_validate_json(_strip_fences(resp.text or ""))
+    out = resp.parsed if getattr(resp, "parsed", None) is not None \
+        else AfterAssessment.model_validate_json(_strip_fences(resp.text or ""))
+    _cache_put(ck, out)
+    return out  # type: ignore[return-value]
 
 
 # ---------------------------------------------------------------- 2. explain
@@ -192,6 +234,10 @@ EXPLAIN_SYSTEM = (
 def explain_decision(summary: str, corpus: List[dict], tool: Callable[..., dict]) -> dict:
     """`tool` must be a plain function with type hints + docstring (the SDK builds the
     function declaration from it and runs the call loop automatically)."""
+    ck = _cache_key("explain", summary, "|".join(sorted(c["id"] for c in corpus)))
+    hit = _cache_get(ck)
+    if hit is not None:
+        return dict(hit)  # type: ignore[arg-type]
     client = _client()
     excerpts = "\n".join(f"[{c['id']}] {c['topic']}: {c['summary']}" for c in corpus)
     prompt = (
@@ -213,6 +259,7 @@ def explain_decision(summary: str, corpus: List[dict], tool: Callable[..., dict]
     data["citations"] = [c for c in data.get("citations", []) if c in valid_ids]
     data["tool_calls"] = calls
     data["model"] = EXPLAIN_MODEL
+    _cache_put(ck, dict(data))
     return data
 
 
