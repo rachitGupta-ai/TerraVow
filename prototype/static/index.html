@@ -9,36 +9,58 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#F2F7F4; --panel:#FFFFFF; --ink:#12262B; --steel:#4F6369; --rule:#CBD8D2;
-  --cost:#A0650A; --cost-soft:#F4E5C8;
-  --allow:#0F766E; --ask:#3B5B8C; --block:#A4133C;
-  --allow-bg:#D9EFEC; --ask-bg:#DFE7F3; --block-bg:#F6DCE3;
-  --brand-green:#1F7A4D; --brand-blue:#1F5FA8;
+  --paper:#EDF3F1; --panel:#FFFFFF; --ink:#0C1D22; --steel:#51666C; --rule:#D6E2DC;
+  --cost:#B4530A; --cost-soft:#FBEAD0;
+  --allow:#0E7C6F; --ask:#355C9A; --block:#B01040;
+  --allow-bg:#D7EFEB; --ask-bg:#E0E8F6; --block-bg:#F8DCE4;
+  --brand-green:#0F7B4F; --brand-green-2:#17A35E; --brand-blue:#1F5FA8;
+  --radius:14px; --radius-sm:9px;
+  --shadow-sm:0 1px 2px rgba(12,29,34,.05),0 1px 3px rgba(12,29,34,.05);
+  --shadow-md:0 10px 28px -10px rgba(12,29,34,.16),0 3px 8px rgba(12,29,34,.05);
+  --shadow-lg:0 30px 70px -22px rgba(9,46,37,.42);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --brand-grad:linear-gradient(135deg,#0F7B4F 0%,#17A35E 58%,#2FC07A 100%);
+  --hero-grad:radial-gradient(1200px 520px at 82% -10%,rgba(47,192,122,.30),transparent 60%),radial-gradient(900px 500px at 0% 110%,rgba(31,95,168,.28),transparent 55%),linear-gradient(135deg,#07241C 0%,#0B3A2C 48%,#0A2E3A 100%);
   --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-/* Light theme only (Req 29.4): the former prefers-color-scheme dark block was removed on purpose. */
+/* Light theme only (Req 29.4): the former prefers-color-scheme dark block was removed on purpose.
+   The landing hero is a single dark-gradient section, not a theme — the app chrome stays light. */
 *{box-sizing:border-box}
 [hidden]{display:none !important}
-html{color-scheme:light}
-body{margin:0;background:var(--paper);color:var(--ink);font:400 15px/1.5 var(--body)}
+html{color-scheme:light;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:
+  radial-gradient(900px 420px at 100% -5%,rgba(23,163,94,.07),transparent 60%),
+  radial-gradient(800px 420px at -10% 8%,rgba(31,95,168,.06),transparent 55%),
+  var(--paper);color:var(--ink);font:400 15px/1.55 var(--body);-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:.2px;margin:0}
 button,input,textarea,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--brand-blue);outline-offset:2px}
 a{color:var(--brand-blue)}
 
 header{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between;
-  padding:14px clamp(16px,3vw,36px);border-bottom:3px solid var(--brand-green);background:var(--panel)}
+  padding:12px clamp(16px,3vw,36px);background:rgba(255,255,255,.82);backdrop-filter:saturate(1.3) blur(10px);
+  border-bottom:1px solid var(--rule);box-shadow:0 1px 0 rgba(12,29,34,.03);position:sticky;top:0;z-index:40}
 .brand h1{color:var(--brand-green)}
+.logo{width:34px;height:34px;flex:0 0 auto;border-radius:9px;background:var(--brand-grad);
+  display:grid;place-items:center;box-shadow:0 4px 12px -3px rgba(15,123,79,.5)}
+.logo svg{width:20px;height:20px;display:block}
+.gemini-badge{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink);
+  padding:5px 11px 5px 9px;border:1px solid var(--rule);border-radius:999px;background:var(--panel);box-shadow:var(--shadow-sm)}
+.gemini-badge .spark{width:15px;height:15px;flex:0 0 auto}
+.gemini-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--allow);box-shadow:0 0 0 3px var(--allow-bg)}
 .who{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13.5px}
 .who fieldset{border:0;margin:0;padding:0;display:flex;gap:10px;align-items:center}
 .who legend{float:left;font-weight:600;margin-right:6px}
 .who input[type=text]{width:150px;padding:4px 8px;border:1px solid var(--rule);border-radius:4px}
 .who .err{margin:0;font-size:12.5px}
-nav.navtabs{display:flex;flex-wrap:wrap;gap:4px;padding:8px clamp(16px,3vw,36px) 0;background:var(--panel);border-bottom:1px solid var(--rule)}
-nav.navtabs button{border:1px solid transparent;border-bottom:0;background:transparent;padding:8px 14px;cursor:pointer;
-  font-weight:600;border-radius:6px 6px 0 0;color:var(--steel)}
-nav.navtabs button[aria-selected="true"]{background:var(--paper);color:var(--brand-green);border-color:var(--rule);box-shadow:inset 0 3px 0 var(--brand-green)}
+nav.navtabs{display:flex;flex-wrap:wrap;gap:6px;padding:10px clamp(16px,3vw,36px);background:rgba(237,243,241,.78);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);position:sticky;top:58px;z-index:30}
+nav.navtabs button{border:1px solid transparent;background:transparent;padding:8px 16px;cursor:pointer;
+  font-weight:600;border-radius:999px;color:var(--steel);transition:background .18s var(--ease),color .18s var(--ease),box-shadow .18s var(--ease)}
+nav.navtabs button:hover{background:var(--panel);color:var(--ink)}
+nav.navtabs button[aria-selected="true"]{background:var(--brand-grad);color:#fff;border-color:transparent;box-shadow:0 6px 16px -5px rgba(15,123,79,.55)}
 .panel{padding:20px clamp(16px,3vw,36px) 48px;max-width:1500px;margin:0 auto}
 .panel > section.card{max-width:1100px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -54,8 +76,8 @@ select,.panel input[type=text]{padding:7px 10px;border:1px solid var(--rule);bor
 .pill{font-size:11.5px;padding:1px 7px;border-radius:999px;border:1px solid var(--steel);color:var(--steel);font-weight:600}
 .pill.ai{border-color:var(--brand-blue);color:var(--brand-blue)}
 .pill.warn{border-color:var(--cost);color:var(--cost)}
-.btn.brand{background:var(--brand-green);color:#fff}
-.btn.blue{background:var(--brand-blue);color:#fff}
+.btn.brand{background:var(--brand-grad);color:#fff}
+.btn.blue{background:linear-gradient(135deg,#1F5FA8,#2C7BD1);color:#fff}
 .status-line{margin-top:10px;padding:10px 12px;border-radius:4px;background:var(--paper);border-left:4px solid var(--brand-blue)}
 .status-line.fallback{border-left-color:var(--cost)}
 .tpl details{background:var(--paper);border-radius:4px;padding:8px 12px;margin-top:10px;color:var(--ink)}
@@ -65,7 +87,7 @@ select,.panel input[type=text]{padding:7px 10px;border:1px solid var(--rule);bor
 .tpl dt{font-weight:600;color:var(--steel)}
 .tpl dd{margin:0}
 footer{padding:14px clamp(16px,3vw,36px);border-top:1px solid var(--rule);color:var(--steel);font-size:13px;background:var(--panel)}
-.brand{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand h1{font-size:30px}
 .brand p{margin:0;color:var(--steel);font-size:14px}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
@@ -76,9 +98,16 @@ footer{padding:14px clamp(16px,3vw,36px);border-top:1px solid var(--rule);color:
 
 main{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:20px;padding:20px clamp(16px,3vw,36px) 48px;max-width:1500px;margin:0 auto}
 @media (max-width:980px){main{grid-template-columns:1fr}}
-section.card{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:18px 20px}
+section.card{background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);padding:20px 22px;
+  box-shadow:var(--shadow-sm);transition:box-shadow .22s var(--ease),transform .22s var(--ease)}
+section.card:hover{box-shadow:var(--shadow-md)}
 section.card + section.card{margin-top:16px}
 .card h2{font-size:22px;margin-bottom:2px}
+/* Scroll reveal: only armed when JS adds .js-reveal to <body>, so cards are never hidden if JS fails
+   or motion is reduced. */
+.js-reveal #detail > section.card{opacity:0;transform:translateY(14px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.js-reveal #detail > section.card.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.js-reveal #detail > section.card{opacity:1;transform:none;transition:none}}
 .sub{color:var(--steel);font-size:13.5px;margin:0 0 12px}
 
 .fleet{list-style:none;margin:0;padding:0}
@@ -110,10 +139,14 @@ textarea{width:100%;min-height:92px;padding:8px 10px;border:1px solid var(--rule
 input[type=file]{width:100%;padding:8px;border:1px dashed var(--steel);border-radius:4px;background:var(--paper)}
 .thumb{max-width:100%;max-height:120px;margin-top:8px;border-radius:4px;display:none}
 .samples{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:12.5px;color:var(--steel,#5b6b7a)}
-.btn{cursor:pointer;border:0;border-radius:4px;padding:9px 16px;font-weight:600;background:var(--ink);color:var(--paper)}
-.btn:disabled{opacity:.55;cursor:progress}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
-.btn.small{padding:5px 11px;font-size:13px}
+.btn{cursor:pointer;border:0;border-radius:var(--radius-sm);padding:10px 18px;font-weight:600;background:var(--ink);color:#fff;
+  box-shadow:var(--shadow-sm);transition:transform .15s var(--ease),box-shadow .15s var(--ease),filter .15s var(--ease)}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.55;cursor:progress;transform:none;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule);box-shadow:none}
+.btn.ghost:hover{background:var(--paper);border-color:var(--steel)}
+.btn.small{padding:6px 13px;font-size:13px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .health{background:var(--paper);border-radius:4px;padding:12px 14px}
 .health h3{font-size:20px}
@@ -190,14 +223,66 @@ td.h{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--steel);white-sp
   vertical-align:-2px;margin-right:6px;animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.spin{animation:none}.toast{transition:none}}
+
+/* ---------- landing hero (single dark-gradient section, not a theme) ---------- */
+.hero-landing{grid-column:1/-1;position:relative;overflow:hidden;border-radius:22px;color:#EAF6F0;
+  background:var(--hero-grad);border:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow-lg);
+  padding:clamp(26px,4vw,54px);margin-bottom:6px;animation:heroIn .6s var(--ease) both}
+.hero-landing::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(640px 320px at 92% 118%,rgba(47,192,122,.20),transparent 60%)}
+@keyframes heroIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.hero-landing{animation:none}}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);
+  gap:clamp(22px,3vw,46px);align-items:center}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;color:#9FE8C4;background:rgba(47,192,122,.14);border:1px solid rgba(47,192,122,.3);
+  padding:6px 13px;border-radius:999px}
+.hero-eyebrow .dot{width:7px;height:7px;border-radius:50%;background:#45E39B;box-shadow:0 0 0 4px rgba(69,227,155,.25)}
+.hero-title{font-family:var(--display);font-weight:700;font-size:clamp(36px,5.2vw,60px);line-height:1.02;
+  margin:16px 0 0;color:#fff;letter-spacing:.3px}
+.hero-title .accent{background:linear-gradient(120deg,#5DE2A0,#8FE9FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-lead{margin:14px 0 0;max-width:48ch;color:#C7DED5;font-size:clamp(15px,1.3vw,17px);line-height:1.62}
+.hero-pipe{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px;align-items:center}
+.hero-step{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600;color:#E6F4EC;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:7px 14px}
+.hero-step .n{width:19px;height:19px;border-radius:50%;background:rgba(47,192,122,.22);color:#8FEEC0;
+  display:grid;place-items:center;font-size:11px;font-weight:700}
+.hero-pipe .arrow{color:#5FBF9B;font-weight:700}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.hero-cta .btn{background:#fff;color:#07241C}
+.hero-cta .btn:hover{filter:brightness(.97)}
+.hero-cta .btn.outline{background:transparent;color:#EAF6F0;border:1px solid rgba(255,255,255,.42);box-shadow:none}
+.hero-cta .btn.outline:hover{background:rgba(255,255,255,.08)}
+.hero-stats{display:grid;gap:12px}
+.hero-stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:16px;padding:16px 18px}
+.hero-stat .hv{font-family:var(--display);font-weight:700;font-size:clamp(28px,3.4vw,40px);line-height:1;color:#fff;font-variant-numeric:tabular-nums}
+.hero-stat .hv.cost{color:#FFD39A}
+.hero-stat .hv.good{color:#8FEEC0}
+.hero-stat .hl{margin-top:6px;font-size:12.5px;color:#AFCCC1;line-height:1.4}
+
+/* ---------- the "cost of waiting" money-shot card ---------- */
+section.card.feature{border-color:rgba(15,123,79,.28);box-shadow:var(--shadow-md);
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4FAF6 100%);position:relative;overflow:hidden}
+section.card.feature::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--brand-grad)}
+section.card.feature h2{color:var(--brand-green)}
+section.card.feature .big{font-size:clamp(40px,5vw,58px)}
+.big{font-weight:700}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
-    <h1>TerraVow</h1>
-    <p>Fix it now, or wait? See what waiting costs in rupees and emissions.</p>
+    <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V5l7-3z" fill="#fff" opacity=".2"/><path d="M8.3 12.2l2.5 2.5 4.9-5.1" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+      <h1>TerraVow</h1>
+      <p>Fix it now, or wait? See what waiting costs in rupees and emissions.</p>
+    </div>
   </div>
+  <span class="gemini-badge" title="This prototype runs live on Gemini via Vertex AI">
+    <svg class="spark" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gg" x1="0" y1="0" x2="24" y2="24"><stop offset="0" stop-color="#1F5FA8"/><stop offset="1" stop-color="#17A35E"/></linearGradient></defs><path d="M12 2c.6 4.3 2.7 6.4 7 7-4.3.6-6.4 2.7-7 7-.6-4.3-2.7-6.4-7-7 4.3-.6 6.4-2.7 7-7z" fill="url(#gg)"/></svg>
+    <span>Gemini on Vertex AI</span><span class="dot" aria-hidden="true"></span>
+  </span>
   <div class="who">
     <fieldset>
       <legend>Role</legend>
@@ -318,6 +403,31 @@ td.h{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--steel);white-sp
 </div>
 
 <main id="panel-fix" role="tabpanel" aria-labelledby="tab-fix" tabindex="-1">
+  <section class="hero-landing" aria-labelledby="heroTitle">
+    <div class="hero-grid">
+      <div>
+        <span class="hero-eyebrow"><span class="dot" aria-hidden="true"></span>Gemini on Vertex AI &middot; decision-grade compliance</span>
+        <h2 class="hero-title" id="heroTitle">Fix it now, or wait?<br><span class="accent">See what waiting really costs.</span></h2>
+        <p class="hero-lead">Upload one photo of a failing part. Gemini reads the damage, a verified engine prices the delay in rupees and CO&#8322;, and a Decision Gate blocks any &ldquo;fix&rdquo; that just moves pollution around &mdash; every call logged to a tamper-evident record.</p>
+        <div class="hero-pipe" aria-hidden="true">
+          <span class="hero-step"><span class="n">1</span>Gemini reads the part</span>
+          <span class="arrow">&rarr;</span>
+          <span class="hero-step"><span class="n">2</span>Engine prices the delay</span>
+          <span class="arrow">&rarr;</span>
+          <span class="hero-step"><span class="n">3</span>Gate certifies the call</span>
+        </div>
+        <div class="hero-cta">
+          <button class="btn" id="heroTry" type="button">See it on a live machine &darr;</button>
+          <button class="btn outline" id="heroReport" type="button">Report a snag</button>
+        </div>
+      </div>
+      <div class="hero-stats" aria-label="Live fleet figures">
+        <div class="hero-stat"><div class="hv cost" id="heroLiab">&#8377;&mdash;</div><div class="hl">lost across the fleet every day to unrepaired defects</div></div>
+        <div class="hero-stat"><div class="hv good" id="heroCo2">&mdash; t</div><div class="hl">CO&#8322; avoidable over 30 days by fixing the &ldquo;fix now&rdquo; machines</div></div>
+        <div class="hero-stat"><div class="hv" id="heroFix">&mdash;</div><div class="hl">machines flagged &ldquo;fix now&rdquo; right now</div></div>
+      </div>
+    </div>
+  </section>
   <aside>
     <section class="card" aria-labelledby="fh">
       <h2 id="fh">Fix-first ranking</h2>
@@ -356,7 +466,7 @@ td.h{font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--steel);white-sp
       </div>
     </section>
 
-    <section class="card" aria-labelledby="ch">
+    <section class="card feature" aria-labelledby="ch">
       <h2 id="ch">2. What waiting costs</h2>
       <p class="sub">Drag the slider to choose how many days to defer the repair.</p>
       <div class="hero">
@@ -441,6 +551,18 @@ const S = { fleet: [], id: "B-2", d: null, day: 0, tab: "engineer", explain: nul
 const inr = (n) => "₹" + Math.round(n).toLocaleString("en-IN");
 const short = (n) => n >= 1e5 ? "₹" + (n / 1e5).toFixed(1).replace(/\.0$/, "") + "L" : "₹" + Math.round(n / 1000) + "k";
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* Animated number tween; writes textContent only (no innerHTML). Instant when motion is reduced. */
+function countUp(elm, target, fmt) {
+  if (!elm) return;
+  const from = +elm.dataset.v || 0; elm.dataset.v = target;
+  if (reduce || from === target) { elm.textContent = fmt(target); return; }
+  const t0 = performance.now();
+  (function step(t) {
+    const k = Math.min(1, (t - t0) / 700), e = 1 - Math.pow(1 - k, 3);
+    elm.textContent = fmt(from + (target - from) * e);
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
+}
 
 function el(tag, attrs = {}, ...kids) {
   const e = document.createElement(tag);
@@ -707,6 +829,9 @@ async function loadImpact() {
       el("div", { class: "v", text: inr(i.fix_now_cost) }),
       el("p", { class: "l", text: "excess fuel and exposure cost avoided, before repair and downtime costs" }),
       el("p", { class: "note", text: `The whole fleet currently loses ${inr(i.fleet_daily_liability)} a day to defects. ${i.note}` }));
+    countUp($("heroLiab"), i.fleet_daily_liability, inr);
+    countUp($("heroCo2"), i.fix_now_co2_t, (v) => n(v) + " t");
+    countUp($("heroFix"), i.fix_now_ids.length, (v) => String(Math.round(v)));
   } catch (e) { $("impact").textContent = "Impact unavailable."; }
 }
 
@@ -776,6 +901,19 @@ for (const t of TABS) {
     if (e.key === "ArrowRight") { e.preventDefault(); showTab(TABS[(i + 1) % TABS.length], true); }
     if (e.key === "ArrowLeft") { e.preventDefault(); showTab(TABS[(i + TABS.length - 1) % TABS.length], true); }
   });
+}
+
+/* ---------- hero CTAs + scroll reveal ---------- */
+$("heroTry").addEventListener("click", () => {
+  showTab("fix"); $("detail").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+});
+$("heroReport").addEventListener("click", () => showTab("report", true));
+if (!reduce && "IntersectionObserver" in window) {
+  document.body.classList.add("js-reveal");
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }, { rootMargin: "0px 0px -8% 0px" });
+  for (const c of document.querySelectorAll("#detail > section.card")) io.observe(c);
 }
 
 /* ---------- role and handle (workflow guidance only, NOT access control) ---------- */
