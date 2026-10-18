@@ -349,6 +349,8 @@ def lookup_specs(industry_name: str, manufacturer: str, model: str, *, timeout_s
     """
     fail = lambda reason: {"kind": "transient-failure", "machine_type": "", "specs": [], "caveat": "",
                            "sources": [], "reason": reason}
+    if settings.GEMINI_HEAVY_DISABLED:
+        return fail("disabled")
     data = json.dumps({"industry": industry_name, "manufacturer": manufacturer, "model": model},
                       ensure_ascii=False)
     for attempt in range(1, max(1, max_attempts) + 1):
@@ -449,6 +451,8 @@ def suggest_alternatives(data: dict, *, timeout_s: float, max_attempts: int = 2)
     raises for expected failures.
     """
     fail = lambda reason: {"kind": "transient-failure", "proposal": None, "sources": [], "reason": reason}
+    if settings.GEMINI_HEAVY_DISABLED:
+        return fail("disabled")
     payload = json.dumps(data, ensure_ascii=False)
     for attempt in range(1, max(1, max_attempts) + 1):
         try:

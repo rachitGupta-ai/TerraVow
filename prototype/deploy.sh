@@ -10,6 +10,10 @@ GEMINI_MODEL="${GEMINI_MODEL:-gemini-2.5-flash}"   # confirm availability in Ver
 VERTEX_LOCATION="${VERTEX_LOCATION:-us-central1}"  # regional endpoint: Google Search grounding (spec lookup,
                                                   # sustainability) and thinking (snag templates) are NOT served
                                                   # on the "global" endpoint, so those calls fall back there.
+# Serve the snag template, grounded spec lookup and sustainability alternatives from their instant
+# fallbacks instead of calling Gemini (keeps those tabs at 2-3s). Set to false to use live generation
+# once grounding/thinking is confirmed working on your Vertex endpoint.
+GEMINI_HEAVY_DISABLED="${GEMINI_HEAVY_DISABLED:-true}"
 SERVICE="terravow"
 
 gcloud config set project "$PROJECT_ID"
@@ -37,7 +41,7 @@ gcloud run deploy "$SERVICE" \
   --memory 512Mi \
   --min-instances 1 \
   --max-instances 1 \
-  --set-env-vars "GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${VERTEX_LOCATION},USE_FIRESTORE=true,GEMINI_MODEL=${GEMINI_MODEL}"
+  --set-env-vars "GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${VERTEX_LOCATION},USE_FIRESTORE=true,GEMINI_MODEL=${GEMINI_MODEL},GEMINI_HEAVY_DISABLED=${GEMINI_HEAVY_DISABLED}"
 
 URL="$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')"
 echo

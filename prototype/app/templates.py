@@ -400,6 +400,13 @@ def response(doc: dict, cache_status: str) -> dict:
 
 def ensure_template(store, entry: dict) -> dict:
     """Get-or-generate the template for a catalogue entry: Gemini runs only on a cache miss."""
+    if settings.GEMINI_HEAVY_DISABLED:
+        # Demo / unavailable-endpoint mode: serve a pre-generated template if one exists,
+        # otherwise the instant base-template fallback. Never calls Gemini.
+        stored = store.get_doc(TEMPLATES, industries.template_id(entry["id"]))
+        if stored is not None and is_hit(stored):
+            return response(stored, "cache-hit")
+        return response(_fallback_doc(entry), "fallback")
     out = cache_once.ensure_once(
         store, TEMPLATES, industries.template_id(entry["id"]),
         profile=cache_once.TEMPLATE, generate=_generator(entry),

@@ -23,6 +23,18 @@ def _float(name: str, default: float) -> float:
         return default
 
 
+def _bool(name: str, default: bool) -> bool:
+    return os.getenv(name, str(default)).strip().lower() in ("1", "true", "yes", "on")
+
+
+# When true, the three slow/heavy Gemini paths (snag-template generation, grounded spec lookup,
+# grounded sustainability alternatives) skip the model call and serve their instant fallback
+# (base template / curated list). A pre-generated template already in the store is still served
+# as a cache-hit. The core photo/explain/verify Gemini calls are unaffected. Use for demos or
+# when grounding/thinking is unavailable on the configured Vertex endpoint.
+GEMINI_HEAVY_DISABLED = _bool("GEMINI_HEAVY_DISABLED", False)
+
+
 # ---- template generation (provisional until T-MEASURE) ---------------------------------
 TEMPLATE_SCHEMA_VERSION = "t1"
 TEMPLATE_MAX_ATTEMPTS = max(1, min(3, _int("TEMPLATE_MAX_ATTEMPTS", 2)))

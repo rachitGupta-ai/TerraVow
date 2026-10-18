@@ -15,7 +15,7 @@ from datetime import date
 from math import isfinite
 from typing import Dict, List, Optional, Tuple
 
-from . import cache_once, engine, gate, gemini_client, industries, snags
+from . import cache_once, engine, gate, gemini_client, industries, settings, snags
 from .settings import SUPPORTED_COUNTRIES
 
 log = logging.getLogger("terravow.sustain")
@@ -244,6 +244,13 @@ def ai_suggestions(store, entry: dict, country: str) -> Tuple[Optional[dict], st
     """(cached AI document or None, cache_status). Gemini runs only on a cache miss."""
     if country not in SUPPORTED_COUNTRIES:
         return None, "not-requested"
+    if settings.GEMINI_HEAVY_DISABLED:
+        # Demo / unavailable-endpoint mode: use a pre-generated AI doc if present, else the
+        # curated fallback immediately. Never calls Gemini and skips the lease round-trips.
+        doc = store.get_doc(ALTERNATIVES, alternatives_id(entry["id"], country))
+        if doc is not None and doc.get("source") == "ai":
+            return doc, "cache-hit"
+        return None, "fallback"
     out = cache_once.ensure_once(
         store, ALTERNATIVES, alternatives_id(entry["id"], country), profile=cache_once.GROUNDED,
         generate=_alt_generator(entry, country), fallback=lambda: {"source": "curated-fallback"},
