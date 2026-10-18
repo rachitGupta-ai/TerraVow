@@ -7,7 +7,9 @@ set -euo pipefail
 : "${PROJECT_ID:?Set PROJECT_ID, e.g. PROJECT_ID=my-project ./deploy.sh}"
 REGION="${REGION:-asia-south1}"            # Mumbai
 GEMINI_MODEL="${GEMINI_MODEL:-gemini-2.5-flash}"   # confirm availability in Vertex AI Model Garden
-VERTEX_LOCATION="${VERTEX_LOCATION:-global}"       # use us-central1 if your model is not on the global endpoint
+VERTEX_LOCATION="${VERTEX_LOCATION:-us-central1}"  # regional endpoint: Google Search grounding (spec lookup,
+                                                  # sustainability) and thinking (snag templates) are NOT served
+                                                  # on the "global" endpoint, so those calls fall back there.
 SERVICE="terravow"
 
 gcloud config set project "$PROJECT_ID"
