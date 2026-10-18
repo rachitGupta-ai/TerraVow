@@ -3,8 +3,14 @@
 **Enforce. Certify. Track.**
 
 TerraVow is an AI-powered environmental compliance, remediation-advisory, and certification
-platform for manufacturing supply chains, built end-to-end on Google Cloud (Gemini on Vertex AI,
-Vertex AI Agent Engine, BigQuery, Cloud Storage, Cloud Run, Firestore, Pub/Sub).
+platform for manufacturing supply chains, designed for Google Cloud.
+
+> **What actually runs today (the working prototype):** a Python FastAPI app and a Java Spring Boot
+> engine in one container on **Cloud Run**, using **Gemini on Vertex AI** (photo assessment,
+> function-calling explanations, industry templates) and **Firestore** (hash-chained decision record),
+> behind a tested Decision Gate. Vertex AI Agent Engine, BigQuery, Pub/Sub and Vertex AI Search are
+> part of the target design: their Java code runs against in-memory stubs and is **not connected** to
+> the live managed services. See [Honesty about scope](#honesty-about-scope).
 
 This document has two parts:
 

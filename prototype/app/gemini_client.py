@@ -128,6 +128,52 @@ def analyze_condition(machine_ctx: str, notes: str, image: Optional[bytes] = Non
     return HealthState.model_validate_json(_strip_fences(resp.text or ""))
 
 
+# ---------------------------------------------------------------- 1b. after repair
+class AfterAssessment(HealthState):
+    same_component: bool = Field(
+        description="True if the AFTER photo shows the same physical assembly as the BEFORE photo")
+    same_component_confidence: float = Field(ge=0.0, le=1.0, description="Confidence in that judgement")
+    same_component_reason: str = Field(description="One sentence: what matches or what differs")
+
+
+REASSESS_SYSTEM = (
+    "You verify maintenance repairs. You are given a BEFORE photo from the original assessment and an "
+    "AFTER-repair photo. FIRST decide whether both show the SAME physical assembly. Judge identity by the "
+    "larger fixed structure: the housing, bolt and stud positions, ring and collar layout, shaft, and "
+    "camera angle. A repair can clean the part, replace small wear items such as vanes or nozzle tips, "
+    "or refurbish it, and heavy soot in the BEFORE photo can hide the exact shape of small parts, so do "
+    "NOT call it a different component just because small parts look different or cleaner. Set "
+    "same_component to false only if the AFTER photo shows a different type of component or a clearly "
+    "different assembly or housing (for example a filter instead of a burner). THEN assess the condition "
+    "of the component in the AFTER photo, honestly and calibrated, using the same severity scale "
+    "(1 cosmetic, 2 minor, 3 moderate, 4 serious, 5 severe). Never assume a repair worked because the "
+    "notes say so. Return ONLY the structured result."
+)
+
+
+def reassess_after_repair(machine_ctx: str, notes: str, after_image: bytes, after_mime: str,
+                          before_thumb: bytes, prior_summary: str) -> AfterAssessment:
+    client = _client()
+    parts: list = [
+        "BEFORE photo (from the original assessment):",
+        types.Part.from_bytes(data=before_thumb, mime_type="image/jpeg"),
+        "AFTER-repair photo:",
+        types.Part.from_bytes(data=after_image, mime_type=after_mime),
+        f"Machine: {machine_ctx}\nOriginal finding: {prior_summary}\n"
+        f"Notes on what was done:\n{notes.strip() or '(none provided)'}\n\n"
+        "Decide if the AFTER photo shows the same assembly, then assess its condition.",
+    ]
+    resp = client.models.generate_content(
+        model=MODEL, contents=parts,
+        config=types.GenerateContentConfig(
+            system_instruction=REASSESS_SYSTEM, response_mime_type="application/json",
+            response_schema=AfterAssessment, temperature=0.0),
+    )
+    if getattr(resp, "parsed", None) is not None:
+        return resp.parsed  # type: ignore[return-value]
+    return AfterAssessment.model_validate_json(_strip_fences(resp.text or ""))
+
+
 # ---------------------------------------------------------------- 2. explain
 EXPLAIN_SYSTEM = (
     "You explain a maintenance decision for an industrial plant. RULES: (1) You must call "

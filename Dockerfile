@@ -16,7 +16,7 @@ RUN mvn -q -B -DskipTests package \
  && cp target/terravow-*.jar /build/terravow-engine.jar
 
 # ---- Stage 2: runtime with Python 3.12 + a JRE, running both processes ----
-FROM python:3.12-slim AS runtime
+FROM python:3.12-slim-bookworm AS runtime
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
     JAVA_PORT=8081 \
     JAVA_ENGINE_URL=http://127.0.0.1:8081

@@ -234,16 +234,28 @@ def test_fleet_impact_lists_fix_now_machines():
 
 
 def test_verified_improvement_with_photo_is_verified_and_reranks(monkeypatch):
+    """Verification now compares the after photo with the stored original (same-component check)."""
+    import io
+    from PIL import Image
     from app import gemini_client
+
+    def jpeg(c):
+        buf = io.BytesIO(); Image.new("RGB", (80, 60), c).save(buf, "JPEG"); return buf.getvalue()
+
     client.post("/api/demo/reset")
     monkeypatch.setattr(gemini_client, "analyze_condition", _fake(4, 0.9))
     client.post("/api/analyze", data={"machine_id": "B-2", "notes": "soot"},
-                files={"image": ("b.jpg", b"\xff\xd8x", "image/jpeg")})
+                files={"image": ("b.jpg", jpeg((40, 40, 40)), "image/jpeg")})
     rank_before = next(m["rank"] for m in client.get("/api/fleet").json()["machines"] if m["id"] == "B-2")
 
-    monkeypatch.setattr(gemini_client, "analyze_condition", _fake(1, 0.9))
+    def fake_after(ctx, notes, image, mime, before_thumb, prior):
+        return gemini_client.AfterAssessment(
+            component_category="burner", component_name="Burner nozzle", defect="x", severity=1,
+            confidence=0.9, evidence=["e"], uncertainty="u", suggested_inspection="i",
+            same_component=True, same_component_confidence=0.95, same_component_reason="Same housing.")
+    monkeypatch.setattr(gemini_client, "reassess_after_repair", fake_after)
     r = client.post("/api/verify_improvement", data={"machine_id": "B-2", "notes": "nozzle cleaned"},
-                    files={"image": ("a.jpg", b"\xff\xd8y", "image/jpeg")})
+                    files={"image": ("a.jpg", jpeg((200, 200, 200)), "image/jpeg")})
     assert r.status_code == 200, r.text
     d = r.json()
     assert d["status"] == "VERIFIED" and d["gate"]["verdict"] == "ALLOW"

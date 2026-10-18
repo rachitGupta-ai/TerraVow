@@ -1,6 +1,8 @@
 """TerraVow API. Runs on Cloud Run; serves the single-page UI from /static."""
 from __future__ import annotations
 
+import base64
+import io
 import logging
 import os
 from typing import Dict, Optional
@@ -73,7 +75,9 @@ def machine_view(m: engine.Machine, with_curve: bool = True) -> dict:
         "downtime_cost_now": m.downtime_cost_now,
         "downtime_cost_planned": m.downtime_cost_planned,
         "planned_window_day": m.planned_window_day,
-        "health": m.health, "data_trust": round(trust, 2),
+        "health": {k: v for k, v in m.health.items() if k != "ref_image_b64"},
+        "has_baseline_photo": bool(m.health.get("ref_image_b64")),
+        "data_trust": round(trust, 2),
         "footprint": engine.footprint(m, sev),
         "daily_liability_today": sim["daily_liability_today"],
         "downtime_savings_if_wait": sim["downtime_savings_if_wait"],
@@ -88,6 +92,20 @@ def machine_view(m: engine.Machine, with_curve: bool = True) -> dict:
     if with_curve:
         out["curve"] = sim["curve"]
     return out
+
+
+def make_thumb(img_bytes: bytes) -> Optional[str]:
+    """Small JPEG kept with an assessment so a later after-repair photo can be compared against it.
+    Returns base64, or None if the image cannot be decoded."""
+    try:
+        from PIL import Image
+        im = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+        im.thumbnail((640, 640))
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=72)
+        return base64.b64encode(buf.getvalue()).decode("ascii")
+    except Exception:
+        return None
 
 
 def gemini_guard(fn, *a, **kw):
@@ -153,6 +171,8 @@ async def analyze(machine_id: str = Form(...), notes: str = Form(""),
     hs = gemini_guard(gemini_client.analyze_condition, ctx, notes, img_bytes, mime)
     health_doc = hs.model_dump()
     health_doc.update(source="gemini", had_image=bool(img_bytes), model=gemini_client.MODEL)
+    if img_bytes:
+        health_doc["ref_image_b64"] = make_thumb(img_bytes)
     store.save_health(machine_id, health_doc)
 
     view = machine_view(get_machine(machine_id))
@@ -234,8 +254,8 @@ def impact():
 @app.post("/api/verify_improvement")
 async def verify_improvement(machine_id: str = Form(...), notes: str = Form(""),
                              image: Optional[UploadFile] = File(None)):
-    """After a repair: re-assess with Gemini, compare with the earlier assessment, and
-    record a verified-improvement entry only if the evidence supports it.
+    """After a repair: compare an after photo with the original assessment photo, and record a
+    verified improvement only if it is the same assembly AND the evidence supports it.
 
     This is an evidence record, NOT an official certification."""
     m = get_machine(machine_id)
@@ -245,50 +265,89 @@ async def verify_improvement(machine_id: str = Form(...), notes: str = Form(""),
 
     before = dict(m.health)
     before_sev = int(before.get("severity", 1))
+    thumb_b64 = before.get("ref_image_b64")
     ctx = f"{m.name} ({m.kind}), fuel: {m.fuel}. This is a re-inspection AFTER a repair."
-    hs = gemini_guard(gemini_client.analyze_condition, ctx, notes, img_bytes, mime)
-    after = hs.model_dump()
+
+    comp = {"same": None, "confidence": None, "reason": None}
+    if img_bytes and thumb_b64:
+        prior = f"{before.get('component_name')} ({before.get('component_category')}): {before.get('defect')}"
+        ra = gemini_guard(gemini_client.reassess_after_repair, ctx, notes, img_bytes, mime,
+                          base64.b64decode(thumb_b64), prior)
+        hs = ra
+        comp = {"same": ra.same_component, "confidence": ra.same_component_confidence,
+                "reason": ra.same_component_reason}
+    else:
+        hs = gemini_guard(gemini_client.analyze_condition, ctx, notes, img_bytes, mime)
+
+    after = {k: v for k, v in hs.model_dump().items() if k in gemini_client.HealthState.model_fields}
     after.update(source="gemini", had_image=bool(img_bytes), model=gemini_client.MODEL)
 
     imp = engine.improvement(m, before_sev, hs.severity)
-    conf = min(float(before.get("confidence", 0.0)), hs.confidence)
+    conf = min(float(before.get("confidence", 0.0)), hs.confidence,
+               comp["confidence"] if comp["confidence"] is not None else 1.0)
     trust = data_trust(after)
     drop = before_sev - hs.severity
 
-    if drop <= 0:
-        gate_res = {"verdict": "BLOCK", "rule": "no_improvement", "confidence": conf, "data_trust": trust,
-                    "reason": "The new assessment does not show a lower severity, so nothing is verified."}
+    def res(verdict, rule, reason):
+        return {"verdict": verdict, "rule": rule, "reason": reason, "confidence": conf, "data_trust": trust}
+
+    # Order matters: identity first, then improvement, then evidence quality, then the gate.
+    if comp["same"] is False:
+        gate_res = res("BLOCK", "different_component",
+                       ("The after-repair photo does not show the same component as the original "
+                        f"assessment. {comp['reason'] or ''}").strip())
         status = "NOT_VERIFIED"
+    elif drop <= 0:
+        gate_res = res("BLOCK", "no_improvement",
+                       "The new assessment does not show a lower severity, so nothing is verified.")
+        status = "NOT_VERIFIED"
+    elif not img_bytes:
+        gate_res = res("ASK", "photo_required",
+                       "Notes alone cannot verify an improvement. Add an after-repair photo, "
+                       "or have a person confirm.")
+        status = "NEEDS_REVIEW"
+    elif comp["same"] is None:
+        gate_res = res("ASK", "no_baseline_photo",
+                       "There is no original photo on record to compare against, so a person must "
+                       "confirm this is the same component. Run an assessment with a photo first.")
+        status = "NEEDS_REVIEW"
+    elif comp["confidence"] < 0.7:
+        gate_res = res("ASK", "component_unclear",
+                       ("It is not clear that this is the same component as before, so a person "
+                        f"must confirm. {comp['reason'] or ''}").strip())
+        status = "NEEDS_REVIEW"
     else:
         gate_res = gate.evaluate({"air": -imp["avoided_co2_kg_horizon"], "water": 0.0}, conf, trust)
         status = {"ALLOW": "VERIFIED", "ASK": "NEEDS_REVIEW", "BLOCK": "NOT_VERIFIED"}[gate_res["verdict"]]
-        # Anti-gaming rule: a claim of "we fixed it" in text alone never verifies an improvement.
-        if status == "VERIFIED" and not img_bytes:
-            status = "NEEDS_REVIEW"
-            gate_res = {**gate_res, "verdict": "ASK", "rule": "photo_required",
-                        "reason": "Notes alone cannot verify an improvement. Add an after-repair photo, "
-                                  "or have a person confirm."}
 
     if status == "VERIFIED":
-        store.save_health(machine_id, {**after, "verified": True})
+        store.save_health(machine_id, {**after, "verified": True, "ref_image_b64": make_thumb(img_bytes)})
 
     mode_txt = "photo+notes" if img_bytes else "notes only"
+    t_co2 = imp["avoided_co2_kg_horizon"] / 1000
+    if status == "VERIFIED":
+        summary = (f"Verified: severity {before_sev} to {hs.severity} ({mode_txt}); avoids about "
+                   f"{t_co2:.1f} t CO2 over {imp['horizon_days']} days. {gate_res['reason']}")
+    elif status == "NEEDS_REVIEW":
+        summary = (f"Needs review: severity {before_sev} to {hs.severity} ({mode_txt}); would avoid about "
+                   f"{t_co2:.1f} t CO2 if confirmed. {gate_res['reason']}")
+    else:
+        summary = f"Not verified: {gate_res['reason']}"
+
     audit = store.add_audit({
         "kind": "verified_improvement", "machine_id": machine_id, "machine": m.name,
-        "status": status,
-        "summary": f"{status.replace('_', ' ').title()}: severity {before_sev} to {hs.severity} "
-                   f"({mode_txt}); avoids about {imp['avoided_co2_kg_horizon'] / 1000:.1f} t CO2 over "
-                   f"{imp['horizon_days']} days. {gate_res['reason']}",
+        "status": status, "summary": summary,
         "verdict": gate_res["verdict"], "rule": gate_res["rule"],
         "before_severity": before_sev, "after_severity": hs.severity,
         "baseline_source": before.get("source", "seeded"),
-        "avoided_co2_kg_horizon": imp["avoided_co2_kg_horizon"],
-        "avoided_cost_horizon": imp["avoided_cost_horizon"],
+        "same_component": comp["same"],
+        "avoided_co2_kg_horizon": imp["avoided_co2_kg_horizon"] if status == "VERIFIED" else 0.0,
+        "avoided_cost_horizon": imp["avoided_cost_horizon"] if status == "VERIFIED" else 0.0,
         "confidence": conf, "data_trust": round(trust, 2), "model": gemini_client.MODEL,
     })
-    return {"status": status, "gate": gate_res, "improvement": imp,
-            "before": before, "after": after, "audit": audit,
-            "machine": machine_view(get_machine(machine_id))}
+    return {"status": status, "gate": gate_res, "improvement": imp, "component_check": comp,
+            "before": {k: v for k, v in before.items() if k != "ref_image_b64"},
+            "after": after, "audit": audit, "machine": machine_view(get_machine(machine_id))}
 
 
 @app.get("/api/improvements")

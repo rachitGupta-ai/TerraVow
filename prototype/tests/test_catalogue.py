@@ -78,6 +78,6 @@ def test_fleet_unchanged_apart_from_added_fields():
                  "downtime_cost_now", "downtime_cost_planned", "planned_window_day", "health", "data_trust",
                  "footprint", "daily_liability_today", "downtime_savings_if_wait", "waiting_cost_at_window",
                  "break_even_day", "recommendation", "options", "assumptions", "formula", "rank"}
-    added = {"industry", "manufacturer", "model", "install_year", "catalogue_id"}
+    added = {"industry", "manufacturer", "model", "install_year", "catalogue_id", "has_baseline_photo"}
     for r in rows:
         assert set(r) == base_keys | added

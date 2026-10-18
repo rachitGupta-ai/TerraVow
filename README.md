@@ -3,8 +3,14 @@
 **Enforce. Certify. Track.**
 
 TerraVow is an AI-powered environmental compliance, remediation-advisory, and certification
-platform for manufacturing supply chains, built end-to-end on Google Cloud (Gemini on Vertex AI,
-Vertex AI Agent Engine, BigQuery, Cloud Storage, Cloud Run, Firestore, Pub/Sub).
+platform for manufacturing supply chains, designed for Google Cloud.
+
+> **What actually runs today (the working prototype):** a Python FastAPI app and a Java Spring Boot
+> engine in one container on **Cloud Run**, using **Gemini on Vertex AI** (photo assessment,
+> function-calling explanations, industry templates) and **Firestore** (hash-chained decision record),
+> behind a tested Decision Gate. Vertex AI Agent Engine, BigQuery, Pub/Sub and Vertex AI Search are
+> part of the target design: their Java code runs against in-memory stubs and is **not connected** to
+> the live managed services. See [Honesty about scope](#honesty-about-scope).
 
 This README covers both the product story and the architecture:
 
@@ -152,6 +158,10 @@ well-evidenced — the accountable human or regulator still makes the call.
    degrades gracefully by lowering confidence, never by failing silently or guessing.
 
 ## System architecture
+
+> **Target architecture (the full design).** In the working prototype only Gemini on Vertex AI, Firestore and
+> Cloud Run are live. Components that call Pub/Sub, BigQuery, Vertex AI Search or Agent Engine are specified and
+> have Java domain logic, but run against in-memory stubs.
 
 ```mermaid
 graph TB
@@ -392,19 +402,21 @@ Each property is a universal statement like "EID attribution is additive," "a ve
 | Substitution Dossier, Economics Engine, Embedded Pollution Passport | ✅ Implemented (Java) |
 | Trajectory Certification | ✅ Implemented (Java) |
 | Emissions-Aware Maintenance Lifecycle | ✅ Implemented (Java) |
-| Reasoning_Agent Orchestrator (schema-validate → retry → escalate, Vertex AI Agent Engine + ADK) | ✅ Implemented (Java) |
-| Two-tier Gemini routing (Pro / Flash), Gemini function calling (verified tools) | ✅ Implemented (Java) |
-| Grounding with Vertex AI Search + BigQuery vector search | ✅ Implemented (Java) |
+| Reasoning_Agent Orchestrator (schema-validate → retry → escalate, Vertex AI Agent Engine + ADK) | 🟡 Java logic and port implemented; Agent Engine adapter is a stub, not connected |
+| Two-tier Gemini routing (Pro / Flash), Gemini function calling (verified tools) | 🟡 Routing logic in Java; live Gemini calls, including function calling, run in the Python prototype |
+| Grounding with Vertex AI Search + BigQuery vector search | 🟡 Java logic over an in-memory corpus; Vertex AI Search and BigQuery are not connected |
 | PII/confidentiality masking, synthetic data | ✅ Implemented (Java) |
-| Pub/Sub + BigQuery continuous queries (event-driven triage) | ✅ Implemented (Java) |
-| Storage split (BigQuery / Cloud Storage / Firestore) | ✅ Implemented (Java) |
+| Pub/Sub + BigQuery continuous queries (event-driven triage) | 🟡 Java logic over in-memory ports; Pub/Sub and BigQuery are not connected |
+| Storage split (BigQuery / Cloud Storage / Firestore) | 🟡 Java logic over in-memory stores; live Firestore is used by the Python prototype |
 | Graceful degradation (all managed paths) | ✅ Implemented (Java) |
 | **Python prototype:** industry templates, snag workflow, health/lifespan engine, sustainability alternatives + India incentives | ✅ Implemented (Python FastAPI, Requirements 18–30) |
 | **Integrity_Gate (Req 16):** source-auth, calibration/health, replay/freshness, authorized-actor, corroboration → Data_Trust_Score | 📋 Specified, not implemented (Java scaffolding present, wiring incomplete) |
 | **Detection hardening (Req 17):** Baseline_Plausibility_Check, Independent_Verification_Source, Trust_Weighted_Profile, Anchored_Hash_Root | 📋 Specified, not implemented |
 | **Public registry / certification publication (Req 9.5)** | 📋 Specified only (Java service exists; public registry endpoint not wired) |
 
-Figures used in economics-engine examples (Environmental Compensation formula shape, PAT/ESCerts, Income Tax Act Section 32) are retrieved-and-cited at runtime against a real regulatory corpus — the platform is designed to never state a regulatory figure it cannot cite back to a primary source.
+**How to read the table:** ✅ means the domain logic and tests exist. The Java engine has no Google Cloud client libraries and uses in-memory or stub adapters (for example `InMemoryPubSubPort` and `StubAgentEnginePort`). The only live Google Cloud services in the prototype are Gemini on Vertex AI, Firestore and Cloud Run.
+
+Regulatory figures: the design is to cite every regulatory figure back to a primary source. In the prototype the regulatory excerpts are short summaries, some still placeholders, and must be verified against primary sources. Two references have changed: the Income Tax Act 1961 (including Section 32) was replaced by the Income-tax Act 2025 from 1 April 2026, and India's PAT scheme is being transitioned into the Carbon Credit Trading Scheme.
 
 The Python prototype (`prototype/`) implements Requirements 18–30 (industry-specific machine templates generated by **Gemini 2.5 Flash** with Google Search grounding, snag workflow, health/lifespan engine, and sustainability alternatives with India incentive schemes). See [`prototype/README.md`](prototype/README.md) and [`docs/competitive-landscape.md`](docs/competitive-landscape.md) for details.
 
